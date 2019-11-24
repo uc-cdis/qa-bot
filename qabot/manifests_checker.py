@@ -42,8 +42,10 @@ class ManifestsChecker():
 
     diff = set(sorted(signed_off_versions.items())) - set(sorted(pr_manifest_versions.items()))
     diff_dict = dict(diff)
-    # convert set back to dictionary
-    return f"""
+    if len(diff_dict.keys()) == 0:
+      return ':white_check_mark: The `manifest.json` from <https://github.com/uc-cdis/cdis-manifest/pull/{0}/files|PR #{0}> and the one from <https://github.com/uc-cdis/cdis-manifest/blob/master/{1}/manifest.json|{1}> contain the same versions.'.format(pr_to_be_verified, signed_off_env_host)
+    else:
+      return f"""
 The following discrepancies have been identified:
 ```
 {dict(sorted(diff_dict.items()))}
