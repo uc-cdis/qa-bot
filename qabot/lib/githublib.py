@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 class GithubLib():
-  def __init__(self, org='uc-cdis', repo='cdis-manifest', token=os.environ['GITHUB_TOKEN']):
+  def __init__(self, org='uc-cdis', repo='cdis-manifest', token=os.environ['GITHUB_TOKEN'].strip()):
     """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
     """
