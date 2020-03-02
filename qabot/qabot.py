@@ -18,6 +18,11 @@ commands_map = {
     'example': '@qa-bot compare-manifests 928 internalstaging.datastage.io',
     'call': ManifestsChecker().compare_manifests
   },
+  'whereis': {
+    'args': 'release version',
+    'example': '@qa-bot whereis 2020.02',
+    'call': ManifestsChecker().whereis_release
+  },
   'hello': {
     'args': '',
     'example': '@qa-bot hello',

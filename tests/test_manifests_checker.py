@@ -1,5 +1,6 @@
 from httmock import urlmatch, HTTMock
 import unittest
+import os
 from unittest.mock import Mock, patch
 from pprint import pprint
 
@@ -34,6 +35,26 @@ class ManifestsCheckerTestCase(unittest.TestCase):
              }
            }
 
+  @urlmatch(netloc=r'(.*\.)?raw\.githubusercontent\.com$', path=r'.*theanvil.*$')
+  def manifest_with_release_mock(self, url, request):
+    return { 'status_code': 200,
+             'content': {
+               'versions': {
+                 'fence': 'quay.io/cdis/fence:2020.02'
+               }
+             }
+           }
+
+  @urlmatch(netloc=r'(.*\.)?raw\.githubusercontent\.com$', path=r'.*')
+  def manifest_without_release_mock(self, url, request):
+    return { 'status_code': 200,
+             'content': {
+               'versions': {
+                 'fence': 'quay.io/cdis/fence:4.15.0'
+               }
+             }
+           }
+
   def setUp(self):
     # create a mock GithubLib object
     githublibMock = Mock(name='GithubLibMock', return_value=(Mock()))
@@ -50,14 +71,21 @@ class ManifestsCheckerTestCase(unittest.TestCase):
     def get_githublib(self):
       return githublibMock
 
+    # mock _get_directories_from_repo function to return arbitrary list of dirs
+    def _get_directories_from_repo(self, repo, ttl_hash=None):
+      return ['gen3.datacommons.io', 'gen3.theanvil.io', 'genomel.bionimbus.org', 'internalstaging.theanvil.io']
+
     self.patch1 = patch.object(ManifestsChecker, 'get_githublib', get_githublib)
+    self.patch2 = patch.object(ManifestsChecker, '_get_directories_from_repo', _get_directories_from_repo)
     self.patch1.start()
+    self.patch2.start()
 
     # initialize the ManifestsChecker instance
     self.manifests_checker = ManifestsChecker()
 
   def tearDown(self):
     self.patch1.stop()
+    self.patch2.stop()
 
   def test_compare_manifests(self):
     with HTTMock(self.pr_manifest_mock, self.signed_off_manifest_mock):
@@ -67,6 +95,16 @@ class ManifestsCheckerTestCase(unittest.TestCase):
         "\nThe following discrepancies have been identified:\n```\n{'fence': 'quay.io/cdis/fence:2.8.2', 'sheepdog': 'quay.io/cdis/sheepdog:1.1.10'}\n```\n", 
         result,
         'Must show discrepancies between versions from both manifests')
+
+  def test_whereis_release(self):
+    with HTTMock(self.manifest_with_release_mock, self.manifest_without_release_mock):
+      result = self.manifests_checker.whereis_release('2020.02')
+      # must show a list of environments where the gen3 core release version 2020.02 is deployed
+      self.assertEqual(
+        "\nThe following environments are running version [2020.02]:\n```\ngen3.theanvil.io\ninternalstaging.theanvil.io\n```\n This represents a *50.0%* adoption",
+        result,
+        'Must show list of environments running a specific gen3 release')
+
 
 if __name__ == '__main__':
   unittest.main() 
