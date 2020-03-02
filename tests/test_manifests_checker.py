@@ -101,7 +101,7 @@ class ManifestsCheckerTestCase(unittest.TestCase):
       result = self.manifests_checker.whereis_release('2020.02')
       # must show a list of environments where the gen3 core release version 2020.02 is deployed
       self.assertEqual(
-        "\nThe following environments are running version [2020.02]:\n```\ngen3.theanvil.io\ninternalstaging.theanvil.io\n```\n This represents a *50.0%* adoption",
+        "\nThe following environments are running version [2020.02]:\n```\ngen3.theanvil.io\ninternalstaging.theanvil.io\n```\n This represents a *50.0%* adoption across *4* environments.",
         result,
         'Must show list of environments running a specific gen3 release')
 

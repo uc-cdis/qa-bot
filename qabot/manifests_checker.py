@@ -71,7 +71,7 @@ class ManifestsChecker():
     log.debug('percentage of envs with release version: {}'.format(release_adoption))
     bot_response =  "\nThe following environments are running version [{}]:\n".format(release_version)
     bot_response += list_of_environments
-    bot_response += "```\n This represents a *{}%* adoption".format(release_adoption)
+    bot_response += "```\n This represents a *{}%* adoption across *{}* environments.".format(release_adoption, environments_count)
     return bot_response
 
 
