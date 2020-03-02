@@ -1,5 +1,6 @@
 from httmock import urlmatch, HTTMock
 import unittest
+import os
 from unittest.mock import Mock, patch
 from pprint import pprint
 
@@ -55,6 +56,8 @@ class ManifestsCheckerTestCase(unittest.TestCase):
            }
 
   def setUp(self):
+    # set mock github token
+    os.environ["GITHUB_TOKEN"] = "MEH-123"
     # create a mock GithubLib object
     githublibMock = Mock(name='GithubLibMock', return_value=(Mock()))
     # create a mock HttpLib object
