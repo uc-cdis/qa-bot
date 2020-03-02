@@ -1,5 +1,7 @@
 from lib.githublib import GithubLib
 from lib.httplib import HttpLib
+from functools import lru_cache
+import time
 import logging
 import re
 from pprint import pprint
@@ -23,6 +25,55 @@ class ManifestsChecker():
 
   def get_httplib(self):
     return HttpLib()
+
+  def _get_ttl_hash(self, seconds=300):
+    """To facilitate caching: Return the same value withing `seconds` time period"""
+    return round(time.time() / seconds)
+
+  @lru_cache()
+  def _get_directories_from_repo(self, repo, ttl_hash=None):
+    del ttl_hash
+    github_client = GithubLib(repo=repo).get_github_client()
+    contents_from_repo = github_client.get_contents('/')
+    directories = []
+    for file in contents_from_repo:
+      if file.type == 'dir':
+        log.debug('file: {}'.format(file.name))
+        directories.append(file.name)
+    return directories
+
+
+  def whereis_release(self, release_version):
+    """
+    Crawl through all the manifests in cdis-manifest & gitops-qa to check which environments are running a given Gen3 Core Release version
+    """
+    # repos_with_manifests = ['cdis-manifest', 'gitops-qa']
+    repos_with_manifests = ['cdis-manifest']
+    to_be_ignored = ['releases', 'login.bionimbus.org']
+    list_of_environments = "```\n"
+    environments_count = 0
+
+    for repo in repos_with_manifests:
+      directories = self._get_directories_from_repo(repo, self._get_ttl_hash())
+      for env in directories:
+        if env not in to_be_ignored:
+          environments_count += 1
+          manifest_url = 'https://raw.githubusercontent.com/uc-cdis/{}/master/{}/manifest.json'.format(repo, env)
+          versions_block = self.httplib.fetch_json(manifest_url)['versions']
+          the_version = versions_block['fence'] if 'fence' in versions_block.keys() else versions_block['indexd']
+          log.debug('repo: {} - env: {} - version: {}'.format(repo, env, the_version))
+          match = re.search('.*\:(.*)$', the_version)
+          if match.group(1) == release_version:
+            log.debug('found it!: {}'.format(env))
+            list_of_environments += env + "\n"
+    num_of_envs_with_release = len(list_of_environments.split('\n'))-2
+    release_adoption = round((num_of_envs_with_release / environments_count) * 100, 2)
+    log.debug('percentage of envs with release version: {}'.format(release_adoption))
+    bot_response =  "\nThe following environments are running version [{}]:\n".format(release_version)
+    bot_response += list_of_environments
+    bot_response += "```\n This represents a *{}%* adoption".format(release_adoption)
+    return bot_response
+
 
   def compare_manifests(self, pr_to_be_verified, signed_off_env):
     """
@@ -52,9 +103,10 @@ The following discrepancies have been identified:
 ```
 """
 
-#if __name__ == '__main__':
-#  mc = ManifestsChecker()
+if __name__ == '__main__':
+  mc = ManifestsChecker()
 #  #diff = mc.compare_manifests(928, 'internalstaging.datastage.io')
 #  diff = mc.compare_manifests(928, 'data.kidsfirstdrc.org')
 #  print('diff: ')
 #  pprint(diff)
+  print(mc.whereis_release('2020.02'))

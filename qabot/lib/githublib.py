@@ -1,11 +1,12 @@
 from github import Github
 import logging
+import os
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
 
 class GithubLib():
-  def __init__(self, org='uc-cdis', repo='cdis-manifest', token=None):
+  def __init__(self, org='uc-cdis', repo='cdis-manifest', token=os.environ['GITHUB_TOKEN']):
     """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
     """
@@ -17,7 +18,7 @@ class GithubLib():
     """
      return a github client object that can instrument a given repo
     """
-    g = Github(token) if self.token else Github()
+    g = Github(self.token)
     org = g.get_organization(self.org)
     repo = org.get_repo(self.repo)
     return repo
