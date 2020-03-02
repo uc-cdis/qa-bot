@@ -6,5 +6,6 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script:
+- export GITHUB_TOKEN="MEH-123"
 - cd qabot
 - python -m unittest discover ../tests

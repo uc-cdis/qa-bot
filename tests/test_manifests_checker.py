@@ -56,8 +56,6 @@ class ManifestsCheckerTestCase(unittest.TestCase):
            }
 
   def setUp(self):
-    # set mock github token
-    os.environ["GITHUB_TOKEN"] = "MEH-123"
     # create a mock GithubLib object
     githublibMock = Mock(name='GithubLibMock', return_value=(Mock()))
     # create a mock HttpLib object
