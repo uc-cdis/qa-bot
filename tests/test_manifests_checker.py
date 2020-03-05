@@ -40,7 +40,8 @@ class ManifestsCheckerTestCase(unittest.TestCase):
     return { 'status_code': 200,
              'content': {
                'versions': {
-                 'fence': 'quay.io/cdis/fence:2020.02'
+                 'indexd': 'quay.io/cdis/indexd:2020.02',
+                 'revproxy': 'quay.io/cdis/nginx:1.17.6-ctds-1.0.1'
                }
              }
            }
@@ -50,7 +51,9 @@ class ManifestsCheckerTestCase(unittest.TestCase):
     return { 'status_code': 200,
              'content': {
                'versions': {
-                 'fence': 'quay.io/cdis/fence:4.15.0'
+                 'fence': 'quay.io/cdis/fence:4.15.0',
+                 'indexd': 'quay.io/cdis/indexd:2.6.1',
+                 'revproxy': 'quay.io/cdis/nginx:1.17.6-ctds-1.0.1'
                }
              }
            }
@@ -96,14 +99,21 @@ class ManifestsCheckerTestCase(unittest.TestCase):
         result,
         'Must show discrepancies between versions from both manifests')
 
-  def test_whereis_release(self):
+  def test_whereis_version(self):
     with HTTMock(self.manifest_with_release_mock, self.manifest_without_release_mock):
-      result = self.manifests_checker.whereis_release('2020.02')
+      result = self.manifests_checker.whereis_version('release', '2020.02')
       # must show a list of environments where the gen3 core release version 2020.02 is deployed
       self.assertEqual(
-        "\nThe following environments are running version [2020.02]:\n```\ngen3.theanvil.io\ninternalstaging.theanvil.io\n```\n This represents a *50.0%* adoption across *4* environments.",
+        "\nThe following environments are running [release:2020.02]:\n```\ngen3.theanvil.io\ninternalstaging.theanvil.io\n```\n This represents a *50.0%* adoption across *4* environments.",
         result,
         'Must show list of environments running a specific gen3 release')
+
+      result2 = self.manifests_checker.whereis_version('revproxy', '1.17.6-ctds-1.0.1')
+      # must show a list of environments where revproxy:1.17.6-ctds-1.0.1 is deployed
+      self.assertEqual(
+      "\nThe following environments are running [revproxy:1.17.6-ctds-1.0.1]:\n```\ngen3.datacommons.io\ngen3.theanvil.io\ngenomel.bionimbus.org\ninternalstaging.theanvil.io\n```\n This represents a *100.0%* adoption across *4* environments.",
+        result2,
+        'Must show list of environments running that specific fence version')
 
 
 if __name__ == '__main__':

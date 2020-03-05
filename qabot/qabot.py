@@ -21,7 +21,7 @@ commands_map = {
   'whereis': {
     'args': 'release version',
     'example': '@qa-bot whereis 2020.02',
-    'call': ManifestsChecker().whereis_release
+    'call': ManifestsChecker().whereis_version
   },
   'hello': {
     'args': '',
