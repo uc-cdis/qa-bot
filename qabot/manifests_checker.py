@@ -49,7 +49,7 @@ class ManifestsChecker():
     """
     # repos_with_manifests = ['cdis-manifest', 'gitops-qa']
     repos_with_manifests = ['cdis-manifest']
-    to_be_ignored = ['releases', 'login.bionimbus.org']
+    to_be_ignored = ['.githooks', 'releases', 'login.bionimbus.org']
     list_of_environments = "```\n"
     environments_count = 0
 
