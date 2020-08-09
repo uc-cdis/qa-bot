@@ -37,7 +37,7 @@ commands_map = {
         "call": JenkinsJobInvoker().get_status_of_job,
     },
     "run-jenkins-job": {
-        "args": "",
+        "args": "job name, jenkins instance and parameters",
         "example": '@qa-bot run-jenkins-job self-service-qa-gen3-roll jenkins2 { "SERVICE_NAME": "all", "TARGET_ENVIRONMENT": "ci-env-1" }',
         "call": JenkinsJobInvoker().invoke_jenkins_job,
     },
