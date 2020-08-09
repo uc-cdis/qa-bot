@@ -8,9 +8,7 @@ log = logging.getLogger(__name__)
 
 
 class JenkinsJobInvoker:
-    def run_test_on_environment(
-        self, job_name, jenkins_instance, target_environment, test_suite
-    ):
+    def run_test_on_environment(self, jenkins_instance, target_environment, test_suite):
         """
         Prepares a py request with url and basic auth based on details provided by the user
         """
