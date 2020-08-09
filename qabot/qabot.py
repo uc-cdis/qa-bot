@@ -2,6 +2,7 @@ import os
 import slack
 import logging
 
+from jenkins_job_invoker import JenkinsJobInvoker
 from manifests_checker import ManifestsChecker
 from greeter import Greeter
 

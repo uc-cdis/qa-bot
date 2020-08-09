@@ -12,8 +12,8 @@ class JenkinsJobInvoker:
         self, job_name, jenkins_instance, target_environment, test_suite
     ):
         """
-     Prepares a py request with url and basic auth based on details provided by the user
-    """
+        Prepares a py request with url and basic auth based on details provided by the user
+        """
         params_str = '{{ "TARGET_ENVIRONMENT": "{}", "TEST_SUITE": "{}" }}'.format(
             target_environment, test_suite
         )
@@ -24,8 +24,8 @@ class JenkinsJobInvoker:
 
     def invoke_jenkins_job(self, job_name, jenkins_instance, params_str=""):
         """
-     Invoke any job
-    """
+        Invoke any job
+        """
         params = json.loads(params_str)
         jl = JenkinsLib()
         err, id_of_triggered_job = jl.prepare_request_and_invoke(
@@ -40,6 +40,12 @@ class JenkinsJobInvoker:
         else:
             bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
         return bot_response
+
+    def get_status_of_job(self, job_name, job_id, jenkins_instance):
+        """
+        Return status of a given job based on its id
+        """
+        return "not implemented yet"
 
 
 if __name__ == "__main__":
