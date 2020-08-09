@@ -3,3 +3,4 @@ dist/
 *.egg-info/
 qabot/__pycache__/
 qabot/lib/__pycache__
+tests/__pycache__/
