@@ -18,6 +18,11 @@ class JenkinsLib:
         """
      Prepares a py request with url and basic auth based on details provided by the user
     """
+        log.info(
+            "Invoking job {} from {} with params {}".format(
+                job_name, jenkins_instance, params
+            )
+        )
         build_url_path = "buildWithParameters" if bool(params) else "build"
         the_url = "{}/{}/{}?token={}".format(
             self.base_url.replace("JENKINS_INSTANCE", jenkins_instance),
@@ -49,11 +54,6 @@ class JenkinsLib:
 
     def prepare_request_and_invoke(self, job_name, jenkins_instance, params={}):
         # convert list of params into dictionary
-        log.info(
-            "Invoking job {} from {} with params {}".format(
-                job_name, jenkins_instance, params
-            )
-        )
         pr = self.prepare_remote_build_request(job_name, jenkins_instance, params)
         err, resp = self.invoke_job(pr)
         if resp.status_code == 201:
