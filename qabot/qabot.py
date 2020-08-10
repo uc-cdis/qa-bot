@@ -57,7 +57,7 @@ def process_command(command, args):
             args[entered_json_block_at_index] += " " + args[i]
 
         args = args[: entered_json_block_at_index + 1]
-        log.debugo("args: {}".format(args))
+        log.debug("args: {}".format(args))
 
     # execute command
     if command in commands_map.keys():
