@@ -56,6 +56,7 @@ def process_command(command, args):
         if entered_json_block_at_index:
             args[entered_json_block_at_index] += " " + args[i]
 
+    if entered_json_block_at_index:
         args = args[: entered_json_block_at_index + 1]
         log.debug("args: {}".format(args))
 
