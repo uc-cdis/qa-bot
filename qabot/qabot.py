@@ -46,6 +46,19 @@ commands_map = {
 
 
 def process_command(command, args):
+    # process args to handle whitespaces inside json blocks
+    entered_json_block_at_index = None
+    for i, a in enumerate(args):
+        if "{" in a and "}" not in a:
+            # print('Entered an incomplete JSON block. We have whitespaces in one of the json values')
+            entered_json_block_at_index = i
+            continue
+        if entered_json_block_at_index:
+            args[entered_json_block_at_index] += " " + args[i]
+
+        args = args[: entered_json_block_at_index + 1]
+        log.debugo("args: {}".format(args))
+
     # execute command
     if command in commands_map.keys():
         log.info("args: " + str(args))
