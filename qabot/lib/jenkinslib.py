@@ -37,6 +37,7 @@ class JenkinsLib:
         )
         for pk, pv in params.items():
             if "http" in pk:
+                log.warn("url found, stripping off characters added by slack...")
                 pv = re.search("http[s]?:\/\/(.*)\|.*", pv)[1]
             the_url += "&{}={}".format(pk, pv)
         req = requests.Request(
