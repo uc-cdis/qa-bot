@@ -36,7 +36,7 @@ class JenkinsLib:
             os.environ["JENKINS_JOB_TOKEN"].strip(),
         )
         for pk, pv in params.items():
-            if "http" in pk:
+            if "http" in pv:
                 log.warn("url found, stripping off characters added by slack...")
                 pv = re.search("http[s]?:\/\/(.*)\|.*", pv)[1]
             the_url += "&{}={}".format(pk, pv)
