@@ -12,6 +12,7 @@ class JenkinsLib:
         """
         Invokes a Jenkins job
         """
+        self.jenkins_instance = jenkins_instance
         self.base_url = "https://{}.planx-pla.net/job".format(jenkins_instance)
         self.jenkins_user_api_token = os.environ[
             "{}_USER_API_TOKEN".format(jenkins_instance.upper())
