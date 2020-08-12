@@ -56,7 +56,7 @@ class JenkinsLib:
 
     def prepare_request_and_invoke(self, job_name, params={}):
         # convert list of params into dictionary
-        pr = self.prepare_remote_build_request(job_name, self.jenkins_instance, params)
+        pr = self.prepare_remote_build_request(job_name, params)
         err, resp = self.invoke_job(pr)
         if resp.status_code == 201:
             metadata_url = "{}/{}/lastBuild/api/json".format(self.base_url, job_name,)
