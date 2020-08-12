@@ -25,10 +25,8 @@ class JenkinsJobInvoker:
         Invoke any job
         """
         params = json.loads(params_str)
-        jl = JenkinsLib()
-        err, id_of_triggered_job = jl.prepare_request_and_invoke(
-            job_name, jenkins_instance, params
-        )
+        jl = JenkinsLib(jenkins_instance)
+        err, id_of_triggered_job = jl.prepare_request_and_invoke(job_name, params)
         if err == None:
             bot_response = "The job has been triggered, here's its URL: \n  {}".format(
                 "https://{}.planx-pla.net/job/{}/{}/console".format(

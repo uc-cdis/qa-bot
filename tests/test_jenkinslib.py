@@ -8,12 +8,11 @@ class JenkinsLibTestCase(unittest.TestCase):
 
     def setUp(self):
         # initialize the JenkinsLib instance
-        self.jenkins_lib = JenkinsLib()
+        self.jenkins_lib = JenkinsLib("jenkins2")
 
     def test_invoke_jenkins_job(self):
         result = self.jenkins_lib.prepare_remote_build_request(
             "run-tests-on-environment",
-            "jenkins2",
             {
                 "TARGET_ENVIRONMENT": "ci-env-1",
                 "TEST_SUITE": "test-portal-homepageTest",
