@@ -8,13 +8,11 @@ log = logging.getLogger(__name__)
 
 
 class JenkinsLib:
-    def __init__(
-        self, jenkins_instance, base_url="https://JENKINS_INSTANCE.planx-pla.net/job"
-    ):
+    def __init__(self, jenkins_instance):
         """
         Invokes a Jenkins job
         """
-        self.base_url = base_url.replace("JENKINS_INSTANCE", jenkins_instance)
+        self.base_url = "https://{}.planx-pla.net/job".format(jenkins_instance)
         self.jenkins_user_api_token = os.environ[
             "{}_USER_API_TOKEN".format(jenkins_instance.upper())
         ].strip()
