@@ -23,7 +23,7 @@ class JenkinsLib:
         """
         log.info(
             "Invoking job {} from {} with params {}".format(
-                job_name, jenkins_instance, params
+                job_name, self.jenkins_instance, params
             )
         )
         build_url_path = "buildWithParameters" if bool(params) else "build"
@@ -53,9 +53,9 @@ class JenkinsLib:
             return err, None
         return None, resp
 
-    def prepare_request_and_invoke(self, job_name, jenkins_instance, params={}):
+    def prepare_request_and_invoke(self, job_name, params={}):
         # convert list of params into dictionary
-        pr = self.prepare_remote_build_request(job_name, jenkins_instance, params)
+        pr = self.prepare_remote_build_request(job_name, self.jenkins_instance, params)
         err, resp = self.invoke_job(pr)
         if resp.status_code == 201:
             metadata_url = "{}/{}/lastBuild/api/json".format(self.base_url, job_name,)
@@ -74,7 +74,7 @@ class JenkinsLib:
             print("Job could not be invoked.")
             return err, None
 
-    def get_status_of_job(self, job_name, job_id, jenkins_instance):
+    def get_status_of_job(self, job_name, job_id):
         job_metadata = requests.get(
             "{}/{}/{}/api/json".format(self.base_url, job_name, job_id,),
             auth=("themarcelor", self.jenkins_user_api_token),
