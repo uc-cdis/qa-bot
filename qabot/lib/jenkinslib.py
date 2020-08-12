@@ -1,6 +1,7 @@
 import requests
 from requests import Session, Request
 import os
+import re
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -35,6 +36,8 @@ class JenkinsLib:
             os.environ["JENKINS_JOB_TOKEN"].strip(),
         )
         for pk, pv in params.items():
+            if "http" in pk:
+                pv = re.search("http[s]?:\/\/(.*)\|.*", pv)[1]
             the_url += "&{}={}".format(pk, pv)
         req = requests.Request(
             "GET", the_url, auth=("themarcelor", self.jenkins_user_api_token),
