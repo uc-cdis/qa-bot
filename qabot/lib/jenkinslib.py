@@ -62,7 +62,7 @@ class JenkinsLib:
         # convert list of params into dictionary
         pr = self.prepare_remote_build_request(job_name, params)
         err, resp = self.invoke_job(pr)
-        if resp.status_code == 201:
+        if resp != None and resp.status_code == 201:
             metadata_url = "{}/{}/lastBuild/api/json".format(self.base_url, job_name,)
             log.debug(
                 "Job triggered successfully. Checking the json metadata: {}".format(
@@ -75,9 +75,9 @@ class JenkinsLib:
             log.debug(job_metadata.json().keys())
             next_build_number = int(job_metadata.json()["id"]) + 1
             return None, next_build_number
-        else:
-            print("Job could not be invoked.")
-            return err, None
+
+        print("Job could not be invoked.")
+        return err, None
 
     def get_status_of_job(self, job_name, job_id):
         job_metadata = requests.get(
