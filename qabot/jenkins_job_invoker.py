@@ -43,6 +43,32 @@ class JenkinsJobInvoker:
         """
         return "not implemented yet"
 
+    def roll_service(self, service_name, cluster_name, environment):
+        """
+        Roll a service in one of our gen3 environments
+        """
+        return "not implemented yet"
+
+    def fetch_list_of_environments(self, cluster_name):
+        # TODO: Refactor and move this to a dictionary lookup in Jenkinslib
+        jenkins_instance = None
+        if cluster_name == "qaplanetv1":
+            jenkins_instance = "jenkins"
+        elif cluster_name == "qaplanetv2":
+            jenkins_instance = "jenkins2"
+        else:
+            return "This cluster does not exist :wat:"
+        jl = JenkinsLib(jenkins_instance)
+        err, list_of_environments = jl.fetch_archived_artifact(
+            "list-namespaces-in-this-cluster", "ls_environments.txt"
+        )
+        if err == None:
+            bot_response = "Here is the list of environments in this cluster: \n"
+            bot_response += "```{}```".format(list_of_environments)
+        else:
+            bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
+        return bot_response
+
 
 if __name__ == "__main__":
     jji = JenkinsJobInvoker()

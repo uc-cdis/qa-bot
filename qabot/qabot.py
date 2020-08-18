@@ -15,7 +15,20 @@ rtmclient = slack.RTMClient(
     token=slack_token.strip(), base_url="https://cdis.slack.com/api/"
 )
 
+
+def list_all_commands():
+    all_commands = commands_map.keys()
+    return "here are all the commands available in qa-bot:\n {}".format(
+        ",".join(all_commands)
+    )
+
+
 commands_map = {
+    "help": {
+        "args": "list all commands",
+        "example": "@qa-bot help",
+        "call": list_all_commands,
+    },
     "compare-manifests": {
         "args": "pr number and signed-off manifest",
         "example": "@qa-bot compare-manifests 928 internalstaging.datastage.io",
@@ -40,6 +53,16 @@ commands_map = {
         "args": "job name, jenkins instance and parameters (json without spaces)",
         "example": '@qa-bot run-jenkins-job self-service-qa-gen3-roll jenkins2 {"SERVICE_NAME":"all","TARGET_ENVIRONMENT":"ci-env-1"}',
         "call": JenkinsJobInvoker().invoke_jenkins_job,
+    },
+    "list-environments": {
+        "args": "selected K8s cluster (e.g., qaplanetv1, qaplanetv2)",
+        "example": "@qa-bot list-environments qaplanetv1",
+        "call": JenkinsJobInvoker().fetch_list_of_environments,
+    },
+    "roll": {
+        "args": "service to roll, jenkins instance and parameters (json without spaces)",
+        "example": "@qa-bot roll guppy in qaplanetv1 qa-dcp",
+        "call": JenkinsJobInvoker().roll_service,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
