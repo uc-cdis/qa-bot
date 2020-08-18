@@ -89,6 +89,20 @@ class JenkinsLib:
         )
         return bot_response
 
+    def fetch_archived_artifact(self, job_name, file_name):
+        artifact_url = "{}/{}/lastSuccessfulBuild/artifact/{}?token=$JENKINS_JOB_TOKEN".format(
+            self.base_url, job_name, file_name
+        )
+        resp = requests.get(
+            artifact_url, auth=("themarcelor", self.jenkins_user_api_token),
+        )
+        if resp.status_code != 200:
+            err_msg = "The request failed. Details: {}".format(resp.reason)
+            log.error(err_msg)
+            err = Exception(err_msg)
+            return err, None
+        return None, resp.text
+
 
 if __name__ == "__main__":
     jl = JenkinsLib("jenkins2")
