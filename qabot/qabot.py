@@ -36,7 +36,7 @@ commands_map = {
     },
     "whereis": {
         "args": "release version",
-        "example": "@qa-bot whereis 2020.02",
+        "example": "@qa-bot whereis release 2020.02 \n or \n @qa-bot whereis tube 2020.08",
         "call": ManifestsChecker().whereis_version,
     },
     "run-test": {
