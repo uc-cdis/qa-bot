@@ -14,19 +14,19 @@ WORKDIR /opt/ctds/qabot
 
 RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev curl
 
+USER qabotuser
+
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
 # cache so that poetry install will run if these files change
 COPY poetry.lock pyproject.toml /opt/ctds/qabot/
 
 # install qa-bot and dependencies via poetry
-RUN source $HOME/.poetry/env \
-    && poetry config virtualenvs.create false \
-    && poetry install -vv --no-dev --no-interaction \
-    && poetry show -v
-
-USER qabotuser
+RUN python -m venv $HOME/env \
+    && . $HOME/env/bin/activate \
+    && $HOME/.poetry/bin/poetry install --no-dev --no-interaction \
+    && $HOME/.poetry/bin/poetry show -v
 
 WORKDIR /opt/ctds/qabot/qabot
 
-ENTRYPOINT ["poetry", "run", "python3.6", "qabot.py"]
+ENTRYPOINT [".", "$HOME/env/bin/activate", "&&", "$HOME/.poetry/bin/poetry", "run", "python3.6", "qabot.py"]
