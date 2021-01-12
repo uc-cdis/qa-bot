@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "qa-bot"
+version = "0.1.0"
+description = ""
+authors = ["CTDS UChicago <cdis@uchicago.edu>"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+requests = "2.22.0"
+slackclient = "2.2.1"
+PyGithub = "1.44.1"
+httmock = "1.3.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

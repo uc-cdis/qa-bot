@@ -12,16 +12,14 @@ RUN mkdir -p /opt/ctds/qabot \
 COPY . /opt/ctds/qabot
 WORKDIR /opt/ctds/qabot
 
-RUN apk --update add python py-pip openssl ca-certificates py-openssl wget curl bash git
-RUN apk --update add --virtual build-dependencies libffi-dev openssl-dev python-dev py-pip build-base \
-  && pip install --upgrade pip \
-  && pip install -r requirements.txt \
-    && COMMIT=`git rev-parse HEAD` && echo "COMMIT=\"${COMMIT}\"" >qabot/version_data.py \
-    && VERSION=`git describe --always --tags` && echo "VERSION=\"${VERSION}\"" >>qabot/version_data.py \
-  && apk del build-dependencies
+RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev curl
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+COPY . /opt/ctds/qabot
+WORKDIR /opt/ctds/qabot
+RUN python -m venv /env && . /env/bin/activate && $HOME/.poetry/bin/poetry install --no-dev --no-interaction
 
 WORKDIR /opt/ctds/qabot/qabot
 
 USER qabotuser
 
-ENTRYPOINT ["sh","-c","python3.6 qabot.py"]
+ENTRYPOINT ["poetry", "run", "python3.6", "qabot.py"]
