@@ -22,9 +22,10 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
 COPY poetry.lock pyproject.toml /opt/ctds/qabot/
 
 # install qa-bot and dependencies via poetry
-RUN $HOME/.poetry/bin/poetry install --no-dev --no-interaction \
-    && $HOME/.poetry/bin/poetry show -v
+RUN source $HOME/.poetry/env \
+    && poetry install --no-dev --no-interaction \
+    && poetry show -v
 
 WORKDIR /opt/ctds/qabot/qabot
 
-ENTRYPOINT ["$HOME/.poetry/bin/poetry", "run", "python3.6", "qabot.py"]
+ENTRYPOINT ["poetry", "run", "python3.6", "qabot.py"]
