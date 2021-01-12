@@ -23,4 +23,4 @@ RUN python -m venv $HOME/env && . $HOME/env/bin/activate && $HOME/.poetry/bin/po
 
 WORKDIR /opt/ctds/qabot/qabot
 
-ENTRYPOINT ["$HOME/.poetry/bin/poetry", "run", "python3.6", "qabot.py"]
+ENTRYPOINT [".", "$HOME/env/bin/activate", "&&", "$HOME/.poetry/bin/poetry", "run", "python3.6", "qabot.py"]
