@@ -22,4 +22,4 @@ WORKDIR /opt/ctds/qabot/qabot
 
 USER qabotuser
 
-ENTRYPOINT ["poetry", "run", "python3.6", "qabot.py"]
+CMD ["poetry", "run", "python3.6", "qabot.py"]
