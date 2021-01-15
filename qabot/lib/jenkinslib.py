@@ -67,7 +67,10 @@ class JenkinsLib:
         )
         # https://jenkins.planx-pla.net/blue/organizations/jenkins/CDIS_GitHub_Org%2Fcdis-manifest/detail/PR-2503/7/pipeline
         url_to_return = "{}/{}/detail/PR-{}/{}/pipeline".format(
-            self.base_blueocean_url, repo_name, pr_number, job_number
+            "https://jenkins.planx-pla.net/blue/organizations/jenkins/CDIS_GitHub_Org%2F",
+            repo_name,
+            pr_number,
+            job_number,
         )
         log.debug("sending POST reques to the following url: {}".format(the_url))
         resp = requests.post(
