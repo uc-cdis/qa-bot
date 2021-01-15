@@ -51,7 +51,9 @@ class JenkinsJobInvoker:
             for i, label in enumerate(labels):
                 # only override all labels on the first iteration
                 override_all = i == 0
-                githublib.set_label_to_pr(int(pr_number), label, override_all)
+                githublib.set_label_to_pr(
+                    int(pr_number), label.replace("*", ""), override_all
+                )
                 log.debug("applied label: {}".format(label))
         except Exception as err:
             return "Something wrong happened :facepalm:. Deets: {}".format(err)
