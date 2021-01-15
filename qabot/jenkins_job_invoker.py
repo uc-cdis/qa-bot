@@ -1,9 +1,10 @@
 from lib.jenkinslib import JenkinsLib
+from lib.githublib import GithubLib
 import json
 import os
 import logging
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
 
@@ -33,6 +34,37 @@ class JenkinsJobInvoker:
                     jenkins_instance, job_name, id_of_triggered_job,
                 )
             )
+        else:
+            bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
+        return bot_response
+
+    def replay_pr(self, repo_name, pr_number, labels):
+        """
+        Replay a Pull Request like a boss
+        """
+        githublib = GithubLib(repo=repo_name)
+        try:
+            if " " in labels:
+                raise Exception("Whitespace found in comma-separated list of labels")
+            labels = labels.split(",")
+            log.info("applying labels...")
+            for i, label in enumerate(labels):
+                # only override all labels on the first iteration
+                override_all = i == 0
+                githublib.set_label_to_pr(int(pr_number), label, override_all)
+                log.debug("applied label: {}".format(label))
+        except Exception as err:
+            return "Something wrong happened :facepalm:. Deets: {}".format(err)
+
+        jl = JenkinsLib("jenkins")
+        log.info("find the number of the last build...")
+        job_num = jl.get_number_of_last_build(repo_name, pr_number)
+
+        err, id_of_triggered_job = jl.send_blueocean_request(
+            repo_name, pr_number, job_num
+        )
+        if err == None:
+            bot_response = "Your PR has been labeled and replayed successfully :tada:"
         else:
             bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
         return bot_response
@@ -71,13 +103,18 @@ class JenkinsJobInvoker:
 
 
 if __name__ == "__main__":
+    # jji = JenkinsJobInvoker()
+    # result = jji.run_test_on_environment(
+    #    "run-tests-on-environment", "jenkins2", "ci-env-1", "test-portal-homepageTest"
+    # )
+    # print(result)
+    # result2 = jji.invoke_jenkins_job(
+    #    "self-service-qa-gen3-roll",
+    #    "jenkins2",
+    #    '{ "SERVICE_NAME": "all", "TARGET_ENVIRONMENT": "ci-env-1" }',
+    # )
     jji = JenkinsJobInvoker()
-    result = jji.run_test_on_environment(
-        "run-tests-on-environment", "jenkins2", "ci-env-1", "test-portal-homepageTest"
-    )
-    print(result)
-    result2 = jji.invoke_jenkins_job(
-        "self-service-qa-gen3-roll",
-        "jenkins2",
-        '{ "SERVICE_NAME": "all", "TARGET_ENVIRONMENT": "ci-env-1" }',
+    # jji.replay_pr('gen3-qa', '549', 'test-portal-homepageTest,test-portal-dataUploadTest')
+    jji.replay_pr(
+        "gen3-qa", "549", "test-portal-homepageTest, test-portal-dataUploadTest"
     )

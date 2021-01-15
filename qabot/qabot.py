@@ -6,7 +6,7 @@ from jenkins_job_invoker import JenkinsJobInvoker
 from manifests_checker import ManifestsChecker
 from greeter import Greeter
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
 slack_token = os.environ["SLACK_API_TOKEN"]
@@ -63,6 +63,11 @@ commands_map = {
         "args": "service to roll, jenkins instance and parameters (json without spaces)",
         "example": "@qa-bot roll guppy in qaplanetv1 qa-dcp",
         "call": JenkinsJobInvoker().roll_service,
+    },
+    "replay-pr": {
+        "args": "repo name, pr number, comma-separated list of labels",
+        "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
+        "call": JenkinsJobInvoker().replay_pr,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
