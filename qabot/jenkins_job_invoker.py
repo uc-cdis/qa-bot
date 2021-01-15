@@ -60,9 +60,7 @@ class JenkinsJobInvoker:
         log.info("find the number of the last build...")
         job_num = jl.get_number_of_last_build(repo_name, pr_number)
 
-        err, id_of_triggered_job = jl.send_blueocean_request(
-            repo_name, pr_number, job_num
-        )
+        err, resp = jl.send_blueocean_request(repo_name, pr_number, job_num)
         if err == None:
             bot_response = "Your PR has been labeled and replayed successfully :tada:"
         else:
