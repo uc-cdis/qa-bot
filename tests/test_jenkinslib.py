@@ -1,6 +1,6 @@
 import unittest
 
-from lib.jenkinslib import JenkinsLib
+from qabot.lib.jenkinslib import JenkinsLib
 
 
 class JenkinsLibTestCase(unittest.TestCase):
