@@ -38,6 +38,15 @@ class GithubLib:
             "Could not find {} among the files of PR #{}".format(filename, pr_number)
         )
 
+    def list_files_in_dir(self, dir):
+        ghc = self.get_github_client()
+        content_files = ghc.get_dir_contents(dir)
+        # This content_files list contains something like:
+        # [ContentFile(path="releases/2020"), ContentFile(path="releases/2021")]
+        # hence, obtain the path and keep only the name of the last folder
+        files = [f.path.split("/")[-1] for f in content_files]
+        return files
+
     def set_label_to_pr(self, pr_number, label, override_all=False):
         pr = self.get_github_client().get_pull(pr_number)
         if override_all:

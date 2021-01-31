@@ -1,5 +1,5 @@
-from qabot.lib.githublib import GithubLib
-from qabot.lib.httplib import HttpLib
+from lib.githublib import GithubLib
+from lib.httplib import HttpLib
 from functools import lru_cache
 import time
 import logging
