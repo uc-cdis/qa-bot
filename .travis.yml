@@ -8,8 +8,11 @@ install:
   - poetry install -vv
 # command to run tests
 script:
-- export JENKINS_USER_API_TOKEN="blablabla"
-- export JENKINS2_USER_API_TOKEN="yaddayaddayadda"
-- export JENKINS_JOB_TOKEN="abc123XYZ"
-- export GITHUB_TOKEN="MEH-123"
-- PYTHONPATH="./qabot" && poetry run python -u -m unittest discover tests
+- poetry run python -u -m unittest discover tests
+
+env:
+  - JENKINS_USER_API_TOKEN="blablabla"
+  - JENKINS2_USER_API_TOKEN="yaddayaddayadda"
+  - JENKINS_JOB_TOKEN="abc123XYZ"
+  - GITHUB_TOKEN="MEH-123"
+  - PYTHONPATH="./qabot"
