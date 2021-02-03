@@ -27,3 +27,16 @@ class HttpLib:
             )
             return None
         return json_data
+
+    def fetch_raw_data(self, url):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+        except requests.exceptions.HTTPError as httperr:
+            log.error(
+                "request to {0} failed due to the following error: {1}".format(
+                    url, str(httperr)
+                )
+            )
+            return None
+        return response.text
