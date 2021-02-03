@@ -5,6 +5,7 @@ import logging
 from jenkins_job_invoker import JenkinsJobInvoker
 from manifests_checker import ManifestsChecker
 from greeter import Greeter
+from release import ReleaseManager
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -68,6 +69,11 @@ commands_map = {
         "args": "repo name, pr number, comma-separated list of labels",
         "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
         "call": JenkinsJobInvoker().replay_pr,
+    },
+    "self-service-release": {
+        "args": "github username of environment's owner",
+        "example": "@qa-bot self-service-release ac3eb",
+        "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
