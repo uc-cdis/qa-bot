@@ -24,6 +24,11 @@ class ReleaseManager:
     def roll_out_latest_gen3_release_to_environments(self, user):
         # find latest published gen3 release
         github_client = self.get_githublib()
+
+        # TODO: Make sure only PMs are allowed to invoke this command
+        # Correlate Slack user ID and Slack Full Name with the github user id in CODEOWNERS
+
+        # TODO: Figure out a better way to identify the latest release
         # Identify most recent year folder among published releases
         year_folders = github_client.list_files_in_dir("releases")
         latest_year = sorted(year_folders)[-1]
@@ -75,4 +80,4 @@ class ReleaseManager:
 
 if __name__ == "__main__":
     rm = ReleaseManager()
-    print(rm.roll_out_latest_gen3_release_to_environments("ac3eb"))
+    print(rm.roll_out_latest_gen3_release_to_environments("gkuffel"))
