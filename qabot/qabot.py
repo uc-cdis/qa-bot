@@ -60,6 +60,11 @@ commands_map = {
         "example": "@qa-bot list-environments qaplanetv1",
         "call": JenkinsJobInvoker().fetch_list_of_environments,
     },
+    "selenium-check-status": {
+        "args": "selected K8s cluster (e.g., qaplanetv1, qaplanetv2)",
+        "example": "@qa-bot selenium-check-status qaplanetv1",
+        "call": JenkinsJobInvoker().fetch_selenium_status,
+    },
     "roll": {
         "args": "service to roll, jenkins instance and parameters (json without spaces)",
         "example": "@qa-bot roll guppy in qaplanetv1 qa-dcp",

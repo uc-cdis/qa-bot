@@ -1,6 +1,7 @@
 from lib.jenkinslib import JenkinsLib
 from lib.githublib import GithubLib
 import json
+import time
 import os
 import logging
 
@@ -95,6 +96,7 @@ class JenkinsJobInvoker:
         else:
             return "This cluster does not exist :wat:"
         jl = JenkinsLib(jenkins_instance)
+        # Just fetch the latest archived artifact (the job runs on a schedule)
         err, list_of_environments = jl.fetch_archived_artifact(
             "list-namespaces-in-this-cluster", "ls_environments.txt"
         )
@@ -103,6 +105,46 @@ class JenkinsJobInvoker:
             bot_response += "```{}```".format(list_of_environments)
         else:
             bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
+        return bot_response
+
+    def fetch_selenium_status(self, cluster_name):
+        # TODO: Refactor and move this to a dictionary lookup in Jenkinslib
+        jenkins_instance = None
+        if cluster_name == "qaplanetv1":
+            jenkins_instance = "jenkins"
+        elif cluster_name == "qaplanetv2":
+            jenkins_instance = "jenkins2"
+        else:
+            return "This cluster does not exist :wat:"
+
+        jl = JenkinsLib(jenkins_instance)
+        err, id_of_triggered_job = jl.prepare_request_and_invoke(
+            "selenium-check-status", None
+        )
+
+        if err == None:
+
+            selenium_status_check_result = jl.get_status_of_job(
+                "selenium-check-status", id_of_triggered_job
+            )
+            log.info("checking the result of the selenium-status-check job...")
+            log.info(f"result: {selenium_status_check_result}")
+
+            err, selenium_status = jl.fetch_archived_artifact(
+                "selenium-check-status", "selenium-status.txt"
+            )
+            if err == None:
+                bot_response = "Here is the status of the Selenium hub :selenium: \n"
+                bot_response += "```{}```".format(selenium_status)
+            else:
+                bot_response = "Could not fetch archived artifacts from the Jenkins job :facepalm:. Deets: {}".format(
+                    err
+                )
+        else:
+            bot_response = "Could not run the Jenkins job :facepalm:. Deets: {}".format(
+                err
+            )
+
         return bot_response
 
 
