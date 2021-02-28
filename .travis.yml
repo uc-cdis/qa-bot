@@ -3,12 +3,13 @@ python: "3.6"
 sudo: false
 cache: pip
 install:
-  - pip install -r requirements.txt
+  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+  - source $HOME/.poetry/env
+  - poetry install -vv
 # command to run tests
 script:
 - export JENKINS_USER_API_TOKEN="blablabla"
 - export JENKINS2_USER_API_TOKEN="yaddayaddayadda"
 - export JENKINS_JOB_TOKEN="abc123XYZ"
 - export GITHUB_TOKEN="MEH-123"
-- cd qabot
-- python -m unittest discover ../tests
+- PYTHONPATH="./qabot" poetry run python -u -m unittest discover tests
