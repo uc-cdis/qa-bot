@@ -1,5 +1,6 @@
 import requests
 from requests import Session, Request
+import time
 import os
 import re
 import logging
@@ -20,7 +21,7 @@ class JenkinsLib:
             "{}_USER_API_TOKEN".format(jenkins_instance.upper())
         ].strip()
 
-    def prepare_remote_build_request(self, job_name, params={}):
+    def prepare_remote_build_request(self, job_name, params):
         """
         Prepares a py request with url and basic auth based on details provided by the user
         """
@@ -36,11 +37,13 @@ class JenkinsLib:
             build_url_path,
             os.environ["JENKINS_JOB_TOKEN"].strip(),
         )
-        for pk, pv in params.items():
-            if "http" in pv:
-                log.warn("url found, stripping off characters added by slack...")
-                pv = re.search("http[s]?:\/\/(.*)\|.*", pv)[1]
-            the_url += "&{}={}".format(pk, pv)
+        if params:
+            for pk, pv in params.items():
+                if "http" in pv:
+                    log.warn("url found, stripping off characters added by slack...")
+                    pv = re.search("http[s]?:\/\/(.*)\|.*", pv)[1]
+                the_url += "&{}={}".format(pk, pv)
+
         req = requests.Request(
             "GET", the_url, auth=("themarcelor", self.jenkins_user_api_token),
         )
@@ -128,14 +131,33 @@ class JenkinsLib:
         return job_metadata.json()["number"]
 
     def get_status_of_job(self, job_name, job_id):
-        job_metadata = requests.get(
-            "{}/{}/{}/api/json".format(self.base_url, job_name, job_id,),
-            auth=("themarcelor", self.jenkins_user_api_token),
-        )
-        bot_response = "The result of {} job # {} is: {}".format(
-            job_name, job_id, job_metadata.json().result
-        )
-        return bot_response
+        # If the job has not been triggered yet, wait a few seconds and try again
+        max_attempts = 15
+        attempts = 0
+        while attempts <= max_attempts:
+            job_metadata = requests.get(
+                "{}/{}/{}/api/json".format(self.base_url, job_name, job_id,),
+                auth=("themarcelor", self.jenkins_user_api_token),
+            )
+            if job_metadata.status_code == 404:
+                log.debug(
+                    f"Attempt #{attempts} - The job does not exist yet. Sleeping for 5 seconds"
+                )
+                time.sleep(5)
+                attempts += 1
+                continue
+
+            job_result = job_metadata.json()["result"]
+            if job_result == None:
+                log.debug(
+                    f"Attempt #{attempts} - The job is still running, there is no result yet (result: {job_result}). Sleeping for 5 seconds"
+                )
+                time.sleep(5)
+                attempts += 1
+            else:
+                return job_result
+
+        return "Could not obtain status"
 
     def fetch_archived_artifact(self, job_name, file_name):
         artifact_url = "{}/{}/lastSuccessfulBuild/artifact/{}?token=$JENKINS_JOB_TOKEN".format(
