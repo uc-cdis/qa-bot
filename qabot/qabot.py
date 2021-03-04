@@ -4,6 +4,7 @@ import logging
 
 from jenkins_job_invoker import JenkinsJobInvoker
 from manifests_checker import ManifestsChecker
+from state_of_the_nation import StateOfTheNation
 from greeter import Greeter
 from release import ReleaseManager
 
@@ -74,6 +75,11 @@ commands_map = {
         "args": "github username of environment's owner",
         "example": "@qa-bot self-service-release ac3eb",
         "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
+    },
+    "state-of-the-nation": {
+        "args": "name_of_the_project [number_of_prs_to_scan] [state_of_the_prs]",
+        "example": "bdcat 50 open",
+        "call": run_state_of_the_nation_report,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
