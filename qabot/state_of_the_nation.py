@@ -161,7 +161,7 @@ class StateOfTheNation:
         return self.get_slacklib(real_name)["id"]
 
     def run_state_of_the_nation_report(
-        self, project_name, num_of_prs_to_scan=50, state_of_the_prs="all"
+        self, project_name, state_of_the_prs, num_of_prs_to_scan=50
     ):
         """
         Prepare full report around the state of the release for a given project
@@ -183,6 +183,9 @@ class StateOfTheNation:
 
         # TODO: Also track PRs in gitops-qa
         # fetch the most recent PRs (arbitrarily 200 of them... that should be enough)
+        log.info(
+            f"Shooting a GET request to https://api.github.com/repos/uc-cdis/cdis-manifest/pulls?per_page={num_of_prs_to_scan}&state={state_of_the_prs}..."
+        )
         get_pull_requests = requests.get(
             f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls?per_page={num_of_prs_to_scan}&state={state_of_the_prs}",
             auth=("themarcelor", ghlib.token),
@@ -211,7 +214,7 @@ class StateOfTheNation:
             # check if the folder associated with the PR matches any of the project's environments
             if env_folder_name in envs:
                 pr_deets = {
-                    "url": pr["url"],
+                    "html_url": pr["html_url"],
                     "title": pr["title"],
                     "tier": self.prj_envs_map[project_name]["environments"][
                         env_folder_name
@@ -285,6 +288,7 @@ class StateOfTheNation:
 
             log.debug(f"versions: {versions}")
 
+            bot_response += f"*{self.prj_envs_map[project_name]['environments'][e]['tier']}* environment: \n"
             bot_response += f":point_right: {e}: \n"
             bot_response += f"Currently running: {versions}: \n"
 
@@ -294,18 +298,20 @@ class StateOfTheNation:
             ]
 
             if len(pending_prs) > 0:
-                # bot_response += f"```"
                 bot_response += f"*PRs:* \n"
+                bot_response += f"```"
                 for pr_deets in pending_prs:
-                    bot_response += f":information_source: {pr_deets['title']} \n"
-                    bot_response += f"{pr_deets['tier']} -> {pr_deets['url']} \n"
+                    bot_response += f"### {pr_deets['title']} \n"
+                    bot_response += (
+                        f"Click here to visit the PR: -> {pr_deets['html_url']} \n"
+                    )
                     if pr_deets["state"] == "closed":
-                        bot_response += f":merged: Merged at {pr_deets['merged_at']} \n"
+                        bot_response += f"Merged at {pr_deets['merged_at']} \n"
                     else:
                         # TODO: tag reviewers (requested_reviewers: [])
-                        bot_response += f":clock1: This PR has not been merged yet. \n"
+                        bot_response += f"This PR has not been merged yet. \n"
                     bot_response += "--- \n"
-                # bot_response += f"```"
+                bot_response += f"``` \n"
 
         return bot_response
 

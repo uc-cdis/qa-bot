@@ -77,8 +77,8 @@ commands_map = {
         "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
     },
     "state-of-the-nation": {
-        "args": "name_of_the_project [number_of_prs_to_scan] [state_of_the_prs]",
-        "example": "bdcat 50 open",
+        "args": "name_of_the_project state_of_the_prs(all, open or closed) [number_of_prs_to_scan]",
+        "example": "bdcat all 50",
         "call": StateOfTheNation().run_state_of_the_nation_report,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
