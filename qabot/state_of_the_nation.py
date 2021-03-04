@@ -19,6 +19,7 @@ class StateOfTheNation:
         It also includes functions to sweep Github repos and determine the state of
         echo environment next steps to move forward with the project's release cycle.
         """
+        # TODO: Find the owners / reviewers of pending PRs and utilize Slack lib to ping them on Slack
         self.prj_envs_map = {
             "anvil": {
                 "environments": {
