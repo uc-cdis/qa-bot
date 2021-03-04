@@ -21,7 +21,7 @@ class ReleaseManager:
     def get_githublib(self):
         return GithubLib()
 
-    def roll_out_latest_gen3_release_to_environments(self, user):
+    def find_latest_release(self):
         # find latest published gen3 release
         github_client = self.get_githublib()
 
@@ -42,6 +42,11 @@ class ReleaseManager:
         latest_release = "{}.{}".format(latest_year, latest_month)
 
         log.info("The latest published Gen3 Release is {}".format(latest_release))
+
+        return latest_release
+
+    def roll_out_latest_gen3_release_to_environments(self, user):
+        latest_release = self.find_latest_release()
 
         # find all environments owned by the user
         em = EnvironmentsManager()

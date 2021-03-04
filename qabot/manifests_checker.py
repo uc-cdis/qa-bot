@@ -17,8 +17,8 @@ class ManifestsChecker:
         manifests_base_url="https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master",
     ):
         """
-     Checks manifest.json files to assist with sign-off procedures
-    """
+        Checks manifest.json files to assist with sign-off procedures
+        """
         # example of raw url:
         # https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/internalstaging.datastage.io/manifest.json
         self.manifests_base_url = manifests_base_url
@@ -49,8 +49,8 @@ class ManifestsChecker:
 
     def whereis_version(self, looking_for, version):
         """
-    Crawl through all the manifests in cdis-manifest & gitops-qa to check which environments are running a given Gen3 Core Release version or find environments running a specific version of a given service
-    """
+        Crawl through all the manifests in cdis-manifest & gitops-qa to check which environments are running a given Gen3 Core Release version or find environments running a specific version of a given service
+        """
         # repos_with_manifests = ['cdis-manifest', 'gitops-qa']
         repos_with_manifests = ["cdis-manifest"]
         to_be_ignored = [".github", ".githooks", "releases", "login.bionimbus.org"]
@@ -103,8 +103,8 @@ class ManifestsChecker:
 
     def compare_manifests(self, pr_to_be_verified, signed_off_env):
         """
-     Compare the manifest.json from a PR that is about to be rolled out with the one from an environment where all tests have been performed (i.e., signed off by the QA team)    
-    """
+        Compare the manifest.json from a PR that is about to be rolled out with the one from an environment where all tests have been performed (i.e., signed off by the QA team)
+        """
         pr_manifest_url = self.githublib.get_file_raw_url(
             int(pr_to_be_verified), "manifest.json"
         )
