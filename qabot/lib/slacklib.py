@@ -11,7 +11,7 @@ class SlackLib:
     def __init__(
         self,
         base_url="https://slack.com/api",
-        token=os.environ["QABOT_SLACK_API_TOKEN"].strip(),
+        token=os.environ["SLACK_API_TOKEN"].strip(),
     ):
         """
      Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
