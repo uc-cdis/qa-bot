@@ -109,6 +109,30 @@ class StateOfTheNation:
                     },
                 },
             },
+            "account": {
+                "environments": {
+                    "qa-acct.planx-pla.net": {
+                        "tier": "qa",
+                        "repo": "gitops-qa",
+                        "purpose": "Used for disruptive experiments (e.g., new DD versions/features) and reproduce PROD bugs",
+                        "promote_to": ["prod"],
+                        "health_check": ["presigned_url"],
+                        "currently_running": "",
+                        "pending_prs": [],
+                        "owners": [],
+                    },
+                    "acct.bionimbus.org": {
+                        "tier": "prod",
+                        "repo": "cdis-manifest",
+                        "purpose": "This is the PRODUCTION / customer-facing environment.",
+                        "promote_to": [],
+                        "health_check": ["presigned_url"],
+                        "currently_running": "",
+                        "pending_prs": [],
+                        "owners": [],
+                    },
+                },
+            },
             "dcf": {
                 "environments": {
                     "qa-dcf.planx-pla.net": {
