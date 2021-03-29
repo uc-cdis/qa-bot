@@ -39,7 +39,7 @@ class JenkinsJobInvoker:
             bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
         return bot_response
 
-    def replay_pr(self, repo_name, pr_number, labels):
+    def replay_pr(self, repo_name, pr_number, labels=[]):
         """
         Replay a Pull Request like a boss
         """
@@ -47,15 +47,18 @@ class JenkinsJobInvoker:
         try:
             if " " in labels:
                 raise Exception("Whitespace found in comma-separated list of labels")
-            labels = labels.split(",")
-            log.info("applying labels...")
-            for i, label in enumerate(labels):
-                # only override all labels on the first iteration
-                override_all = i == 0
-                githublib.set_label_to_pr(
-                    int(pr_number), label.replace("*", ""), override_all
-                )
-                log.debug("applied label: {}".format(label))
+            if len(labels) > 0:
+                labels = labels.split(",")
+                log.info("applying labels...")
+                for i, label in enumerate(labels):
+                    # only override all labels on the first iteration
+                    override_all = i == 0
+                    githublib.set_label_to_pr(
+                        int(pr_number), label.replace("*", ""), override_all
+                    )
+                    log.debug("applied label: {}".format(label))
+            else:
+                log.warn("Replaying PR without labels...")
         except Exception as err:
             return "Something wrong happened :facepalm:. Deets: {}".format(err)
 
