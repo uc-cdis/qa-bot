@@ -7,7 +7,7 @@ import re
 import os
 from pprint import pprint
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
 
@@ -53,13 +53,23 @@ class ManifestsChecker:
         """
         # repos_with_manifests = ['cdis-manifest', 'gitops-qa']
         repos_with_manifests = ["cdis-manifest"]
-        to_be_ignored = [".github", ".githooks", "releases", "login.bionimbus.org"]
+        to_be_ignored = [
+            ".github",
+            ".githooks",
+            "releases",
+            "login.bionimbus.org",
+            "spoke1.workspace.occ-pla.net",
+            "workspace.occ-pla.net",
+        ]
         list_of_environments = "```\n"
         environments_count = 0
 
         for repo in repos_with_manifests:
             directories = self._get_directories_from_repo(repo, self._get_ttl_hash())
             for env in directories:
+                log.debug(
+                    "looking for version: {} in env folder: {}...".format(version, env)
+                )
                 if env not in to_be_ignored:
                     environments_count += 1
                     manifest_url = "https://raw.githubusercontent.com/uc-cdis/{}/master/{}/manifest.json".format(
@@ -68,19 +78,14 @@ class ManifestsChecker:
                     versions_block = self.httplib.fetch_json(manifest_url)["versions"]
                     if looking_for == "release":
                         the_version = (
-                            versions_block["fence"]
-                            if "fence" in versions_block.keys()
+                            versions_block["sheepdog"]
+                            if "sheepdog" in versions_block.keys()
                             else versions_block["indexd"]
                         )
                     elif looking_for in versions_block.keys():
                         the_version = versions_block[looking_for]
                     else:
                         continue
-                    log.debug(
-                        "repo: {} - env: {} - version: {}".format(
-                            repo, env, the_version
-                        )
-                    )
                     match = re.search(".*\:(.*)$", the_version)
                     if match.group(1) == version:
                         log.debug("found it!: {}".format(env))
@@ -148,5 +153,4 @@ if __name__ == "__main__":
     #  diff = mc.compare_manifests(928, 'data.kidsfirstdrc.org')
     #  print('diff: ')
     #  pprint(diff)
-    print(mc.whereis_version("release", "2020.02"))
-    print(mc.whereis_version("revproxy", "1.17.6-ctds-1.0.1"))
+    print(mc.whereis_version("release", "2021.03"))
