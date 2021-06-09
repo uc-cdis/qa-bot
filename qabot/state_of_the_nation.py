@@ -186,7 +186,7 @@ class StateOfTheNation:
         return self.get_slacklib(real_name)["id"]
 
     def run_state_of_the_nation_report(
-        self, project_name, state_of_the_prs, num_of_prs_to_scan=50
+        self, project_name, state_of_the_prs, num_of_prs_to_scan=15
     ):
         """
         Prepare full report around the state of the release for a given project

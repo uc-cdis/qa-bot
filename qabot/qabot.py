@@ -140,6 +140,7 @@ def post_message(payload, bot_reply, channel_id):
 def capture_messages(**payload):
     data = payload["data"]
     log.debug("### DATA: {}".format(data))
+    log.debug(f"##### data.keys(): {data.keys()}")
     if "subtype" not in data.keys():
         channel_id = data["channel"]
         user = data["user"]
