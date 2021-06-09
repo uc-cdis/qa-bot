@@ -1,6 +1,7 @@
 import os
 import slack
 import logging
+import traceback
 
 from jenkins_job_invoker import JenkinsJobInvoker
 from manifests_checker import ManifestsChecker
@@ -121,6 +122,7 @@ example:  {commands_map[command]['example']}
                 return str(te)
             except Exception as e:
                 log.error(e)
+                traceback.print_exc()
                 return "something went wrong. Contact the QA team"
     else:
         return "command not recognized. :thisisfine:"
