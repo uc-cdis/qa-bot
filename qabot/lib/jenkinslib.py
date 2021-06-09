@@ -44,6 +44,9 @@ class JenkinsLib:
                     pv = re.search("http[s]?:\/\/(.*)\|.*", pv)[1]
                 the_url += "&{}={}".format(pk, pv)
 
+        the_url_logging_safe = the_url[0 : the_url.index("token")]
+        log.info("Here's the URL: {}".format(the_url_logging_safe))
+
         req = requests.Request(
             "GET", the_url, auth=("themarcelor", self.jenkins_user_api_token),
         )
