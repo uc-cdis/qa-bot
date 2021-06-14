@@ -142,9 +142,9 @@ def post_message(payload, bot_reply, channel_id):
 def capture_messages(**payload):
     data = payload["data"]
     log.debug("### DATA: {}".format(data))
-    if "subtype" not in data.keys():
+    user = data["user"] if "user" in data.keys() else data["username"]
+    if user is not "qa-bot":
         channel_id = data["channel"]
-        user = data["user"]
 
         # determines if the bot is being called
         if "<@UQKCGCU1H>" in data["text"]:
