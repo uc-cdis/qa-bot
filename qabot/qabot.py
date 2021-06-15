@@ -152,7 +152,13 @@ def capture_messages(**payload):
     else:
         user = ""
     # determines if the bot is being called
-    if "<@UQKCGCU1H>" in data["text"]:
+    the_msg = ""
+    if "text" in data.keys():
+        the_msg = data["text"]
+    elif data["subtype"] == "message_changed":
+        the_msg = data["message"]["text"]
+
+    if "<@UQKCGCU1H>" in the_msg:
         log.info("user {} just sent a msg: {}".format(user, data["text"]))
 
         raw_command = data["text"].replace("\xa0", " ")
