@@ -159,9 +159,9 @@ def capture_messages(**payload):
         the_msg = data["message"]["text"]
 
     if "<@UQKCGCU1H>" in the_msg:
-        log.info("user {} just sent a msg: {}".format(user, data["text"]))
+        log.info("user {} just sent a msg: {}".format(user, the_msg))
 
-        raw_command = data["text"].replace("\xa0", " ")
+        raw_command = the_msg.replace("\xa0", " ")
         raw_command = raw_command.replace("“", '"').replace("”", '"')
         msg_parts_split = raw_command.split(" ")
         msg_parts = list(filter(None, msg_parts_split))
