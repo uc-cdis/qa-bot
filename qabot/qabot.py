@@ -146,12 +146,11 @@ def capture_messages(**payload):
     channel_id = data["channel"]
 
     # determine user for logging purposes
-    # defaults to empty string
-    user = ""
+    # ignore username when receiving msgs from other bots or other events
     if "user" in data.keys():
         user = data["user"]
     else:
-        user = data["username"]
+        user = ""
     # determines if the bot is being called
     if "<@UQKCGCU1H>" in data["text"]:
         log.info("user {} just sent a msg: {}".format(user, data["text"]))
