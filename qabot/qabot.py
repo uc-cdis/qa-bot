@@ -142,31 +142,42 @@ def post_message(payload, bot_reply, channel_id):
 def capture_messages(**payload):
     data = payload["data"]
     log.debug("### DATA: {}".format(data))
-    user = data["user"] if "user" in data.keys() else data["username"]
-    if user is not "qa-bot":
-        channel_id = data["channel"]
 
-        # determines if the bot is being called
-        if "<@UQKCGCU1H>" in data["text"]:
-            log.info("user {} just sent a msg: {}".format(user, data["text"]))
+    channel_id = data["channel"]
 
-            raw_command = data["text"].replace("\xa0", " ")
-            raw_command = raw_command.replace("“", '"').replace("”", '"')
-            msg_parts_split = raw_command.split(" ")
-            msg_parts = list(filter(None, msg_parts_split))
-            # identify command
-            if len(msg_parts) > 1:
-                command = msg_parts[1]
-                args = msg_parts[2:]
-                bot_reply = process_command(command, args)
-            else:
-                bot_reply = """
+    # determine user for logging purposes
+    # ignore username when receiving msgs from other bots or other events
+    if "user" in data.keys():
+        user = data["user"]
+    else:
+        user = ""
+    # determines if the bot is being called
+    the_msg = ""
+    if "text" in data.keys():
+        the_msg = data["text"]
+    elif data["subtype"] == "message_changed":
+        the_msg = data["message"]["text"]
+
+    if "<@UQKCGCU1H>" in the_msg:
+        log.info("user {} just sent a msg: {}".format(user, the_msg))
+
+        raw_command = the_msg.replace("\xa0", " ")
+        raw_command = raw_command.replace("“", '"').replace("”", '"')
+        msg_parts_split = raw_command.split(" ")
+        msg_parts = list(filter(None, msg_parts_split))
+        # identify command
+        if len(msg_parts) > 1:
+            command = msg_parts[1]
+            args = msg_parts[2:]
+            bot_reply = process_command(command, args)
+        else:
+            bot_reply = """
 Usage instructions: *@qa-bot <command>* \n
 e.g., @qa-bot command
           _visit https://github.com/uc-cdis/qa-bot to learn more_
           """
 
-            post_message(payload, bot_reply, channel_id)
+        post_message(payload, bot_reply, channel_id)
 
 
 def main():
