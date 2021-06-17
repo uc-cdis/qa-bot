@@ -87,6 +87,11 @@ commands_map = {
         "example": "bdcat all 50",
         "call": StateOfTheNation().run_state_of_the_nation_report,
     },
+    "get-failure-rate": {
+        "args": "test_suite_name",
+        "example": "test-portal-homepageTest",
+        "call": PipelineMaintenance().failure_rate_for_test_suite,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
