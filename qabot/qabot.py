@@ -8,6 +8,7 @@ from manifests_checker import ManifestsChecker
 from state_of_the_nation import StateOfTheNation
 from greeter import Greeter
 from release import ReleaseManager
+from pipeline_maintenance import PipelineMaintenance
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
