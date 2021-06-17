@@ -50,6 +50,8 @@ class PipelineMaintenance:
         if match:
             feature_name = match.group(1)
             log.info(f"Found feature name: {feature_name}")
+            # whitespaces need to be converted to underscore characters
+            feature_name = feature_name.replace(" ", "_")
         else:
             raise Exception(
                 f":facepalm: Could not find the CodeceptJs feature name in script `{test_script}`"
