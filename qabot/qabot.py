@@ -8,6 +8,7 @@ from manifests_checker import ManifestsChecker
 from state_of_the_nation import StateOfTheNation
 from greeter import Greeter
 from release import ReleaseManager
+from pipeline_maintenance import PipelineMaintenance
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -86,6 +87,11 @@ commands_map = {
         "args": "name_of_the_project state_of_the_prs(all, open or closed) [number_of_prs_to_scan]",
         "example": "bdcat all 50",
         "call": StateOfTheNation().run_state_of_the_nation_report,
+    },
+    "get-failure-rate": {
+        "args": "test_suite_name",
+        "example": "test-portal-homepageTest",
+        "call": PipelineMaintenance().failure_rate_for_test_suite,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }

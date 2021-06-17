@@ -7,7 +7,7 @@ The @qa-bot is a Slack bot that has been registered as a custom-integration of o
 
 ## Running tests
 
-`poetry run python -u -m unittest discover tests`
+`PYTHONPATH="./qabot" poetry run python -u -m unittest discover tests`
 
 ## Features
 
