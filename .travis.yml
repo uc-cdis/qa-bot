@@ -8,6 +8,7 @@ install:
   - poetry install -vv
 # command to run tests
 script:
+- export SLACK_API_TOKEN="meh"
 - export JENKINS_USER_API_TOKEN="blablabla"
 - export JENKINS2_USER_API_TOKEN="yaddayaddayadda"
 - export JENKINS_JOB_TOKEN="abc123XYZ"
