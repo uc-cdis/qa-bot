@@ -9,6 +9,8 @@ from lib.slacklib import SlackLib
 from lib.githublib import GithubLib
 from lib.influxlib import InfluxLib
 
+from jenkins_job_invoker import JenkinsJobInvoker
+
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
@@ -57,6 +59,30 @@ class PipelineMaintenance:
                 f":facepalm: Could not find the CodeceptJs feature name in script `{test_script}`"
             )
         return feature_name
+
+    def quarantine_ci_env(self, ci_env_name):
+        """
+        Remove ci-environment from the source-of-truth pool of CI environments files:
+         - services pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-services.txt
+         - releases pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-releases.txt
+        both files are restored every night by a cronjob.
+        """
+        bot_response = ""
+
+        jji = JenkinsJobInvoker()
+        log.info(f"Putting environment {ci_env_name} in quarantine...")
+        json_params = {
+            "ENVIRONMENT_NAME": ci_env_name,
+        }
+        str_params = json.dumps(json_params, separators=(",", ":"))
+        bot_response = jji.invoke_jenkins_job(
+            "quarantine-ci-environment", "jenkins", str_params
+        )
+        if "something went wrong" in bot_response:
+            return bot_response
+
+        bot_response = f"The environment {ci_env_name} has been placed under quarantine. :face_with_thermometer:"
+        return bot_response
 
     def failure_rate_for_test_suite(self, test_suite_name):
         """
@@ -129,5 +155,6 @@ class PipelineMaintenance:
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
-    result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
+    # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
+    result = pipem.quarantine_ci_env("jenkins-genomel")
     print(result)
