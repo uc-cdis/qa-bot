@@ -152,9 +152,12 @@ class PipelineMaintenance:
 
         return bot_response
 
+    def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
+        log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
     # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
-    result = pipem.quarantine_ci_env("jenkins-genomel")
+    result = pipem.quarantine_ci_env("jenkins-new")
     print(result)

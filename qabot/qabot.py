@@ -93,6 +93,11 @@ commands_map = {
         "example": "test-portal-homepageTest",
         "call": PipelineMaintenance().failure_rate_for_test_suite,
     },
+    "quarantine-ci-environment": {
+        "args": "ci_environment_name",
+        "example": "jenkins-brain",
+        "call": PipelineMaintenance().quarantine_ci_env,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
@@ -163,6 +168,10 @@ def capture_messages(**payload):
         the_msg = data["text"]
     elif data["subtype"] == "message_changed":
         the_msg = data["message"]["text"]
+
+    if "bot_profile" in data.keys() and data["bot_profile"]["id"] == "B80E3HU5P":
+        log.info("Jenkins just posted a Slack msg")
+        PipelineMaintenance().react_to_jenkins_updates(data["attachments"])
 
     if "<@UQKCGCU1H>" in the_msg:
         log.info("user {} just sent a msg: {}".format(user, the_msg))
