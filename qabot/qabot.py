@@ -98,6 +98,11 @@ commands_map = {
         "example": "jenkins-brain",
         "call": PipelineMaintenance().quarantine_ci_env,
     },
+    "check-pool-of-ci-environments": {
+        "args": "",
+        "example": "",
+        "call": PipelineMaintenance().check_pool_of_ci_envs,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 

@@ -21,7 +21,10 @@ class PipelineMaintenance:
         Aggregating various utility functions to increase productivity by automating CI pipeline maintenance tasks
         e.g., find out test suite failure trends (to support auto-replay), purge jenkins queue, facilitate debugging, etc.
         """
-        ci_swimming_lanes = ["services", "releases"]
+        self.ci_swimming_lanes = ["services", "releases"]
+        self.cdis_public_bucket_base_url = (
+            "https://cdistest-public-test-bucket.s3.amazonaws.com/"
+        )
 
     def get_slacklib(self):
         return SlackLib()
@@ -152,6 +155,28 @@ class PipelineMaintenance:
 
         return bot_response
 
+    def check_pool_of_ci_envs(self):
+        bot_response = "Pool of CI environments :jenkins-fire: \n"
+
+        for ci_pool in self.ci_swimming_lanes:
+            bot_response += f"{ci_pool} pool :point_down:\n"
+            bot_response += "```"
+            try:
+                response = requests.get(
+                    f"{self.cdis_public_bucket_base_url}jenkins-envs-{ci_pool}.txt"
+                )
+                response.raise_for_status()
+            except requests.exceptions.HTTPError as httperr:
+                log.error(
+                    "request to {0} failed due to the following error: {1}".format(
+                        url, str(httperr)
+                    )
+                )
+                return httperr
+            bot_response += response.text
+            bot_response += "```\n"
+        return bot_response
+
     def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
         log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
 
@@ -159,5 +184,6 @@ class PipelineMaintenance:
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
     # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
-    result = pipem.quarantine_ci_env("jenkins-new")
+    # result = pipem.quarantine_ci_env("jenkins-new")
+    result = pipem.check_pool_of_ci_envs()
     print(result)
