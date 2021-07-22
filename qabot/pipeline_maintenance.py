@@ -2,12 +2,15 @@ import json
 import os
 import re
 import logging
+import datetime
 
 import requests
+from requests.exceptions import RequestException
 
 from lib.slacklib import SlackLib
 from lib.githublib import GithubLib
 from lib.influxlib import InfluxLib
+from lib.jenkinslib import JenkinsLib
 
 from jenkins_job_invoker import JenkinsJobInvoker
 
@@ -180,10 +183,31 @@ class PipelineMaintenance:
     def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
         log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
 
+    def ci_benchmarking(self, repo_name, pr_num, stage_name):
+        bot_response = ""
+        jl = JenkinsLib("jenkins")
+        try:
+            stage_duration = jl.get_duration_of_ci_pipeline_stage(
+                repo_name, pr_num, stage_name
+            )
+            duration_raw = datetime.datetime.fromtimestamp(stage_duration / 1000.0)
+            friendly_duration_format = duration_raw.strftime("%Mm and %Ss")
+            bot_response += f"the {stage_name} stage from repo `{repo_name}` PR `#{pr_num}` took `{friendly_duration_format}` to run... :clock1:\n"
+        except RequestException as err:
+            err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
+            log.error(err_msg)
+            bot_response += err_msg
+
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
     # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
     # result = pipem.quarantine_ci_env("jenkins-new")
-    result = pipem.check_pool_of_ci_envs()
+    # result = pipem.check_pool_of_ci_envs()
+    # result = pipem.ci_benchmarking("cdis-manifest", "3265", "K8sReset")
+    result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
+    # negative test
+    # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
     print(result)
