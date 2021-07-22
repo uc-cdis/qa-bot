@@ -103,6 +103,11 @@ commands_map = {
         "example": "",
         "call": PipelineMaintenance().check_pool_of_ci_envs,
     },
+    "ci-benchmarking": {
+        "args": "repo_name pr_number stage_name",
+        "example": " cdis-manifest 3265 K8sReset\n gitops-qa 1523 RunTests",
+        "call": PipelineMaintenance().ci_benchmarking,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 

@@ -1,5 +1,6 @@
 import requests
 from requests import Session, Request
+from requests.exceptions import RequestException
 import time
 import os
 import re
@@ -132,6 +133,32 @@ class JenkinsLib:
             auth=("themarcelor", self.jenkins_user_api_token),
         )
         return job_metadata.json()["number"]
+
+    def get_duration_of_ci_pipeline_stage(self, repo_name, job_number, stage_name):
+        log.debug(
+            f"Sending request to URL: {self.base_url}/CDIS_GitHub_Org/job/{repo_name}/job/PR-{job_number}/wfapi/runs"
+        )
+        try:
+            job_metadata = requests.get(
+                f"{self.base_url}/CDIS_GitHub_Org/job/{repo_name}/job/PR-{job_number}/wfapi/runs",
+                auth=("themarcelor", self.jenkins_user_api_token),
+            )
+            job_metadata.raise_for_status()
+        except requests.exceptions.HTTPError as httperr:
+            raise RequestException(
+                f"error_code:{job_metadata.status_code}, error_msg:{job_metadata.reason}"
+            )
+
+        # the first item in the array always represents the latest run
+        ci_build_stages = job_metadata.json()[0]["stages"]
+        for stage_metadata in ci_build_stages:
+            if stage_metadata["name"] == stage_name:
+                return stage_metadata["durationMillis"]
+
+        # if it can't find any stages with that name
+        raise RequestException(
+            f"Could not find the ci pipeline stage metadata associated with repo_name:{repo_name}, pr_num:{pr_num} and stage_name:{stage_name}"
+        )
 
     def get_status_of_job(self, job_name, job_id):
         # If the job has not been triggered yet, wait a few seconds and try again
