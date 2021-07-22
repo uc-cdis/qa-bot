@@ -192,7 +192,7 @@ class PipelineMaintenance:
             )
             duration_raw = datetime.datetime.fromtimestamp(stage_duration / 1000.0)
             friendly_duration_format = duration_raw.strftime("%Mm and %Ss")
-            bot_response += f"the {stage_name} stage took `{friendly_duration_format}` to run... :clock1:\n"
+            bot_response += f"the {stage_name} stage from repo `{repo_name}` PR `#{pr_num}` took `{friendly_duration_format}` to run... :clock1:\n"
         except RequestException as err:
             err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
             log.error(err_msg)
