@@ -54,6 +54,13 @@ class ReleaseManager:
 
         environments = [k for k, v in envdict.items() if v == "@{}".format(user)]
 
+        # if the operator doesn't own any environments, terminate the function
+        # by returning a response
+        if environments is None or len(environments) == 0:
+            log.info("Warning: The operator doesn't own any environments")
+            bot_response = "Sorry operator, you don’t own any environments"
+            return bot_response
+
         log.info(
             "Creating release PRs for {} environments owned by user {}".format(
                 len(environments), user
