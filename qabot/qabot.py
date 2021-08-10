@@ -98,6 +98,11 @@ commands_map = {
         "example": "jenkins-brain",
         "call": PipelineMaintenance().quarantine_ci_env,
     },
+    "unquarantine-ci-environment": {
+        "args": "ci_environment_name",
+        "example": "jenkins-brain",
+        "call": PipelineMaintenance().unquarantine_ci_env,
+    },
     "check-pool-of-ci-environments": {
         "args": "",
         "example": "",
