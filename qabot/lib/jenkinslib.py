@@ -118,8 +118,13 @@ class JenkinsLib:
             job_metadata = requests.get(
                 metadata_url, auth=("themarcelor", self.jenkins_user_api_token),
             )
+            # wait for Jenkins to process the build before fetching its metadata
+            time.sleep(2)
             log.debug(job_metadata.json().keys())
-            next_build_number = int(job_metadata.json()["id"]) + 1
+            try:
+                next_build_number = int(job_metadata.json()["id"]) + 1
+            except JSONDecodeError as jde:
+                return "err: Could not determine the next build number :(", None
             return None, next_build_number
 
         print("Job could not be invoked.")
