@@ -120,8 +120,8 @@ class JenkinsLib:
             )
             # wait for Jenkins to process the build before fetching its metadata
             time.sleep(2)
-            log.debug(job_metadata.json().keys())
             try:
+                log.debug(job_metadata.json().keys())
                 next_build_number = int(job_metadata.json()["id"]) + 1
             except JSONDecodeError as jde:
                 return "err: Could not determine the next build number :(", None
