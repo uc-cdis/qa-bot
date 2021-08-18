@@ -65,7 +65,7 @@ class PipelineMaintenance:
                 f":facepalm: Could not find the CodeceptJs feature name in script `{test_script}`"
             )
         return feature_name
-    
+
     def unquarantine_ci_env(self, ci_env_name):
         """
         Add ci-environment back to the source-of-truth pool of CI environments files:
@@ -213,8 +213,10 @@ class PipelineMaintenance:
             stage_duration = jl.get_duration_of_ci_pipeline_stage(
                 repo_name, pr_num, stage_name
             )
-            duration_raw = datetime.datetime.fromtimestamp(stage_duration / 1000.0)
-            friendly_duration_format = duration_raw.strftime("%Mm and %Ss")
+            seconds = stage_duration / 1000
+            minutes = seconds / 60
+            hours = minutes / 60
+            friendly_duration_format = f"{str(hours % 60)[0:1]}h {str(minutes % 60)[0:2]}m {str(seconds)[0:2]}s"
             bot_response += f"the {stage_name} stage from repo `{repo_name}` PR `#{pr_num}` took `{friendly_duration_format}` to run... :clock1:\n"
         except RequestException as err:
             err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
