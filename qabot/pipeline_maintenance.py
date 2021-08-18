@@ -65,6 +65,29 @@ class PipelineMaintenance:
                 f":facepalm: Could not find the CodeceptJs feature name in script `{test_script}`"
             )
         return feature_name
+    
+    def unquarantine_ci_env(self, ci_env_name):
+        """
+        Add ci-environment back to the source-of-truth pool of CI environments files:
+         - services pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-services.txt
+         - releases pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-releases.txt
+        """
+        bot_response = ""
+
+        jji = JenkinsJobInvoker()
+        log.info(f"Putting environment {ci_env_name} back into CI-envs pool...")
+        json_params = {
+            "ENVIRONMENT_NAME": ci_env_name,
+        }
+        str_params = json.dumps(json_params, separators=(",", ":"))
+        bot_response = jji.invoke_jenkins_job(
+            "unquarantine-ci-environment", "jenkins", str_params
+        )
+        if "something went wrong" in bot_response:
+            return bot_response
+
+        bot_response = f"The environment {ci_env_name} has been placed back into the CI-envs pool. :awesome-face:"
+        return bot_response
 
     def quarantine_ci_env(self, ci_env_name):
         """
