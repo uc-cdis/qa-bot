@@ -1,6 +1,7 @@
 import requests
 from requests import Session, Request
 from requests.exceptions import RequestException
+from json import JSONDecodeError
 import time
 import os
 import re
