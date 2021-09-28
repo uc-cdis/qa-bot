@@ -65,7 +65,7 @@ class PipelineMaintenance:
                 f":facepalm: Could not find the CodeceptJs feature name in script `{test_script}`"
             )
         return feature_name
-    
+
     def unquarantine_ci_env(self, ci_env_name):
         """
         Add ci-environment back to the source-of-truth pool of CI environments files:
@@ -203,6 +203,8 @@ class PipelineMaintenance:
             bot_response += "```\n"
         return bot_response
 
+    # TODO: This should empower auto-replay features
+    # based on test suite's failure rate
     def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
         log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
 
@@ -223,6 +225,44 @@ class PipelineMaintenance:
 
         return bot_response
 
+    def fetch_ci_failures(self, repo_name, pr_num, create_bug_tickets=False):
+        bot_response = ""
+        jl = JenkinsLib("jenkins")
+        try:
+            log.info("find the number of the last build...")
+            job_num = jl.get_number_of_last_build(repo_name, pr_num)
+
+            successful_tests, failed_tests = jl.fetch_tests_summary_from_pr_check(
+                repo_name, pr_num, job_num
+            )
+            bot_response += f"The last build from this PR check contains \n"
+
+            # let us just track the number of successfully executed tests
+            successful_tests_count = len(successful_tests)
+            bot_response += f" `{successful_tests_count} successful tests` \n"
+
+            if len(failed_tests) > 0:
+                bot_response += (
+                    f"and the following {len(failed_tests)} tests failed: \n ```"
+                )
+
+                # let us explicitly return a list of the failing tests' names/description
+                for failed_test in failed_tests:
+                    bot_response += f"- {failed_test} \n"
+
+                bot_response += f"```"
+
+                bot_response += f"If you wish to consult a Subject Matter Expert (SME) to triage this CI failure, just run: \n"
+                bot_response += (
+                    f"``` @qa-bot who-do-I-ask-about <name-of-the-service> ``` \n"
+                )
+
+        except RequestException as err:
+            err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
+            log.error(err_msg)
+            bot_response += err_msg
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
@@ -230,7 +270,8 @@ if __name__ == "__main__":
     # result = pipem.quarantine_ci_env("jenkins-new")
     # result = pipem.check_pool_of_ci_envs()
     # result = pipem.ci_benchmarking("cdis-manifest", "3265", "K8sReset")
-    result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
+    # result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
     # negative test
     # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
+    result = pipem.fetch_ci_failures("gitops-qa", 1649)
     print(result)
