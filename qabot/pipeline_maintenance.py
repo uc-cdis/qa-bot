@@ -225,7 +225,7 @@ class PipelineMaintenance:
 
         return bot_response
 
-    def fetch_ci_failures(self, repo_name, pr_num, create_bug_tickets=False):
+    def fetch_ci_failures(self, repo_name, pr_num):
         bot_response = ""
         jl = JenkinsLib("jenkins")
         try:
@@ -239,18 +239,22 @@ class PipelineMaintenance:
 
             # let us just track the number of successfully executed tests
             successful_tests_count = len(successful_tests)
-            bot_response += f" `{successful_tests_count} successful tests` \n"
+            # singular/plural logic due to OCD
+            test_tests = "test" if successful_tests_count == 1 else "tests"
+            bot_response += f" `{successful_tests_count} successful {test_tests}` \n"
 
             if len(failed_tests) > 0:
                 bot_response += (
-                    f"and the following {len(failed_tests)} tests failed: \n ```"
+                    f"and the following {len(failed_tests)} tests failed: \n"
                 )
+                # start formatted text here
+                bot_response += "```"
 
                 # let us explicitly return a list of the failing tests' names/description
                 for failed_test in failed_tests:
                     bot_response += f"- {failed_test} \n"
-
-                bot_response += f"```"
+                # end of formatted text
+                bot_response += "```\n"
 
                 bot_response += f"If you wish to consult a Subject Matter Expert (SME) to triage this CI failure, just run: \n"
                 bot_response += (
@@ -273,5 +277,6 @@ if __name__ == "__main__":
     # result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
     # negative test
     # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
-    result = pipem.fetch_ci_failures("gitops-qa", 1649)
+    # result = pipem.fetch_ci_failures("gitops-qa", 1649)
+    result = pipem.fetch_ci_failures("gen3-qa", 700)
     print(result)

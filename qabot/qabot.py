@@ -114,8 +114,8 @@ commands_map = {
         "call": PipelineMaintenance().ci_benchmarking,
     },
     "fetch-test-results": {
-        "args": "repo_name pr_number (optional: create_bug_ticket)",
-        "example": " cdis-manifest 1234 \n fence 5678 create_bug_ticket",
+        "args": "repo_name pr_number",
+        "example": " cdis-manifest 1234 \n fence 5678",
         "call": PipelineMaintenance().fetch_ci_failures,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
