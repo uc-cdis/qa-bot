@@ -31,4 +31,4 @@ RUN source $HOME/.poetry/env \
 
 WORKDIR /opt/ctds/qabot/qabot
 
-ENTRYPOINT poetry run python3.6 qabot.py
+ENTRYPOINT source $HOME/.poetry/env && poetry run python3.6 qabot.py
