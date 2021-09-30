@@ -123,6 +123,11 @@ commands_map = {
         "example": " cdis-manifest 1234 \n fence 5678",
         "call": PipelineMaintenance().fetch_ci_failures,
     },
+    "who-do-I-ask-about": {
+        "args": "repo_name",
+        "example": "@qa-bot who-do-I-ask-about arborist",
+        "call": PipelineMaintenance().get_repo_sme,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
