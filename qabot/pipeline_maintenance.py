@@ -310,6 +310,33 @@ class PipelineMaintenance:
         )
         return bot_response
 
+    def get_repo_sme(self, repo_name):
+        contents_url = (
+            "https://api.github.com/repos/uc-cdis/qa-bot/contents/qabot/repo_owner.json"
+        )
+        contents_url_info = requests.get(
+            contents_url,
+            headers={
+                "Authorization": "token {}".format(os.environ["GITHUB_TOKEN"].strip()),
+                "Accept": "application/vnd.github.v3+json",
+            },
+        ).json()
+        download_url = contents_url_info["download_url"]
+        r = requests.get(
+            download_url,
+            headers={
+                "Authorization": "token {}".format(os.environ["GITHUB_TOKEN"].strip())
+            },
+        )
+        if r.status_code != 200:
+            raise Exception(
+                "Unable to get file repo_owner.json at `{}`: got code {}.".format(
+                    download_url[: download_url.index("token")], response.status_code,
+                )
+            )
+        repos_and_owners = r.json()
+        return f"primary: {repos_and_owners[repo_name]['primary']} & secondary: {repos_and_owners[repo_name]['secondary']}"
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
@@ -321,10 +348,11 @@ if __name__ == "__main__":
     # negative test
     # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
     # result = pipem.fetch_ci_failures("gitops-qa", 1649)
-    result = pipem.fetch_ci_failures("gen3-qa", 700)
+    # result = pipem.fetch_ci_failures("gen3-qa", 700)
     # result = pipem.create_bug_ticket(
     #    title="this PR-123 is failing",
     #    description="help, this is failing",
     #    assignee="Atharva Rane",
     # )
+    result = pipem.get_repo_sme("arborist")
     print(result)
