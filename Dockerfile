@@ -17,6 +17,8 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev
 
 USER qabotuser
 
+RUN pip install --upgrade pip
+
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
 # cache so that poetry install will run if these files change
@@ -24,7 +26,6 @@ COPY poetry.lock pyproject.toml /opt/ctds/qabot/
 
 # install qa-bot and dependencies via poetry
 RUN source $HOME/.poetry/env \
-    && export CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
     && poetry install --no-dev --no-interaction \
     && poetry show -v
 
