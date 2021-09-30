@@ -80,7 +80,7 @@ class JenkinsLib:
             pr_number,
             int(job_number) + 1,
         )
-        log.debug("sending POST reques to the following url: {}".format(the_url))
+        log.debug("sending POST request to the following url: {}".format(the_url))
         resp = requests.post(
             the_url,
             headers={"Content-type": "application/json"},
@@ -138,6 +138,9 @@ class JenkinsLib:
             ),
             auth=("themarcelor", self.jenkins_user_api_token),
         )
+        if job_metadata.status_code == 404:
+            log.warn("This PR job is no longer available (probably old), abort.")
+            return None
         return job_metadata.json()["number"]
 
     def get_duration_of_ci_pipeline_stage(self, repo_name, job_number, stage_name):
@@ -208,6 +211,53 @@ class JenkinsLib:
             err = Exception(err_msg)
             return err, None
         return None, resp.text
+
+    def fetch_tests_summary_from_pr_check(self, repo_name, pr_number, job_number):
+        """
+        Prepares a py request against the Jenkins Blueocean REST API
+        to fetch the results of the tests in a PR check run
+
+        sample curl to fetch the failed/passed count from the tests executed in a PR check:
+        url -s -X GET -u themarcelor:$JENKINS_USER_API_TOKEN "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/pipelines/gitops-qa/pipelines/PR-1646/runs/4/blueTestSummary/" | jq .
+        sample curl to get the full list of failed/passed tests
+        url -s -X GET -u themarcelor:$JENKINS_USER_API_TOKEN "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/pipelines/gitops-qa/pipelines/PR-1646/runs/4/tests/" | jq .
+        """
+        log.info(
+            "Sending a request to Jenkins Blueocean REST API to PR {} from Repo {}".format(
+                pr_number, repo_name
+            )
+        )
+        the_url = "{}/{}/PR-{}/runs/{}/tests/".format(
+            self.base_blueocean_url, repo_name, pr_number, job_number
+        )
+        log.debug("sending GET request to the following url: {}".format(the_url))
+        resp = requests.get(
+            the_url,
+            headers={"Content-type": "application/json"},
+            auth=("themarcelor", self.jenkins_user_api_token),
+        )
+        # if 404, maybe the PR is still in flight and it didn't finish RunTests yet
+        if resp.status_code == 404:
+            return None, None
+
+        if resp.status_code != 200:
+            err_msg = "The request failed. Details: {}".format(resp.reason)
+            log.error(err_msg)
+            raise Exception(err_msg)
+
+        tests = resp.json()
+        log.debug(f"full tests query output: {tests}")
+        log.info(f"this PR check ran {len(tests)} tests.")
+        successful_tests, failed_tests = [], []
+
+        for test in tests:
+            if "name" in test:
+                t = test["name"]
+                successful_tests.append(t) if test[
+                    "status"
+                ] == "PASSED" else failed_tests.append(t)
+
+        return successful_tests, failed_tests
 
 
 if __name__ == "__main__":

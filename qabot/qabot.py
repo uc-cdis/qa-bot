@@ -118,6 +118,11 @@ commands_map = {
         "example": " cdis-manifest 3265 K8sReset\n gitops-qa 1523 RunTests",
         "call": PipelineMaintenance().ci_benchmarking,
     },
+    "fetch-test-results": {
+        "args": "repo_name pr_number",
+        "example": " cdis-manifest 1234 \n fence 5678",
+        "call": PipelineMaintenance().fetch_ci_failures,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
