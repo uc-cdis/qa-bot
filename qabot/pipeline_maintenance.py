@@ -335,7 +335,11 @@ class PipelineMaintenance:
                 )
             )
         repos_and_owners = r.json()
-        return f"primary: {repos_and_owners[repo_name]['primary']} & secondary: {repos_and_owners[repo_name]['secondary']}"
+        try:
+            bot_response = f"primary: {repos_and_owners[repo_name]['primary']} & secondary: {repos_and_owners[repo_name]['secondary']}"
+        except KeyError:
+            bot_response = f"hey :sweat_smile:, there's no point of contact defined for `{repo_name}`, please update the repo_owner.json file or just go to #gen3-dev-oncall ."
+        return bot_response
 
 
 if __name__ == "__main__":

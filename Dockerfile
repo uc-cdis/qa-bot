@@ -24,6 +24,7 @@ COPY poetry.lock pyproject.toml /opt/ctds/qabot/
 
 # install qa-bot and dependencies via poetry
 RUN source $HOME/.poetry/env \
+    && export CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
     && poetry install --no-dev --no-interaction \
     && poetry show -v
 
