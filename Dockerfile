@@ -17,7 +17,7 @@ RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev
 
 USER qabotuser
 
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip --user
 
 RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 
