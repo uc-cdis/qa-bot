@@ -12,6 +12,7 @@ RUN mkdir -p /opt/ctds/qabot \
 COPY . /opt/ctds/qabot
 WORKDIR /opt/ctds/qabot
 
+ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev curl
 
 USER qabotuser
