@@ -95,7 +95,7 @@ TODO: The QA team needs to, eventually, make these commands friendlier by wrappi
 
 Lists all the environments (k8s namespaces) from a given EKS cluster.
 
-Exameple: `@qa-bot list-environments qaplanetv1`
+Example: `@qa-bot list-environments qaplanetv1`
 
 *hello*
 
