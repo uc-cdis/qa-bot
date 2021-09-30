@@ -138,6 +138,9 @@ class JenkinsLib:
             ),
             auth=("themarcelor", self.jenkins_user_api_token),
         )
+        if job_metadata.status_code == 404:
+            log.warn("This PR job is no longer available (probably old), abort.")
+            return None
         return job_metadata.json()["number"]
 
     def get_duration_of_ci_pipeline_stage(self, repo_name, job_number, stage_name):
@@ -233,6 +236,10 @@ class JenkinsLib:
             headers={"Content-type": "application/json"},
             auth=("themarcelor", self.jenkins_user_api_token),
         )
+        # if 404, maybe the PR is still in flight and it didn't finish RunTests yet
+        if resp.status_code == 404:
+            return None, None
+
         if resp.status_code != 200:
             err_msg = "The request failed. Details: {}".format(resp.reason)
             log.error(err_msg)

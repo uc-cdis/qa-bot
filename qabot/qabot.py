@@ -48,6 +48,11 @@ commands_map = {
         "example": "@qa-bot run-test jenkins2 ci-env-1 test-portal-homepageTest",
         "call": JenkinsJobInvoker().run_test_on_environment,
     },
+    "create-ticket": {
+        "args": 'ticket_type {"title":"any title","description":"any description","assignee":"Name [Middle Name] LastName"}',
+        "example": '@qa-bot create-ticket bug {"title":"PR-1234 failed. help!","description":"This test test-portal-discoveryPageTest is failing","assignee":"Hara Prasad Juvala"}',
+        "call": PipelineMaintenance().create_ticket,
+    },
     "check-result": {
         "args": "job name, id id and jenkins instance",
         "example": "@qa-bot check-result run-tests-on-environment 21 jenkins2",
@@ -123,6 +128,7 @@ commands_map = {
 
 
 def process_command(command, args):
+    print(f"### ## args = {args}")
     # process args to handle whitespaces inside json blocks
     entered_json_block_at_index = None
     for i, a in enumerate(args):

@@ -11,6 +11,7 @@ from lib.slacklib import SlackLib
 from lib.githublib import GithubLib
 from lib.influxlib import InfluxLib
 from lib.jenkinslib import JenkinsLib
+from lib.jiralib import JiraLib
 
 from jenkins_job_invoker import JenkinsJobInvoker
 
@@ -215,8 +216,14 @@ class PipelineMaintenance:
             stage_duration = jl.get_duration_of_ci_pipeline_stage(
                 repo_name, pr_num, stage_name
             )
-            duration_raw = datetime.datetime.fromtimestamp(stage_duration / 1000.0)
-            friendly_duration_format = duration_raw.strftime("%Mm and %Ss")
+            duration = (
+                str(datetime.timedelta(milliseconds=stage_duration))
+                .split(".")[0]
+                .split(":")
+            )
+            friendly_duration_format = " ".join(
+                [i + j for i, j in zip(duration, ["h", "m", "s"])]
+            )
             bot_response += f"the {stage_name} stage from repo `{repo_name}` PR `#{pr_num}` took `{friendly_duration_format}` to run... :clock1:\n"
         except RequestException as err:
             err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
@@ -232,9 +239,18 @@ class PipelineMaintenance:
             log.info("find the number of the last build...")
             job_num = jl.get_number_of_last_build(repo_name, pr_num)
 
+            if job_num == None:
+                bot_response += "Could not fetch test results form this PR check. The Blueocean workspace is no longer available."
+                return bot_response
+
             successful_tests, failed_tests = jl.fetch_tests_summary_from_pr_check(
                 repo_name, pr_num, job_num
             )
+            # the latest PR build is still in flight
+            if successful_tests == None and failed_tests == None:
+                bot_response += "The latest PR build is still in flight... keep an eye on #gen3-qa-notifications :eye: "
+                return bot_response
+
             bot_response += f"The last build from this PR check contains \n"
 
             # let us just track the number of successfully executed tests
@@ -267,6 +283,33 @@ class PipelineMaintenance:
             bot_response += err_msg
         return bot_response
 
+    def create_ticket(self, type, args=""):
+        # handle arguments
+        jira_ticket_params = json.loads(args)
+
+        type = type.capitalize()
+
+        bot_response = ""
+        jil = JiraLib()
+        try:
+            jira_id = jil.create_ticket(
+                jira_ticket_params["title"],
+                jira_ticket_params["description"],
+                type,
+                jira_ticket_params["assignee"],
+            )
+        except Exception as err:
+            log.error(str(err))
+            return f"Could not create the bug ticket :sad-super-sad: {str(err)}"
+
+        bot_response = (
+            f"JIRA bug ticket {jira_id} has been created successfully. :tada: \n"
+        )
+        bot_response += (
+            f"click here to see the ticket: {jil.jira_server}/browse/{jira_id} \n"
+        )
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
@@ -279,4 +322,9 @@ if __name__ == "__main__":
     # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
     # result = pipem.fetch_ci_failures("gitops-qa", 1649)
     result = pipem.fetch_ci_failures("gen3-qa", 700)
+    # result = pipem.create_bug_ticket(
+    #    title="this PR-123 is failing",
+    #    description="help, this is failing",
+    #    assignee="Atharva Rane",
+    # )
     print(result)
