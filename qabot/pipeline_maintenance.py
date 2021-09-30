@@ -11,6 +11,7 @@ from lib.slacklib import SlackLib
 from lib.githublib import GithubLib
 from lib.influxlib import InfluxLib
 from lib.jenkinslib import JenkinsLib
+from lib.jiralib import JiraLib
 
 from jenkins_job_invoker import JenkinsJobInvoker
 
@@ -229,6 +230,33 @@ class PipelineMaintenance:
 
         return bot_response
 
+    def create_ticket(self, type, args=""):
+        # handle arguments
+        jira_ticket_params = json.loads(args)
+
+        type = type.capitalize()
+
+        bot_response = ""
+        jil = JiraLib()
+        try:
+            jira_id = jil.create_ticket(
+                jira_ticket_params["title"],
+                jira_ticket_params["description"],
+                type,
+                jira_ticket_params["assignee"],
+            )
+        except Exception as err:
+            log.error(str(err))
+            return f"Could not create the bug ticket :sad-super-sad: {str(err)}"
+
+        bot_response = (
+            f"JIRA bug ticket {jira_id} has been created successfully. :tada: \n"
+        )
+        bot_response += (
+            f"click here to see the ticket: {jil.jira_server}/browse/{jira_id} \n"
+        )
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
@@ -236,7 +264,12 @@ if __name__ == "__main__":
     # result = pipem.quarantine_ci_env("jenkins-new")
     # result = pipem.check_pool_of_ci_envs()
     # result = pipem.ci_benchmarking("cdis-manifest", "3265", "K8sReset")
-    result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
+    # result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
     # negative test
     # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
+    result = pipem.create_bug_ticket(
+        title="this PR-123 is failing",
+        description="help, this is failing",
+        assignee="Atharva Rane",
+    )
     print(result)
