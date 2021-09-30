@@ -17,11 +17,11 @@
     },
     "cdis-data-client": {
         "primary" : "@mshao1",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "guppy": {
         "primary" : "@mshao1",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "hatchery": {
         "primary" : "@emalinowski",
@@ -36,12 +36,12 @@
         "secondary" : "@mlukowski"
     },
     "manifestservice": {
-        "primary" : "@",
-        "secondary" : "@"
+        "primary" : "",
+        "secondary" : ""
     },
     "peregrine": {
         "primary" : "@pauline",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "pidgin": {
         "primary" : "@pauline",
@@ -53,35 +53,35 @@
     },
     "sheepdog": {
         "primary" : "@pauline",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "sower": {
         "primary" : "@aprokh",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "sower-jobs": {
         "primary" : "@aprokh",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "ssjdispatcher": {
         "primary" : "@mshao1",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "tube": {
         "primary" : "@thanhnd",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "gen3-fuse": {
-        "primary" : "@",
-        "secondary" : "@"
+        "primary" : "",
+        "secondary" : ""
     },
     "indexs3client": {
         "primary" : "@mshao1",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "gen3-spark": {
         "primary" : "@thanhnd",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "metadata-service": {
         "primary" : "@avantol",
@@ -93,13 +93,13 @@
     },
     "dcf-dataservice": {
         "primary" : "@binamb",
-        "secondary" : "@"
+        "secondary" : ""
     },
     "mariner": {
         "primary" : "@christerrazas",
         "secondary" : "@avantol"
     },
-    "we-storage": {
+    "ws-storage": {
         "primary" : "@emalinowski",
         "secondary" : "@qureshi"
     },
