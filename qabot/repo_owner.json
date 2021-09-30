@@ -1,0 +1,114 @@
+{
+    "arborist": {
+        "primary" : "@avantol",
+        "secondary" : "@pauline"
+    },
+    "audit-service": {
+        "primary" : "@pauline",
+        "secondary" : "@binamb"
+    },
+    "gen3-statistics": {
+        "primary" : "@emalinowski",
+        "secondary" : "@qureshi"
+    },
+    "fence": {
+        "primary" : "@avantol",
+        "secondary" : "@pauline"
+    },
+    "cdis-data-client": {
+        "primary" : "@mshao1",
+        "secondary" : ""
+    },
+    "guppy": {
+        "primary" : "@mshao1",
+        "secondary" : ""
+    },
+    "hatchery": {
+        "primary" : "@emalinowski",
+        "secondary" : "@qureshi"
+    },
+    "indexd": {
+        "primary" : "@pauline",
+        "secondary" : "@avantol"
+    },
+    "pelican": {
+        "primary" : "@aprokh",
+        "secondary" : "@mlukowski"
+    },
+    "manifestservice": {
+        "primary" : "",
+        "secondary" : ""
+    },
+    "peregrine": {
+        "primary" : "@pauline",
+        "secondary" : ""
+    },
+    "pidgin": {
+        "primary" : "@pauline",
+        "secondary" : "@thanhnd"
+    },
+    "data-portal": {
+        "primary" : "@mshao1",
+        "secondary" : "@mpingram"
+    },
+    "sheepdog": {
+        "primary" : "@pauline",
+        "secondary" : ""
+    },
+    "sower": {
+        "primary" : "@aprokh",
+        "secondary" : ""
+    },
+    "sower-jobs": {
+        "primary" : "@aprokh",
+        "secondary" : ""
+    },
+    "ssjdispatcher": {
+        "primary" : "@mshao1",
+        "secondary" : ""
+    },
+    "tube": {
+        "primary" : "@thanhnd",
+        "secondary" : ""
+    },
+    "gen3-fuse": {
+        "primary" : "",
+        "secondary" : ""
+    },
+    "indexs3client": {
+        "primary" : "@mshao1",
+        "secondary" : ""
+    },
+    "gen3-spark": {
+        "primary" : "@thanhnd",
+        "secondary" : ""
+    },
+    "metadata-service": {
+        "primary" : "@avantol",
+        "secondary" : "@johnmccann"
+    },
+    "docker-nginx": {
+        "primary" : "@emalinowski",
+        "secondary" : "@qureshi"
+    },
+    "dcf-dataservice": {
+        "primary" : "@binamb",
+        "secondary" : ""
+    },
+    "mariner": {
+        "primary" : "@christerrazas",
+        "secondary" : "@avantol"
+    },
+    "ws-storage": {
+        "primary" : "@emalinowski",
+        "secondary" : "@qureshi"
+    },
+    "ACCESS-backend": {
+        "primary" : "@mcannalte",
+        "secondary" : "@avantol"
+    },
+    "aweshelper": {
+        "primary" : "@emalinowski",
+        "secondary" : "@qureshi"
+    }
+}
