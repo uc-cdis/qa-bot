@@ -69,7 +69,7 @@ python-versions = "*"
 
 [[package]]
 name = "cryptography"
-version = "3.4"
+version = "3.4.1"
 description = "cryptography is a package which provides cryptographic recipes and primitives to Python developers."
 category = "main"
 optional = false
@@ -482,7 +482,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytes
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "11884cdbfb7ccd69d602e554cdd5d48570d1e286d63088a1a5848e84d06c71d3"
+content-hash = "eea086fe90af43b07849f391435dfbad21b2fc658dc46551288ba1e63324a943"
 
 [metadata.files]
 aiohttp = [
@@ -588,14 +588,13 @@ chardet = [
     {file = "chardet-3.0.4.tar.gz", hash = "sha256:84ab92ed1c4d4f16916e05906b6b75a6c0fb5db821cc65e70cbd64a3e2a5eaae"},
 ]
 cryptography = [
-    {file = "cryptography-3.4-cp36-abi3-macosx_10_10_x86_64.whl", hash = "sha256:fbd38b271aee2c3a8faef582aefd78e3e3a4ffdb6c7e942ab21bd9b0511d26a9"},
-    {file = "cryptography-3.4-cp36-abi3-macosx_10_15_x86_64.whl", hash = "sha256:e7d5aa2a82ccbfbae7b216d687bd81775cc32dbf82ad910d3b44f6322e3a7816"},
-    {file = "cryptography-3.4-cp36-abi3-manylinux2010_x86_64.whl", hash = "sha256:33877917286b449364ef0b1769d2ec8c51b8aa03233e9221aea0339d8ae0c773"},
-    {file = "cryptography-3.4-cp36-abi3-manylinux2014_aarch64.whl", hash = "sha256:e1184327cbce81cc1cabc65820d775bdc72fa032805d2a756ab75bd3bf0a31e3"},
-    {file = "cryptography-3.4-cp36-abi3-manylinux2014_x86_64.whl", hash = "sha256:9efbd2867258a4b12e3c39ba12a064d3f862fb3aad6bc05120c830d51c250f16"},
-    {file = "cryptography-3.4-cp36-abi3-win32.whl", hash = "sha256:b652ae00b3b7c6f0afef061686919206d92e12ce2c926dc28b68ccb1b3ceb630"},
-    {file = "cryptography-3.4-cp36-abi3-win_amd64.whl", hash = "sha256:6f414e7f0fb5cb5667251fd32367674dbed90da45daa532827c8e54868e9a0b7"},
-    {file = "cryptography-3.4.tar.gz", hash = "sha256:9f7aa11ea95723359f914be3217d8b378bc3897f65a1ec1ab4e0118c336f51fc"},
+    {file = "cryptography-3.4.1-cp36-abi3-macosx_10_10_x86_64.whl", hash = "sha256:e63b8da1d77ff60a73d72db68cb72e8ffbe9f7319e5ffa23f6bfe2757d6871e3"},
+    {file = "cryptography-3.4.1-cp36-abi3-manylinux2010_x86_64.whl", hash = "sha256:4d8df1f5b6b172fe53a465d8fc32134a07ccd4dc677f19af85562bcbc7e97504"},
+    {file = "cryptography-3.4.1-cp36-abi3-manylinux2014_aarch64.whl", hash = "sha256:cd1d14b6c52d9372a7f4682576fa7d9c9d256afa6cc50828b337dbb8a9596066"},
+    {file = "cryptography-3.4.1-cp36-abi3-manylinux2014_x86_64.whl", hash = "sha256:85c7d84beacf32bf629767f06c78af0350eb869e2830e4ebe05b239c695eca38"},
+    {file = "cryptography-3.4.1-cp36-abi3-win32.whl", hash = "sha256:007edf78a0b96513b94c1c7cc515286aec72f787bdcd11892edcdec9e27e936d"},
+    {file = "cryptography-3.4.1-cp36-abi3-win_amd64.whl", hash = "sha256:423c12d04df7ed3323e74745cba91056a411bd8f57609a6a64562845ccc5541a"},
+    {file = "cryptography-3.4.1.tar.gz", hash = "sha256:be70bdaa29bcacf70896dae3a6f3eef91daf51bfba8a49dbfb9c23bb2cc914ba"},
 ]
 defusedxml = [
     {file = "defusedxml-0.7.1-py2.py3-none-any.whl", hash = "sha256:a352e7e428770286cc899e2542b6cdaedb2b4953ff269a210103ec58f6198a61"},

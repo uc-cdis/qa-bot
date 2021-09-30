@@ -12,7 +12,7 @@ PyGithub = "1.44.1"
 httmock = "1.3.0"
 influxdb = "^5.3.1"
 jira = "^3.0.1"
-cryptography = "3.4"
+cryptography = "3.4.1"
 
 [tool.poetry.dev-dependencies]
 
