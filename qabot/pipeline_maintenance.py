@@ -3,6 +3,7 @@ import os
 import re
 import logging
 import datetime
+from ascii_graph import Pyasciigraph
 
 import requests
 from requests.exceptions import RequestException
@@ -29,6 +30,7 @@ class PipelineMaintenance:
         self.cdis_public_bucket_base_url = (
             "https://cdistest-public-test-bucket.s3.amazonaws.com/"
         )
+        self.in_memory_ci_stats = {}
 
     def get_slacklib(self):
         return SlackLib()
@@ -204,36 +206,71 @@ class PipelineMaintenance:
             bot_response += "```\n"
         return bot_response
 
+    def _populate_ci_stats(self, repo_name, pr_number, ci_results):
+        if repo_name not in self.in_memory_ci_stats:
+            self.in_memory_ci_stats[repo_name] = {}
+
+        stats_key = "failed" if "failed" in ci_results else "successful"
+        if stats_key not in self.in_memory_ci_stats[repo_name]:
+            self.in_memory_ci_stats[repo_name][stats_key] = {}
+
+        pr = f"PR-{pr_number}"
+        repo_stats_mapping = self.in_memory_ci_stats[repo_name][stats_key]
+        repo_stats_mapping.__setitem__(
+            pr, repo_stats_mapping[pr] + 1
+        ) if pr in repo_stats_mapping else repo_stats_mapping.__setitem__(pr, 1)
+
+    def _identify_pr_details_from_jenkins_notification(self, jenkins_msg):
+        # identify repo_name and pr_number in the msg
+        matchstring = ".*https:\/\/github.com\/uc-cdis\/(.*)\/pull\/(.*)>.*"
+        regex_result = re.match(matchstring, jenkins_msg)
+
+        if regex_result:
+            log.info(f"repo_name from CI notification: {regex_result.group(1)}")
+            log.info(f"pr_number from CI notification: {regex_result.group(2)}")
+            repo_name = regex_result.group(1)
+            pr_number = regex_result.group(2)
+
+            return repo_name, pr_number
+        else:
+            log.warn(
+                "invalid CI notification, can't identify repo_name and pr_number. Just ignore... meh."
+            )
+            return None, None
+
     # TODO: This should empower auto-replay features
     # based on test suite's failure rate
     def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
         log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
 
         bot_response = ""
+        actual_msg = jenkins_slack_msg_raw["attachments"][0]["fields"][0]["value"]
 
         # if a CI notification is sent to the #nightly-builds channel
         if jenkins_slack_msg_raw["channel"] == "C01TS6PDMRT":
-            # identify repo_name and pr_number in the msg
-            actual_msg = jenkins_slack_msg_raw["attachments"][0]["fields"][0]["value"]
+            bot_response += "Additional nightly-build stats :moon: \n"
+            repo_name, pr_number = self._identify_pr_details_from_jenkins_notification(
+                actual_msg
+            )
 
-            matchstring = ".*https:\/\/github.com\/uc-cdis\/(.*)\/pull\/(.*)>.*"
-            regex_result = re.match(matchstring, actual_msg)
-
-            if regex_result:
-                log.info(f"repo_name from CI notification: {regex_result.group(1)}")
-                log.info(f"pr_number from CI notification: {regex_result.group(2)}")
-                repo_name = regex_result.group(1)
-                pr_number = regex_result.group(2)
-
+            if repo_name and pr_number:
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "K8sReset")
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
-                bot_response += self.fetch_ci_failures(repo_name, pr_number)
+                ci_results = self.fetch_ci_failures(repo_name, pr_number)
+                bot_response += ci_results
+
+                self._populate_ci_stats(repo_name, pr_number, ci_results)
 
                 return bot_response
-            else:
-                log.warn(
-                    "invalid CI notification, can't identify repo_name and pr_number. Just ignore... meh."
-                )
+        # if a CI notification is sent to the #gen3-qa-notifications channel
+        elif jenkins_slack_msg_raw["channel"] == "C0183EFTPLG":
+            repo_name, pr_number = self._identify_pr_details_from_jenkins_notification(
+                actual_msg
+            )
+
+            if repo_name and pr_number:
+                ci_results = self.fetch_ci_failures(repo_name, pr_number)
+                self._populate_ci_stats(repo_name, pr_number, ci_results)
 
     def ci_benchmarking(self, repo_name, pr_num, stage_name):
         bot_response = ""
@@ -367,6 +404,38 @@ class PipelineMaintenance:
             bot_response = f"hey :sweat_smile:, there's no point of contact defined for `{repo_name}`, please update the repo_owner.json file or just go to #gen3-dev-oncall ."
         return bot_response
 
+    def get_ci_summary(self):
+        print(f"### ## self.in_memory_ci_stats: {self.in_memory_ci_stats}")
+
+        prs_tuples = {"failed": [], "successful": []}
+        repos_list = self.in_memory_ci_stats.keys()
+
+        for result in ["failed", "successful"]:
+            for repo in repos_list:
+                per_repo_counter = 0
+                if result in self.in_memory_ci_stats[repo]:
+                    for pr in self.in_memory_ci_stats[repo][result].keys():
+                        per_repo_counter += self.in_memory_ci_stats[repo][result][pr]
+                prs_tuples[result].append((repo, per_repo_counter))
+
+        failed_prs = prs_tuples["failed"]
+
+        bot_response = "CI Summary:"
+        output = "```"
+        graph = Pyasciigraph()
+        for line in graph.graph("Failed PR checks:", failed_prs):
+            output += line + "\n"
+
+        successful_prs = prs_tuples["successful"]
+
+        output += "############################################################################### \n"
+        for line in graph.graph("Successful PR checks:", successful_prs):
+            output += line + "\n"
+
+        output += "```"
+        bot_response += output
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
@@ -385,7 +454,7 @@ if __name__ == "__main__":
     #    assignee="Atharva Rane",
     # )
     # result = pipem.get_repo_sme("arborist")
-    result = pipem.react_to_jenkins_updates(
+    pipem.react_to_jenkins_updates(
         {
             "subtype": "bot_message",
             "text": "",
@@ -410,4 +479,6 @@ if __name__ == "__main__":
             "ts": "1633106721.151600",
         }
     )
+    pipem.in_memory_ci_stats = {}
+    result = pipem.get_ci_summary()
     print(result)
