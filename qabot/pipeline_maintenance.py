@@ -209,6 +209,32 @@ class PipelineMaintenance:
     def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
         log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
 
+        bot_response = ""
+
+        # if a CI notification is sent to the #nightly-builds channel
+        if jenkins_slack_msg_raw["channel"] == "C01TS6PDMRT":
+            # identify repo_name and pr_number in the msg
+            actual_msg = jenkins_slack_msg_raw["attachments"][0]["fields"][0]["value"]
+
+            matchstring = ".*https:\/\/github.com\/uc-cdis\/(.*)\/pull\/(.*)>.*"
+            regex_result = re.match(matchstring, actual_msg)
+
+            if regex_result:
+                log.info(f"repo_name from CI notification: {regex_result.group(1)}")
+                log.info(f"pr_number from CI notification: {regex_result.group(2)}")
+                repo_name = regex_result.group(1)
+                pr_number = regex_result.group(2)
+
+                bot_response += self.ci_benchmarking(repo_name, pr_number, "K8sReset")
+                bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
+                bot_response += self.fetch_ci_failures(repo_name, pr_number)
+
+                return bot_response
+            else:
+                log.warn(
+                    "invalid CI notification, can't identify repo_name and pr_number. Just ignore... meh."
+                )
+
     def ci_benchmarking(self, repo_name, pr_num, stage_name):
         bot_response = ""
         jl = JenkinsLib("jenkins")
@@ -358,5 +384,45 @@ if __name__ == "__main__":
     #    description="help, this is failing",
     #    assignee="Atharva Rane",
     # )
-    result = pipem.get_repo_sme("arborist")
+    # result = pipem.get_repo_sme("arborist")
+    result = pipem.react_to_jenkins_updates(
+        {
+            "subtype": "bot_message",
+            "text": "",
+            "suppress_notification": False,
+            "bot_id": "B80E3HU5P",
+            "team": "T03A08KRA",
+            "bot_profile": {
+                "id": "B80E3HU5P",
+                "deleted": False,
+                "name": "jenkins",
+                "updated": 1510774821,
+                "app_id": "A0F7VRFKN",
+                "icons": {
+                    "image_36": "https://a.slack-edge.com/80588/img/services/jenkins-ci_36.png",
+                    "image_48": "https://a.slack-edge.com/80588/img/services/jenkins-ci_48.png",
+                    "image_72": "https://a.slack-edge.com/80588/img/services/jenkins-ci_72.png",
+                },
+                "team_id": "T03A08KRA",
+            },
+            "attachments": [
+                {
+                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
+                    "id": 1,
+                    "color": "439FE0",
+                    "fields": [
+                        {
+                            "title": "",
+                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
+                            "short": False,
+                        }
+                    ],
+                    "mrkdwn_in": ["pretext", "text", "fields"],
+                }
+            ],
+            "channel": "C01TS6PDMRT",
+            "event_ts": "1633106721.151600",
+            "ts": "1633106721.151600",
+        }
+    )
     print(result)
