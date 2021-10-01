@@ -390,21 +390,6 @@ if __name__ == "__main__":
             "subtype": "bot_message",
             "text": "",
             "suppress_notification": False,
-            "bot_id": "B80E3HU5P",
-            "team": "T03A08KRA",
-            "bot_profile": {
-                "id": "B80E3HU5P",
-                "deleted": False,
-                "name": "jenkins",
-                "updated": 1510774821,
-                "app_id": "A0F7VRFKN",
-                "icons": {
-                    "image_36": "https://a.slack-edge.com/80588/img/services/jenkins-ci_36.png",
-                    "image_48": "https://a.slack-edge.com/80588/img/services/jenkins-ci_48.png",
-                    "image_72": "https://a.slack-edge.com/80588/img/services/jenkins-ci_72.png",
-                },
-                "team_id": "T03A08KRA",
-            },
             "attachments": [
                 {
                     "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
