@@ -183,7 +183,8 @@ def post_message(payload, bot_reply, channel_id):
 @slack.RTMClient.run_on(event="message")
 def capture_messages(**payload):
     data = payload["data"]
-    log.debug("### DATA: {}".format(data))
+    # this will log every single msg, it should be disabled by default
+    # log.debug("### DATA: {}".format(data))
 
     channel_id = data["channel"]
 
@@ -202,7 +203,9 @@ def capture_messages(**payload):
 
     if "bot_profile" in data.keys() and data["bot_profile"]["id"] == "B80E3HU5P":
         log.info("Jenkins just posted a Slack msg")
-        PipelineMaintenance().react_to_jenkins_updates(data["attachments"])
+        bot_reply = PipelineMaintenance().react_to_jenkins_updates(data)
+        if bot_reply != None:
+            post_message(payload, bot_reply, "C01TS6PDMRT")
 
     if "<@UQKCGCU1H>" in the_msg:
         log.info("user {} just sent a msg: {}".format(user, the_msg))
