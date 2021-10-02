@@ -28,11 +28,7 @@ def list_all_commands():
 
 
 commands_map = {
-    "help": {
-        "args": "list all commands",
-        "example": "@qa-bot help",
-        "call": list_all_commands,
-    },
+    "help": {"args": "", "example": "@qa-bot help", "call": list_all_commands,},
     "compare-manifests": {
         "args": "pr number and signed-off manifest",
         "example": "@qa-bot compare-manifests 928 internalstaging.datastage.io",
@@ -110,7 +106,7 @@ commands_map = {
     },
     "check-pool-of-ci-environments": {
         "args": "",
-        "example": "",
+        "example": "@qa-bot check-pool-of-ci-environments",
         "call": PipelineMaintenance().check_pool_of_ci_envs,
     },
     "ci-benchmarking": {
@@ -127,6 +123,11 @@ commands_map = {
         "args": "repo_name",
         "example": "@qa-bot who-do-I-ask-about arborist",
         "call": PipelineMaintenance().get_repo_sme,
+    },
+    "get-ci-summary": {
+        "args": "",
+        "example": "@qa-bot get-ci-summary",
+        "call": PipelineMaintenance().get_ci_summary,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
