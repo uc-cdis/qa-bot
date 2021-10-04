@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 from pprint import pprint
 
 from qabot.pipeline_maintenance import PipelineMaintenance
+from lib.influxlib import InfluxLib
 
 
 class PipelineMaintenanceTestCase(unittest.TestCase):
@@ -62,24 +63,17 @@ class PipelineMaintenanceTestCase(unittest.TestCase):
     ]
 
     def setUp(self):
-        # create a mock InfluxLib object
-        influxlibMock = Mock(name="InfluxLibMock", return_value=(Mock()))
-
         # mock InfluxLib "query_ci_metrics" function
-        def query_ci_metrics(measurement, tags):
+        influxdb = InfluxLib()
+
+        def query_ci_metrics(influxdb, measurement, tags):
             # expect {"suite_name": "MockHomepage"}
             if tags["suite_name"] == "MockHomepage":
                 return self.mock_influx_query_results
             else:
                 return "could not identify the name of the feature"
 
-        influxlibMock.query_ci_metrics = query_ci_metrics
-
-        # mock get_influxlib function to return the influxlibMock mock obj
-        def get_influxlib(self):
-            return influxlibMock
-
-        self.patch1 = patch.object(PipelineMaintenance, "get_influxlib", get_influxlib)
+        self.patch1 = patch.object(InfluxLib, "query_ci_metrics", query_ci_metrics)
         self.patch1.start()
 
         # initialize the ManifestsChecker instance

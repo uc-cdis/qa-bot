@@ -52,9 +52,6 @@ class PipelineMaintenance:
     def get_githublib(self):
         return GithubLib()
 
-    def get_influxlib(self):
-        return InfluxLib()
-
     def _get_test_script_source(self, test_script):
         try:
             # try to find the test script that corresponds to the test suite name
@@ -156,7 +153,7 @@ class PipelineMaintenance:
             log.error(str(err))
             return str(err)
 
-        influxlib = self.get_influxlib()
+        influxlib = InfluxLib()
         data_points = influxlib.query_ci_metrics(
             "fail_count", {"suite_name": feature_name}
         )
