@@ -2,6 +2,7 @@ import json
 import os
 import re
 import logging
+import time
 import datetime
 
 import requests
@@ -227,6 +228,8 @@ class PipelineMaintenance:
 
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "K8sReset")
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
+                # wait for the remaining pipeline stages (post-RunTests)
+                time.sleep(60)
                 bot_response += self.fetch_ci_failures(repo_name, pr_number)
 
                 return bot_response
