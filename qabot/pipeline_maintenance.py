@@ -21,6 +21,18 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
 
+def singleton(cls):
+    instances = {}
+
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls()
+        return instances[cls]
+
+    return getinstance
+
+
+@singleton
 class PipelineMaintenance:
     def __init__(self):
         """
@@ -281,7 +293,7 @@ class PipelineMaintenance:
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "K8sReset")
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
                 # wait for the remaining pipeline stages (post-RunTests)
-                time.sleep(60)
+                # time.sleep(60)
                 ci_results = self.fetch_ci_failures(repo_name, pr_number)
                 bot_response += ci_results
                 log.info("populating ci stats....")
@@ -468,7 +480,7 @@ class PipelineMaintenance:
 
 
 if __name__ == "__main__":
-    pipem = PipelineMaintenance()
+    # pipem = PipelineMaintenance()
     # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
     # result = pipem.quarantine_ci_env("jenkins-new")
     # result = pipem.check_pool_of_ci_envs()
@@ -484,20 +496,21 @@ if __name__ == "__main__":
     #    assignee="Atharva Rane",
     # )
     # result = pipem.get_repo_sme("arborist")
-    pipem.react_to_jenkins_updates(
+    pipem1 = PipelineMaintenance()
+    pipem1.react_to_jenkins_updates(
         {
             "subtype": "bot_message",
             "text": "",
             "suppress_notification": False,
             "attachments": [
                 {
-                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
+                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
                     "id": 1,
                     "color": "439FE0",
                     "fields": [
                         {
                             "title": "",
-                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
+                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
                             "short": False,
                         }
                     ],
@@ -509,20 +522,21 @@ if __name__ == "__main__":
             "ts": "1633106721.151600",
         }
     )
-    pipem.react_to_jenkins_updates(
+    pipem2 = PipelineMaintenance()
+    pipem2.react_to_jenkins_updates(
         {
             "subtype": "bot_message",
             "text": "",
             "suppress_notification": False,
             "attachments": [
                 {
-                    "fallback": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1667> :facepalm: running on jenkins-dcp :jenkins:.",
+                    "fallback": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
                     "id": 1,
                     "color": "439FE0",
                     "fields": [
                         {
                             "title": "",
-                            "value": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1667> :facepalm: running on jenkins-dcp :jenkins:.",
+                            "value": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
                             "short": False,
                         }
                     ],
@@ -535,5 +549,7 @@ if __name__ == "__main__":
         }
     )
     # pipem.in_memory_ci_stats = {}
-    result = pipem.get_ci_summary()
+    # trying with different instances to test singleton
+    pipem3 = PipelineMaintenance()
+    result = pipem3.get_ci_summary()
     print(result)
