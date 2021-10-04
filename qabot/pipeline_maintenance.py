@@ -2,6 +2,7 @@ import json
 import os
 import re
 import logging
+import time
 import datetime
 from ascii_graph import Pyasciigraph
 
@@ -279,6 +280,8 @@ class PipelineMaintenance:
             if repo_name and pr_number:
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "K8sReset")
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
+                # wait for the remaining pipeline stages (post-RunTests)
+                time.sleep(60)
                 ci_results = self.fetch_ci_failures(repo_name, pr_number)
                 bot_response += ci_results
                 log.info("populating ci stats....")
