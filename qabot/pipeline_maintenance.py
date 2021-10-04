@@ -270,6 +270,7 @@ class PipelineMaintenance:
 
         # if a CI notification is sent to the #nightly-builds channel
         if jenkins_slack_msg_raw["channel"] == "C01TS6PDMRT":
+            log.info("new Jenkins msg on the #nightly-builds channel...")
             bot_response += "Additional nightly-build stats :moon: \n"
             repo_name, pr_number = self._identify_pr_details_from_jenkins_notification(
                 actual_msg
@@ -280,18 +281,20 @@ class PipelineMaintenance:
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
                 ci_results = self.fetch_ci_failures(repo_name, pr_number)
                 bot_response += ci_results
-
+                log.info("populating ci stats....")
                 self._populate_ci_stats(msg_event_ts, repo_name, pr_number, ci_results)
 
                 return bot_response
         # if a CI notification is sent to the #gen3-qa-notifications channel
         elif jenkins_slack_msg_raw["channel"] == "C0183EFTPLG":
+            log.info("new Jenkins msg on the #gen3-qa-notifications channel...")
             repo_name, pr_number = self._identify_pr_details_from_jenkins_notification(
                 actual_msg
             )
 
             if repo_name and pr_number:
                 ci_results = self.fetch_ci_failures(repo_name, pr_number)
+                log.info("populating ci stats....")
                 self._populate_ci_stats(msg_event_ts, repo_name, pr_number, ci_results)
 
     def ci_benchmarking(self, repo_name, pr_num, stage_name):
