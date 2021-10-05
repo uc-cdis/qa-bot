@@ -4,6 +4,7 @@ import re
 import logging
 import time
 import datetime
+from ascii_graph import Pyasciigraph
 
 import requests
 from requests.exceptions import RequestException
@@ -20,6 +21,18 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
 
+def singleton(cls):
+    instances = {}
+
+    def getinstance():
+        if cls not in instances:
+            instances[cls] = cls()
+        return instances[cls]
+
+    return getinstance
+
+
+@singleton
 class PipelineMaintenance:
     def __init__(self):
         """
@@ -30,15 +43,14 @@ class PipelineMaintenance:
         self.cdis_public_bucket_base_url = (
             "https://cdistest-public-test-bucket.s3.amazonaws.com/"
         )
+        self.in_memory_ci_stats = {}
+        self.in_memory_ci_stats["repos"] = {}
 
     def get_slacklib(self):
         return SlackLib()
 
     def get_githublib(self):
         return GithubLib()
-
-    def get_influxlib(self):
-        return InfluxLib()
 
     def _get_test_script_source(self, test_script):
         try:
@@ -141,7 +153,7 @@ class PipelineMaintenance:
             log.error(str(err))
             return str(err)
 
-        influxlib = self.get_influxlib()
+        influxlib = InfluxLib()
         data_points = influxlib.query_ci_metrics(
             "fail_count", {"suite_name": feature_name}
         )
@@ -205,38 +217,97 @@ class PipelineMaintenance:
             bot_response += "```\n"
         return bot_response
 
+    def _populate_ci_stats(self, msg_event_ts, repo_name, pr_number, ci_results):
+        msg_timestamp = datetime.datetime.fromtimestamp(msg_event_ts)
+        print(f"### ## msg_timestamp: {msg_timestamp}")
+
+        # purge ci stats from the past whenever a new jenkins msg is sent on the next day
+        # if we don't do this, the in-memory dict will keep growing indefinitely
+        if "latest_entry_ts" in self.in_memory_ci_stats:
+            date1 = self.in_memory_ci_stats["latest_entry_ts"]
+            date2 = msg_timestamp
+            # diff between timestamps
+            diff_between_timestamps = abs(date2 - date1).days
+            log.debug(f"### ## diff between timestamps: {diff_between_timestamps}")
+
+            if diff_between_timestamps > 0:
+                # reset everything so we don't store more than a day's worth of CI stats
+                log.warn("Resetting CI stats...")
+                self.in_memory_ci_stats["repos"] = {}
+        else:
+            self.in_memory_ci_stats["latest_entry_ts"] = msg_timestamp
+
+        if repo_name not in self.in_memory_ci_stats:
+            self.in_memory_ci_stats["repos"][repo_name] = {}
+
+        stats_key = "failed" if "failed" in ci_results else "successful"
+        if stats_key not in self.in_memory_ci_stats["repos"][repo_name]:
+            self.in_memory_ci_stats["repos"][repo_name][stats_key] = {}
+
+        pr = f"PR-{pr_number}"
+        repo_stats_mapping = self.in_memory_ci_stats["repos"][repo_name][stats_key]
+        repo_stats_mapping.__setitem__(
+            pr, repo_stats_mapping[pr] + 1
+        ) if pr in repo_stats_mapping else repo_stats_mapping.__setitem__(pr, 1)
+
+    def _identify_pr_details_from_jenkins_notification(self, jenkins_msg):
+        # identify repo_name and pr_number in the msg
+        log.debug(f"### ## jenkins_msg: {jenkins_msg}")
+        matchstring = ".*https:\/\/github.com\/uc-cdis\/(.*)\/pull\/(.*)>.*"
+        regex_result = re.match(matchstring, jenkins_msg)
+
+        if regex_result:
+            log.info(f"repo_name from CI notification: {regex_result.group(1)}")
+            log.info(f"pr_number from CI notification: {regex_result.group(2)}")
+            repo_name = regex_result.group(1)
+            pr_number = regex_result.group(2)
+
+            return repo_name, pr_number
+        else:
+            log.warn(
+                "invalid CI notification, can't identify repo_name and pr_number. Just ignore... meh."
+            )
+            return None, None
+
     # TODO: This should empower auto-replay features
     # based on test suite's failure rate
     def react_to_jenkins_updates(self, jenkins_slack_msg_raw):
         log.debug(f"###  ## Slack msg from Jenkins: {jenkins_slack_msg_raw}")
+        msg_event_ts = int(jenkins_slack_msg_raw["event_ts"].split(".")[0])
 
         bot_response = ""
+        actual_msg = jenkins_slack_msg_raw["attachments"][0]["fields"][0]["value"]
 
         # if a CI notification is sent to the #nightly-builds channel
         if jenkins_slack_msg_raw["channel"] == "C01TS6PDMRT":
-            # identify repo_name and pr_number in the msg
-            actual_msg = jenkins_slack_msg_raw["attachments"][0]["fields"][0]["value"]
+            log.info("new Jenkins msg on the #nightly-builds channel...")
+            bot_response += "Additional nightly-build stats :moon: \n"
+            repo_name, pr_number = self._identify_pr_details_from_jenkins_notification(
+                actual_msg
+            )
 
-            matchstring = ".*https:\/\/github.com\/uc-cdis\/(.*)\/pull\/(.*)>.*"
-            regex_result = re.match(matchstring, actual_msg)
-
-            if regex_result:
-                log.info(f"repo_name from CI notification: {regex_result.group(1)}")
-                log.info(f"pr_number from CI notification: {regex_result.group(2)}")
-                repo_name = regex_result.group(1)
-                pr_number = regex_result.group(2)
-
+            if repo_name and pr_number:
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "K8sReset")
                 bot_response += self.ci_benchmarking(repo_name, pr_number, "RunTests")
                 # wait for the remaining pipeline stages (post-RunTests)
-                time.sleep(60)
-                bot_response += self.fetch_ci_failures(repo_name, pr_number)
+                # time.sleep(60)
+                ci_results = self.fetch_ci_failures(repo_name, pr_number)
+                bot_response += ci_results
+                log.info("populating ci stats....")
+                self._populate_ci_stats(msg_event_ts, repo_name, pr_number, ci_results)
 
                 return bot_response
-            else:
-                log.warn(
-                    "invalid CI notification, can't identify repo_name and pr_number. Just ignore... meh."
-                )
+        # if a CI notification is sent to the #gen3-qa-notifications channel
+        elif jenkins_slack_msg_raw["channel"] == "C0183EFTPLG":
+            log.info("new Jenkins msg on the #gen3-qa-notifications channel...")
+            repo_name, pr_number = self._identify_pr_details_from_jenkins_notification(
+                actual_msg
+            )
+
+            if repo_name and pr_number:
+                ci_results = self.fetch_ci_failures(repo_name, pr_number)
+                log.info("populating ci stats....")
+                self._populate_ci_stats(msg_event_ts, repo_name, pr_number, ci_results)
 
     def ci_benchmarking(self, repo_name, pr_num, stage_name):
         bot_response = ""
@@ -370,9 +441,43 @@ class PipelineMaintenance:
             bot_response = f"hey :sweat_smile:, there's no point of contact defined for `{repo_name}`, please update the repo_owner.json file or just go to #gen3-dev-oncall ."
         return bot_response
 
+    def get_ci_summary(self):
+        print(f"### ## self.in_memory_ci_stats: {self.in_memory_ci_stats}")
+
+        prs_tuples = {"failed": [], "successful": []}
+        repos_list = self.in_memory_ci_stats["repos"].keys()
+
+        for result in ["failed", "successful"]:
+            for repo in repos_list:
+                per_repo_counter = 0
+                if result in self.in_memory_ci_stats["repos"][repo]:
+                    for pr in self.in_memory_ci_stats["repos"][repo][result].keys():
+                        per_repo_counter += self.in_memory_ci_stats["repos"][repo][
+                            result
+                        ][pr]
+                prs_tuples[result].append((repo, per_repo_counter))
+
+        failed_prs = prs_tuples["failed"]
+
+        bot_response = "CI Summary:"
+        output = "```"
+        graph = Pyasciigraph()
+        for line in graph.graph("Failed PR checks:", failed_prs):
+            output += line + "\n"
+
+        successful_prs = prs_tuples["successful"]
+
+        output += "\n"
+        for line in graph.graph("Successful PR checks:", successful_prs):
+            output += line + "\n"
+
+        output += "```"
+        bot_response += output
+        return bot_response
+
 
 if __name__ == "__main__":
-    pipem = PipelineMaintenance()
+    # pipem = PipelineMaintenance()
     # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
     # result = pipem.quarantine_ci_env("jenkins-new")
     # result = pipem.check_pool_of_ci_envs()
@@ -388,20 +493,21 @@ if __name__ == "__main__":
     #    assignee="Atharva Rane",
     # )
     # result = pipem.get_repo_sme("arborist")
-    result = pipem.react_to_jenkins_updates(
+    pipem1 = PipelineMaintenance()
+    pipem1.react_to_jenkins_updates(
         {
             "subtype": "bot_message",
             "text": "",
             "suppress_notification": False,
             "attachments": [
                 {
-                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
+                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
                     "id": 1,
                     "color": "439FE0",
                     "fields": [
                         {
                             "title": "",
-                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3586> :tada:",
+                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
                             "short": False,
                         }
                     ],
@@ -409,8 +515,38 @@ if __name__ == "__main__":
                 }
             ],
             "channel": "C01TS6PDMRT",
-            "event_ts": "1633106721.151600",
+            "event_ts": "1633005588.151600",
             "ts": "1633106721.151600",
         }
     )
+    pipem2 = PipelineMaintenance()
+    pipem2.react_to_jenkins_updates(
+        {
+            "subtype": "bot_message",
+            "text": "",
+            "suppress_notification": False,
+            "attachments": [
+                {
+                    "fallback": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
+                    "id": 1,
+                    "color": "439FE0",
+                    "fields": [
+                        {
+                            "title": "",
+                            "value": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
+                            "short": False,
+                        }
+                    ],
+                    "mrkdwn_in": ["pretext", "text", "fields"],
+                }
+            ],
+            "channel": "C01TS6PDMRT",
+            "event_ts": "1633178730.151600",
+            "ts": "1633106721.151600",
+        }
+    )
+    # pipem.in_memory_ci_stats = {}
+    # trying with different instances to test singleton
+    pipem3 = PipelineMaintenance()
+    result = pipem3.get_ci_summary()
     print(result)
