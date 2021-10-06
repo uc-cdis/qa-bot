@@ -213,7 +213,7 @@ class StateOfTheNation:
         )
         get_pull_requests = requests.get(
             f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls?per_page={num_of_prs_to_scan}&state={state_of_the_prs}",
-            auth=("themarcelor", ghlib.token),
+            auth=("PlanXCyborg", ghlib.token),
         )
         # print(pull_requests_resp.json())
 
@@ -222,7 +222,7 @@ class StateOfTheNation:
             # fetch the first file referenced on the PR
             get_pr_files = requests.get(
                 f"https://api.github.com/repos/uc-cdis/cdis-manifest/pulls/{pr['number']}/files",
-                auth=("themarcelor", ghlib.token),
+                auth=("PlanXCyborg", ghlib.token),
             )
             pr_files = get_pr_files.json()
             env_folder_name = pr_files[0]["filename"].split("/")[0]
