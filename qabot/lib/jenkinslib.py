@@ -50,7 +50,7 @@ class JenkinsLib:
         log.info("Here's the URL: {}".format(the_url_logging_safe))
 
         req = requests.Request(
-            "GET", the_url, auth=("themarcelor", self.jenkins_user_api_token),
+            "GET", the_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         prepared_request = req.prepare()
         return prepared_request
@@ -61,7 +61,7 @@ class JenkinsLib:
         with url and basic auth based on details provided by the user
 
         sample curl to trigger a Jenkins Blueocean REST API Replay operation
-        curl -X POST -u themarcelor:$JENKINS_USER_API_TOKEN \
+        curl -X POST -u PlanXCyborg:$JENKINS_USER_API_TOKEN \
          -H "Content-Type: application/json" \
          "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/gen3-qa/PR-549/runs/1/replay"
         """
@@ -84,7 +84,7 @@ class JenkinsLib:
         resp = requests.post(
             the_url,
             headers={"Content-type": "application/json"},
-            auth=("themarcelor", self.jenkins_user_api_token),
+            auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         if resp.status_code != 200:
             err_msg = "The replay operation failed. Details: {}".format(resp.reason)
@@ -117,7 +117,7 @@ class JenkinsLib:
                 )
             )
             job_metadata = requests.get(
-                metadata_url, auth=("themarcelor", self.jenkins_user_api_token),
+                metadata_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
             )
             # wait for Jenkins to process the build before fetching its metadata
             time.sleep(5)
@@ -136,7 +136,7 @@ class JenkinsLib:
             "{}/CDIS_GitHub_Org/job/{}/job/PR-{}/lastBuild/api/json".format(
                 self.base_url, repo_name, job_number
             ),
-            auth=("themarcelor", self.jenkins_user_api_token),
+            auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         if job_metadata.status_code == 404:
             log.warn("This PR job is no longer available (probably old), abort.")
@@ -150,7 +150,7 @@ class JenkinsLib:
         try:
             job_metadata = requests.get(
                 f"{self.base_url}/CDIS_GitHub_Org/job/{repo_name}/job/PR-{job_number}/wfapi/runs",
-                auth=("themarcelor", self.jenkins_user_api_token),
+                auth=("PlanXCyborg", self.jenkins_user_api_token),
             )
             job_metadata.raise_for_status()
         except requests.exceptions.HTTPError as httperr:
@@ -176,7 +176,7 @@ class JenkinsLib:
         while attempts <= max_attempts:
             job_metadata = requests.get(
                 "{}/{}/{}/api/json".format(self.base_url, job_name, job_id,),
-                auth=("themarcelor", self.jenkins_user_api_token),
+                auth=("PlanXCyborg", self.jenkins_user_api_token),
             )
             if job_metadata.status_code == 404:
                 log.debug(
@@ -203,7 +203,7 @@ class JenkinsLib:
             self.base_url, job_name, file_name
         )
         resp = requests.get(
-            artifact_url, auth=("themarcelor", self.jenkins_user_api_token),
+            artifact_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         if resp.status_code != 200:
             err_msg = "The request failed. Details: {}".format(resp.reason)
@@ -218,9 +218,9 @@ class JenkinsLib:
         to fetch the results of the tests in a PR check run
 
         sample curl to fetch the failed/passed count from the tests executed in a PR check:
-        url -s -X GET -u themarcelor:$JENKINS_USER_API_TOKEN "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/pipelines/gitops-qa/pipelines/PR-1646/runs/4/blueTestSummary/" | jq .
+        url -s -X GET -u PlanXCyborg:$JENKINS_USER_API_TOKEN "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/pipelines/gitops-qa/pipelines/PR-1646/runs/4/blueTestSummary/" | jq .
         sample curl to get the full list of failed/passed tests
-        url -s -X GET -u themarcelor:$JENKINS_USER_API_TOKEN "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/pipelines/gitops-qa/pipelines/PR-1646/runs/4/tests/" | jq .
+        url -s -X GET -u PlanXCyborg:$JENKINS_USER_API_TOKEN "https://jenkins.planx-pla.net/blue/rest/organizations/jenkins/pipelines/CDIS_GitHub_Org/pipelines/gitops-qa/pipelines/PR-1646/runs/4/tests/" | jq .
         """
         log.info(
             "Sending a request to Jenkins Blueocean REST API to PR {} from Repo {}".format(
@@ -234,7 +234,7 @@ class JenkinsLib:
         resp = requests.get(
             the_url,
             headers={"Content-type": "application/json"},
-            auth=("themarcelor", self.jenkins_user_api_token),
+            auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         # if 404, maybe the PR is still in flight and it didn't finish RunTests yet
         if resp.status_code == 404:
