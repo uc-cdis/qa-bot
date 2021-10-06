@@ -120,7 +120,7 @@ class JenkinsLib:
                 metadata_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
             )
             # wait for Jenkins to process the build before fetching its metadata
-            time.sleep(5)
+            time.sleep(10)
             try:
                 log.debug(job_metadata.json().keys())
                 next_build_number = int(job_metadata.json()["id"]) + 1
