@@ -27,9 +27,12 @@ class EnvironmentsManager:
 
         for line in lines:
             if line != "":
-                (envJson, githubID, planxqa) = line.split()
-                env = envJson.split("/")[0]
-                envdict[env] = githubID
+                githubIDs = line.split()
+                env = githubIDs.pop(0)
+                # pop planxqa at the end
+                githubIDs.pop(-1)
+
+                envdict[env] = githubIDs
 
         log.info(
             "Returning a map of environments and owners with {} keys".format(

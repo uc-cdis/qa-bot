@@ -14,7 +14,7 @@ class EnvironmentsManagerTestCase(unittest.TestCase):
     def codeowners_mock(self, url, request):
         return {
             "status_code": 200,
-            "content": "caninedc.org/manifest.json @theowner @uc-cdis/planx-qa",
+            "content": "caninedc.org @theowner @uc-cdis/planx-qa",
         }
 
     # TODO: Negative test
@@ -28,9 +28,9 @@ class EnvironmentsManagerTestCase(unittest.TestCase):
             result = em.map_environments_and_owners()
 
             self.assertEqual(
-                "@theowner",
+                ["@theowner"],
                 result["caninedc.org"],
-                'Must return a dictionary containing the expected owner "@theowner" for the environment "caninedc.org"',
+                'Must return a dictionary containing the expected owner list ["@theowner"] for the environment "caninedc.org"',
             )
 
 
