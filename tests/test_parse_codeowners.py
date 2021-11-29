@@ -28,9 +28,9 @@ class EnvironmentsManagerTestCase(unittest.TestCase):
             result = em.map_environments_and_owners()
 
             self.assertEqual(
-                "@theowner",
+                "[@theowner]",
                 result["caninedc.org"],
-                'Must return a dictionary containing the expected owner "@theowner" for the environment "caninedc.org"',
+                'Must return a dictionary containing the expected owner list "[@theowner]" for the environment "caninedc.org"',
             )
 
 
