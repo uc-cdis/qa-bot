@@ -14,7 +14,7 @@ class EnvironmentsManagerTestCase(unittest.TestCase):
     def codeowners_mock(self, url, request):
         return {
             "status_code": 200,
-            "content": "caninedc.org/manifest.json @theowner @uc-cdis/planx-qa",
+            "content": "caninedc.org @theowner @uc-cdis/planx-qa",
         }
 
     # TODO: Negative test
