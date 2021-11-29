@@ -52,7 +52,7 @@ class ReleaseManager:
         em = EnvironmentsManager()
         envdict = em.map_environments_and_owners()
 
-        environments = [k for k, v in envdict.items() if v == "@{}".format(user)]
+        environments = [k for k, v in envdict.items() if "@{}".format(user) in v]
 
         # if the operator doesn't own any environments, terminate the function
         # by returning a response
