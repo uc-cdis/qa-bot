@@ -87,7 +87,10 @@ class JenkinsLib:
             auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         if resp.status_code != 200:
-            err_msg = "The replay operation failed. Details: {}".format(resp.json()['message'])
+            if 'message' in resp.json().keys():
+                err_msg = "The replay operation failed. Details: {}".format(resp.json()['message'])
+            else:
+                err_msg = "The replay operation failed. Details: {}".format(resp.reason)
             log.error(err_msg)
             err = Exception(err_msg)
             return err, None
