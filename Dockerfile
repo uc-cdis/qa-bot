@@ -15,7 +15,7 @@ COPY . /opt/ctds/qabot
 WORKDIR /opt/ctds/qabot
 
 RUN     apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gcc musl-dev libffi-dev openssl-dev curl
+    build-essential gcc musl-dev libffi-dev openssl libssl-dev curl
 
 USER qabotuser
 
