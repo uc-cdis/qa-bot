@@ -1,9 +1,9 @@
 language: python
-python: "3.6"
+python: "3.9"
 sudo: false
 cache: pip
 install:
-  - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+  - curl -sSL https://install.python-poetry.org | python -
   - source $HOME/.poetry/env
   - poetry install -vv
 # command to run tests
