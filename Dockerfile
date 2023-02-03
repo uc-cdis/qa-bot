@@ -19,7 +19,7 @@ RUN     apt-get update && apt-get install -y --no-install-recommends \
 
 USER qabotuser
 
-RUN pip install --upgrade pip poetry
+RUN pip install --upgrade pip poetry --user
 
 # cache so that poetry install will run if these files change
 COPY poetry.lock pyproject.toml /opt/ctds/qabot/
