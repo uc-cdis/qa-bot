@@ -14,21 +14,20 @@ ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
 COPY . /opt/ctds/qabot
 WORKDIR /opt/ctds/qabot
 
-RUN apk add --no-cache --virtual .build-deps gcc musl-dev libffi-dev openssl-dev curl
+RUN     apt-get update && apt-get install -y --no-install-recommends \
+    build-essential gcc musl-dev libffi-dev openssl-dev curl
 
 USER qabotuser
 
-RUN pip install --upgrade pip --user
+RUN pip install --upgrade pip poetry
 
 # cache so that poetry install will run if these files change
 COPY poetry.lock pyproject.toml /opt/ctds/qabot/
 
-RUN curl -sSL https://install.python-poetry.org | python -
-
-RUN source $HOME/.poetry/env \
-     && export CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
-     && poetry install -vv --no-dev --no-interaction
+RUN poetry config virtualenvs.create false \
+    && poetry install -vv --no-root --no-dev --no-interaction \
+    && poetry show -v
 
 WORKDIR /opt/ctds/qabot/qabot
 
-ENTRYPOINT source $HOME/.poetry/env && poetry run python qabot.py
+ENTRYPOINT poetry run python qabot.py
