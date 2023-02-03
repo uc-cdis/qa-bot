@@ -3,11 +3,9 @@ python: "3.9"
 sudo: false
 cache: pip
 install:
-  - curl -sSL https://install.python-poetry.org | python3 -
-  - echo $HOME
-  - echo $POETRY_HOME
-  - ls $HOME
-  - source $HOME/.poetry/env
+  - pip install --upgrade pip
+  - export CRYPTOGRAPHY_DONT_BUILD_RUST=1
+  - pip install poetry
   - poetry install -vv
 # command to run tests
 script:
