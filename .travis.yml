@@ -15,4 +15,4 @@ script:
 - export JENKINS_JOB_TOKEN="abc123XYZ"
 - export GITHUB_TOKEN="MEH-123"
 - export JIRA_API_TOKEN="blah-456"
-- PYTHONPATH="./qabot" poetry run python3 -u -m unittest discover tests
+- poetry run python3 -u -m unittest discover tests

@@ -1,4 +1,4 @@
-from lib.httplib import HttpLib
+from qabot.lib.httplib import HttpLib
 import logging
 import os
 from pprint import pprint

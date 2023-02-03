@@ -1,5 +1,5 @@
-from lib.jenkinslib import JenkinsLib
-from lib.githublib import GithubLib
+from qabot.lib.jenkinslib import JenkinsLib
+from qabot.lib.githublib import GithubLib
 import json
 import time
 import os

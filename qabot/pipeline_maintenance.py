@@ -9,13 +9,13 @@ from ascii_graph import Pyasciigraph
 import requests
 from requests.exceptions import RequestException
 
-from lib.slacklib import SlackLib
-from lib.githublib import GithubLib
-from lib.influxlib import InfluxLib
-from lib.jenkinslib import JenkinsLib
-from lib.jiralib import JiraLib
+from qabot.lib.slacklib import SlackLib
+from qabot.lib.githublib import GithubLib
+from qabot.lib.influxlib import InfluxLib
+from qabot.lib.jenkinslib import JenkinsLib
+from qabot.lib.jiralib import JiraLib
 
-from jenkins_job_invoker import JenkinsJobInvoker
+from qabot.jenkins_job_invoker import JenkinsJobInvoker
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
