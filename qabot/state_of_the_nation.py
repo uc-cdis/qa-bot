@@ -1,7 +1,7 @@
 import requests
-from lib.slacklib import SlackLib
-from lib.githublib import GithubLib
-from lib.httplib import HttpLib
+from qabot.lib.slacklib import SlackLib
+from qabot.lib.githublib import GithubLib
+from qabot.lib.httplib import HttpLib
 import json
 import os
 import re
