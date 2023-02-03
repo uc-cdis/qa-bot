@@ -12,8 +12,8 @@ GITHUBLINK = "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/COD
 class EnvironmentsManager:
     def __init__(self):
         """
-    Provides utilitary functions to manage environments and their respective config (e.g., owners, etc.)
-    """
+        Provides utilitary functions to manage environments and their respective config (e.g., owners, etc.)
+        """
         self.httplib = self.get_httplib()
 
     def get_httplib(self):

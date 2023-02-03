@@ -14,8 +14,8 @@ log = logging.getLogger(__name__)
 class ReleaseManager:
     def __init__(self):
         """
-    Manage releases to automate the QA engineers out of this job (so they can work on innovation and other tech debt items)
-    """
+        Manage releases to automate the QA engineers out of this job (so they can work on innovation and other tech debt items)
+        """
         self.githublib = self.get_githublib()
 
     def get_githublib(self):

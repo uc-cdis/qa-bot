@@ -1,4 +1,4 @@
-FROM quay.io/cdis/python-nginx:master
+FROM quay.io/cdis/python:python3.9-buster-master
 
 ENV appname=qabot
 
@@ -23,7 +23,7 @@ RUN pip install --upgrade pip --user
 # cache so that poetry install will run if these files change
 COPY poetry.lock pyproject.toml /opt/ctds/qabot/
 
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
+RUN curl -sSL https://install.python-poetry.org | python -
 
 RUN source $HOME/.poetry/env \
      && export CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
@@ -31,4 +31,4 @@ RUN source $HOME/.poetry/env \
 
 WORKDIR /opt/ctds/qabot/qabot
 
-ENTRYPOINT source $HOME/.poetry/env && poetry run python3.6 qabot.py
+ENTRYPOINT source $HOME/.poetry/env && poetry run python qabot.py

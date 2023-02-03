@@ -28,7 +28,11 @@ def list_all_commands():
 
 
 commands_map = {
-    "help": {"args": "", "example": "@qa-bot help", "call": list_all_commands,},
+    "help": {
+        "args": "",
+        "example": "@qa-bot help",
+        "call": list_all_commands,
+    },
     "compare-manifests": {
         "args": "pr number and signed-off manifest",
         "example": "@qa-bot compare-manifests 928 internalstaging.datastage.io",

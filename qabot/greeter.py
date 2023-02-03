@@ -1,3 +1,3 @@
-class Greeter():
-  def say_hello(self):
-    return 'hello'
+class Greeter:
+    def say_hello(self):
+        return "hello"

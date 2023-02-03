@@ -45,12 +45,30 @@ class PipelineMaintenance:
         )
         self.in_memory_ci_stats = {}
         self.in_memory_ci_stats["repos"] = {}
+        self.ci_env_pools = {
+            "services": ["jenkins-brain", "jenkins-blood"],
+            "releases": [
+                "jenkins-dcp",
+                "jenkins-genomel",
+                "jenkins-new",
+                "jenkins-niaid",
+                "jenkins",
+            ],
+        }
 
     def get_slacklib(self):
         return SlackLib()
 
     def get_githublib(self):
         return GithubLib()
+
+    def _get_ci_env_pool(self, ci_env):
+        if ci_env in self.ci_env_pools["services"]:
+            return "services"
+        elif ci_env in self.ci_env_pools["releases"]:
+            return "releases"
+        else:
+            raise Exception(f"Invalid CI Environment value - {ci_env}")
 
     def _get_test_script_source(self, test_script):
         try:
@@ -76,7 +94,7 @@ class PipelineMaintenance:
             feature_name = feature_name.replace(" ", "_")
         else:
             raise Exception(
-                f":facepalm: Could not find the CodeceptJs feature name in script `{test_script}`"
+                f":facepalm: Could not find the CodeceptJs feature name in script `{test_script_source}`"
             )
         return feature_name
 
@@ -87,12 +105,11 @@ class PipelineMaintenance:
          - releases pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-releases.txt
         """
         bot_response = ""
+        ci_env_pool = self._get_ci_env_pool(ci_env_name)
 
         jji = JenkinsJobInvoker()
-        log.info(f"Putting environment {ci_env_name} back into CI-envs pool...")
-        json_params = {
-            "ENVIRONMENT_NAME": ci_env_name,
-        }
+        log.info(f"Putting environment {ci_env_name} back into {ci_env_pool} pool...")
+        json_params = {"ENVIRONMENT_NAME": ci_env_name, "CI_ENV_POOL": ci_env_pool}
         str_params = json.dumps(json_params, separators=(",", ":"))
         bot_response = jji.invoke_jenkins_job(
             "unquarantine-ci-environment", "jenkins", str_params
@@ -111,12 +128,11 @@ class PipelineMaintenance:
         both files are restored every night by a cronjob.
         """
         bot_response = ""
+        ci_env_pool = self._get_ci_env_pool(ci_env_name)
 
         jji = JenkinsJobInvoker()
         log.info(f"Putting environment {ci_env_name} in quarantine...")
-        json_params = {
-            "ENVIRONMENT_NAME": ci_env_name,
-        }
+        json_params = {"ENVIRONMENT_NAME": ci_env_name, "CI_ENV_POOL": ci_env_pool}
         str_params = json.dumps(json_params, separators=(",", ":"))
         bot_response = jji.invoke_jenkins_job(
             "quarantine-ci-environment", "jenkins", str_params
@@ -209,7 +225,7 @@ class PipelineMaintenance:
             except requests.exceptions.HTTPError as httperr:
                 log.error(
                     "request to {0} failed due to the following error: {1}".format(
-                        url, str(httperr)
+                        self.cdis_public_bucket_base_url, str(httperr)
                     )
                 )
                 return httperr
@@ -431,7 +447,8 @@ class PipelineMaintenance:
         if r.status_code != 200:
             raise Exception(
                 "Unable to get file repo_owner.json at `{}`: got code {}.".format(
-                    download_url[: download_url.index("token")], response.status_code,
+                    download_url[: download_url.index("token")],
+                    r.status_code,
                 )
             )
         repos_and_owners = r.json()

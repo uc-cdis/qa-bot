@@ -50,7 +50,9 @@ class JenkinsLib:
         log.info("Here's the URL: {}".format(the_url_logging_safe))
 
         req = requests.Request(
-            "GET", the_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
+            "GET",
+            the_url,
+            auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         prepared_request = req.prepare()
         return prepared_request
@@ -87,8 +89,10 @@ class JenkinsLib:
             auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         if resp.status_code != 200:
-            if 'message' in resp.json().keys():
-                err_msg = "The replay operation failed. Details: {}".format(resp.json()['message'])
+            if "message" in resp.json().keys():
+                err_msg = "The replay operation failed. Details: {}".format(
+                    resp.json()["message"]
+                )
             else:
                 err_msg = "The replay operation failed. Details: {}".format(resp.reason)
             log.error(err_msg)
@@ -113,14 +117,18 @@ class JenkinsLib:
         pr = self.prepare_remote_build_request(job_name, params)
         err, resp = self.invoke_job(pr)
         if resp != None and resp.status_code == 201:
-            metadata_url = "{}/{}/lastBuild/api/json".format(self.base_url, job_name,)
+            metadata_url = "{}/{}/lastBuild/api/json".format(
+                self.base_url,
+                job_name,
+            )
             log.debug(
                 "Job triggered successfully. Checking the json metadata: {}".format(
                     metadata_url
                 )
             )
             job_metadata = requests.get(
-                metadata_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
+                metadata_url,
+                auth=("PlanXCyborg", self.jenkins_user_api_token),
             )
             # wait for Jenkins to process the build before fetching its metadata
             time.sleep(10)
@@ -178,7 +186,11 @@ class JenkinsLib:
         attempts = 0
         while attempts <= max_attempts:
             job_metadata = requests.get(
-                "{}/{}/{}/api/json".format(self.base_url, job_name, job_id,),
+                "{}/{}/{}/api/json".format(
+                    self.base_url,
+                    job_name,
+                    job_id,
+                ),
                 auth=("PlanXCyborg", self.jenkins_user_api_token),
             )
             if job_metadata.status_code == 404:
@@ -202,11 +214,14 @@ class JenkinsLib:
         return "Could not obtain status"
 
     def fetch_archived_artifact(self, job_name, file_name):
-        artifact_url = "{}/{}/lastSuccessfulBuild/artifact/{}?token=$JENKINS_JOB_TOKEN".format(
-            self.base_url, job_name, file_name
+        artifact_url = (
+            "{}/{}/lastSuccessfulBuild/artifact/{}?token=$JENKINS_JOB_TOKEN".format(
+                self.base_url, job_name, file_name
+            )
         )
         resp = requests.get(
-            artifact_url, auth=("PlanXCyborg", self.jenkins_user_api_token),
+            artifact_url,
+            auth=("PlanXCyborg", self.jenkins_user_api_token),
         )
         if resp.status_code != 200:
             err_msg = "The request failed. Details: {}".format(resp.reason)
