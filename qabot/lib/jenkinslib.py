@@ -90,9 +90,7 @@ class JenkinsLib:
         )
         if resp.status_code != 200:
             if "message" in resp.json().keys():
-                err_msg = "The replay operation failed. Details: {}".format(
-                    resp.json()["message"]
-                )
+                err_msg = "The replay operation failed. Details: {}".format(resp.json()["message"])
             else:
                 err_msg = "The replay operation failed. Details: {}".format(resp.reason)
             log.error(err_msg)
