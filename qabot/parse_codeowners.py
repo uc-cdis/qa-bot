@@ -6,7 +6,12 @@ from pprint import pprint
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
-GITHUBLINK = "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/CODEOWNERS"
+cdisManifestLINK = (
+    "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/CODEOWNERS"
+)
+gitopsQALINK = (
+    "https://raw.githubusercontent.com/uc-cdis/gitops-qa/master/master/CODEOWNERS"
+)
 
 
 class EnvironmentsManager:
@@ -19,10 +24,8 @@ class EnvironmentsManager:
     def get_httplib(self):
         return HttpLib()
 
-    def map_environments_and_owners(self):
-        envdict = {}
-
-        CODEOWNERS = self.httplib.fetch_raw_data(GITHUBLINK)
+    def create_dict(self, url, dict):
+        CODEOWNERS = self.httplib.fetch_raw_data(url)
         lines = CODEOWNERS.splitlines()
 
         for line in lines:
@@ -32,7 +35,24 @@ class EnvironmentsManager:
                 # pop planxqa at the end
                 githubIDs.pop(-1)
 
-                envdict[env] = githubIDs
+                dict[env] = githubIDs
+
+    def map_environments_and_owners(self):
+        envdict = {}
+
+        # CODEOWNERS = self.httplib.fetch_raw_data(GITHUBLINK)
+        # lines = CODEOWNERS.splitlines()
+
+        # for line in lines:
+        #     if line != "":
+        #         githubIDs = line.split()
+        #         env = githubIDs.pop(0)
+        #         # pop planxqa at the end
+        #         githubIDs.pop(-1)
+
+        #         envdict[env] = githubIDs
+        self.create_dict(cdisManifestLINK, envdict)
+        self.create_dict(gitopsQALINK, envdict)
 
         log.info(
             "Returning a map of environments and owners with {} keys".format(
