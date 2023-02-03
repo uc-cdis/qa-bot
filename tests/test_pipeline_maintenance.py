@@ -5,7 +5,7 @@ from unittest.mock import Mock, patch
 from pprint import pprint
 
 from qabot.pipeline_maintenance import PipelineMaintenance
-from lib.influxlib import InfluxLib
+from qabot.lib.influxlib import InfluxLib
 
 
 class PipelineMaintenanceTestCase(unittest.TestCase):

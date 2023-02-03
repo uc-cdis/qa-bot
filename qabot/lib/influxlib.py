@@ -33,13 +33,14 @@ class InfluxLib:
         return list(results.get_points(tags=tags))
 
     def query_ci_metrics(self, measurement, tags):
+        query = f'SELECT * FROM "{measurement}"'
         try:
-            points = self._run_query(f'SELECT * FROM "{measurement}"', tags, 14)
+            points = self._run_query(query, tags, 14)
 
             # If zero metrics are found for this query/tags in a 2-week time frame
             # go further back a few months
             if len(points) == 0:
-                points = self._run_query(f'SELECT * FROM "{measurement}"', tags, 120)
+                points = self._run_query(query, tags, 120)
 
             if len(points) > 0:
                 if logging.getLogger().level == logging.DEBUG:

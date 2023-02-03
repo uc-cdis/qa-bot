@@ -1,5 +1,5 @@
-from lib.jenkinslib import JenkinsLib
-from lib.githublib import GithubLib
+from qabot.lib.jenkinslib import JenkinsLib
+from qabot.lib.githublib import GithubLib
 import json
 import time
 import os
@@ -32,7 +32,9 @@ class JenkinsJobInvoker:
         if err == None:
             bot_response = "The job has been triggered, here's its URL: \n  {}".format(
                 "https://{}.planx-pla.net/job/{}/{}/console".format(
-                    jenkins_instance, job_name, id_of_triggered_job,
+                    jenkins_instance,
+                    job_name,
+                    id_of_triggered_job,
                 )
             )
         else:
@@ -126,7 +128,6 @@ class JenkinsJobInvoker:
         )
 
         if err == None:
-
             selenium_status_check_result = jl.get_status_of_job(
                 "selenium-check-status", id_of_triggered_job
             )

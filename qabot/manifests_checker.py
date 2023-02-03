@@ -1,5 +1,5 @@
-from lib.githublib import GithubLib
-from lib.httplib import HttpLib
+from qabot.lib.githublib import GithubLib
+from qabot.lib.httplib import HttpLib
 from functools import lru_cache
 import time
 import logging
@@ -101,8 +101,10 @@ class ManifestsChecker:
             looking_for, version
         )
         bot_response += list_of_environments
-        bot_response += "```\n This represents a *{}%* adoption across *{}* environments.".format(
-            version_adoption, environments_count
+        bot_response += (
+            "```\n This represents a *{}%* adoption across *{}* environments.".format(
+                version_adoption, environments_count
+            )
         )
         return bot_response
 

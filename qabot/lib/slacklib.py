@@ -14,8 +14,8 @@ class SlackLib:
         token=os.environ["SLACK_API_TOKEN"].strip(),
     ):
         """
-     Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
-    """
+        Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
+        """
         self.base_url = base_url
         self.token = token
 

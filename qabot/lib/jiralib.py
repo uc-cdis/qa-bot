@@ -18,16 +18,16 @@ class JiraLib:
         token=os.environ["JIRA_API_TOKEN"].strip(),
     ):
         """
-     Creates a JiraLib utils object to perform various operations against JIRA 
-    """
+        Creates a JiraLib utils object to perform various operations against JIRA
+        """
         self.jira_server = jira_server
         self.service_account = service_account
         self.token = token
 
     def get_jira_client(self):
         """
-     return a jira client object
-    """
+        return a jira client object
+        """
         options = {"server": self.jira_server}
         j = JIRA(options, basic_auth=(self.service_account, self.token))
         return j

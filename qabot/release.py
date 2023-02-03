@@ -1,11 +1,11 @@
-from lib.githublib import GithubLib
 import logging
 import os
 import json
 from pprint import pprint
 
-from parse_codeowners import EnvironmentsManager
-from jenkins_job_invoker import JenkinsJobInvoker
+from qabot.parse_codeowners import EnvironmentsManager
+from qabot.jenkins_job_invoker import JenkinsJobInvoker
+from qabot.lib.githublib import GithubLib
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -14,8 +14,8 @@ log = logging.getLogger(__name__)
 class ReleaseManager:
     def __init__(self):
         """
-    Manage releases to automate the QA engineers out of this job (so they can work on innovation and other tech debt items)
-    """
+        Manage releases to automate the QA engineers out of this job (so they can work on innovation and other tech debt items)
+        """
         self.githublib = self.get_githublib()
 
     def get_githublib(self):

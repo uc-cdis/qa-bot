@@ -14,16 +14,16 @@ class GithubLib:
         token=os.environ["GITHUB_TOKEN"].strip(),
     ):
         """
-     Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
-    """
+        Creates a Github utils object to perform various operations against the uc-cdis repos and its branches, pull requests, etc.
+        """
         self.org = org
         self.repo = repo
         self.token = token
 
     def get_github_client(self):
         """
-     return a github client object that can instrument a given repo
-    """
+        return a github client object that can instrument a given repo
+        """
         g = Github(self.token)
         org = g.get_organization(self.org)
         repo = org.get_repo(self.repo)
