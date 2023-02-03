@@ -3,12 +3,12 @@ import slack
 import logging
 import traceback
 
-from jenkins_job_invoker import JenkinsJobInvoker
-from manifests_checker import ManifestsChecker
-from state_of_the_nation import StateOfTheNation
-from greeter import Greeter
-from release import ReleaseManager
-from pipeline_maintenance import PipelineMaintenance
+from qabot.jenkins_job_invoker import JenkinsJobInvoker
+from qabot.manifests_checker import ManifestsChecker
+from qabot.state_of_the_nation import StateOfTheNation
+from qabot.greeter import Greeter
+from qabot.release import ReleaseManager
+from qabot.pipeline_maintenance import PipelineMaintenance
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)

@@ -19,4 +19,4 @@ RUN poetry config virtualenvs.create false \
     && poetry install -vv --no-root --no-dev --no-interaction \
     && poetry show -v
 
-ENTRYPOINT poetry run python qabot.py
+ENTRYPOINT poetry run python qabot/qabot.py
