@@ -4,7 +4,7 @@ ENV appname=qabot
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN adduser -D -g '' qabotuser
+RUN adduser --disabled-login --group '' qabotuser
 
 RUN mkdir -p /opt/ctds/qabot \
     && chown qabotuser /opt/ctds/qabot
