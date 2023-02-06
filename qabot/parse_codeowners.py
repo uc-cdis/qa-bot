@@ -52,7 +52,7 @@ class EnvironmentsManager:
 
         #         envdict[env] = githubIDs
         self.create_dict(cdisManifestLINK, envdict)
-        self.create_dict(gitopsQALINK, envdict)
+        self.create_dict(GITOPS_QA_LINK, envdict)
 
         log.info(
             "Returning a map of environments and owners with {} keys".format(
