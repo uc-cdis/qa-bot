@@ -40,17 +40,6 @@ class EnvironmentsManager:
     def map_environments_and_owners(self):
         envdict = {}
 
-        # CODEOWNERS = self.httplib.fetch_raw_data(GITHUBLINK)
-        # lines = CODEOWNERS.splitlines()
-
-        # for line in lines:
-        #     if line != "":
-        #         githubIDs = line.split()
-        #         env = githubIDs.pop(0)
-        #         # pop planxqa at the end
-        #         githubIDs.pop(-1)
-
-        #         envdict[env] = githubIDs
         self.create_dict(CDIS_MANIFEST_LINK, envdict)
         self.create_dict(GITOPS_QA_LINK, envdict)
 
