@@ -51,7 +51,7 @@ class EnvironmentsManager:
         #         githubIDs.pop(-1)
 
         #         envdict[env] = githubIDs
-        self.create_dict(cdisManifestLINK, envdict)
+        self.create_dict(CDIS_MANIFEST_LINK, envdict)
         self.create_dict(GITOPS_QA_LINK, envdict)
 
         log.info(
