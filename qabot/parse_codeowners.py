@@ -6,10 +6,10 @@ from pprint import pprint
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
-cdisManifestLINK = (
+CDIS_MANIFEST_LINK = (
     "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/CODEOWNERS"
 )
-gitopsQALINK = (
+GITOPS_QA_LINK = (
     "https://raw.githubusercontent.com/uc-cdis/gitops-qa/master/master/CODEOWNERS"
 )
 
