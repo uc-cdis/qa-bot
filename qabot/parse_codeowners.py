@@ -10,7 +10,7 @@ CDIS_MANIFEST_LINK = (
     "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/CODEOWNERS"
 )
 GITOPS_QA_LINK = (
-    "https://raw.githubusercontent.com/uc-cdis/gitops-qa/master/master/CODEOWNERS"
+    "https://raw.githubusercontent.com/uc-cdis/gitops-qa/master/CODEOWNERS"
 )
 
 
