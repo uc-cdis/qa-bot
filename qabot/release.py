@@ -50,34 +50,42 @@ class ReleaseManager:
 
         # find all environments owned by the user
         em = EnvironmentsManager()
-        envdict = em.map_environments_and_owners()
 
-        environments = [k for k, v in envdict.items() if "@{}".format(user) in v]
-
-        # if the operator doesn't own any environments, terminate the function
-        # by returning a response
-        if environments is None or len(environments) == 0:
-            log.info("Warning: The operator doesn't own any environments")
-            bot_response = "Sorry operator, you don’t own any environments"
-            return bot_response
+        qa_envs = em.get_envs_owned(user, "gitops-qa")
+        prod_envs = em.get_envs_owned(user, "cdis-manifest")
 
         log.info(
             "Creating release PRs for {} environments owned by user {}".format(
-                len(environments), user
+                len(qa_envs) + len(prod_envs), user
             )
         )
 
         jji = JenkinsJobInvoker()
-        envs = []
-        # Invoke Jenkins job for each environment owned by this user
-        for e in environments:
-            log.info("creating release PR for {}".format(e))
-            envs.append(e)
 
-        list_of_environments = ",".join(envs)
+        # Invoke Jenkins job for QA environments owned by this user
+        for e in qa_envs:
+            log.info("creating release PR for {}".format(e))
+
         json_params = {
             "RELEASE_VERSION": latest_release,
-            "LIST_OF_ENVIRONMENTS": list_of_environments,
+            "LIST_OF_ENVIRONMENTS": ",".join(qa_envs),
+            "REPO_NAME": "gitops-qa",
+        }
+        str_params = json.dumps(json_params, separators=(",", ":"))
+        bot_response = jji.invoke_jenkins_job(
+            "create-prs-for-all-monthly-release-envs", "jenkins", str_params
+        )
+        if "something went wrong" in bot_response:
+            return bot_response
+
+        # Invoke Jenkins job for Prod environments owned by this user
+        for e in prod_envs:
+            log.info("creating release PR for {}".format(e))
+
+        json_params = {
+            "RELEASE_VERSION": latest_release,
+            "LIST_OF_ENVIRONMENTS": ",".join(qa_envs),
+            "REPO_NAME": "cdis-manifest",
         }
         str_params = json.dumps(json_params, separators=(",", ":"))
         bot_response = jji.invoke_jenkins_job(
