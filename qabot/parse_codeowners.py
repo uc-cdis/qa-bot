@@ -29,6 +29,7 @@ class EnvironmentsManager:
         for line in codeowners.splitlines():
             if user in line:
                 envs.append(line.split()[0])
+        return envs
 
     def create_dict(self, repo, dict):
         url = f"https://raw.githubusercontent.com/uc-cdis/{repo}/master/CODEOWNERS"
