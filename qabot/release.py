@@ -84,7 +84,7 @@ class ReleaseManager:
 
         json_params = {
             "RELEASE_VERSION": latest_release,
-            "LIST_OF_ENVIRONMENTS": ",".join(qa_envs),
+            "LIST_OF_ENVIRONMENTS": ",".join(prod_envs),
             "REPO_NAME": "cdis-manifest",
         }
         str_params = json.dumps(json_params, separators=(",", ":"))
