@@ -50,12 +50,15 @@ class PipelineMaintenance:
                 "jenkins-brain",
                 "jenkins-blood",
                 "jenkins-dcp",
+                "jenkins-genomel",
+                "jenkins-niaid",
             ],
             "releases": [
-                "jenkins-genomel",
                 "jenkins-new",
                 "jenkins-new-1",
-                "jenkins-niaid",
+                "jenkins-new-2",
+                "jenkins-new-3",
+                "jenkins-new-4",
             ],
         }
 
