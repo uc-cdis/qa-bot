@@ -132,7 +132,7 @@ class JenkinsLib:
             time.sleep(10)
             try:
                 log.debug(job_metadata.json().keys())
-                next_build_number = int(job_metadata.json()["id"]) + 1
+                next_build_number = int(job_metadata.json()["id"])
             except JSONDecodeError as jde:
                 return "err: Could not determine the next build number :(", None
             return None, next_build_number
