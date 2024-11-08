@@ -9,9 +9,7 @@ log = logging.getLogger(__name__)
 CDIS_MANIFEST_LINK = (
     "https://raw.githubusercontent.com/uc-cdis/cdis-manifest/master/CODEOWNERS"
 )
-GITOPS_QA_LINK = (
-    "https://raw.githubusercontent.com/uc-cdis/gitops-qa/master/master/CODEOWNERS"
-)
+GITOPS_QA_LINK = "https://raw.githubusercontent.com/uc-cdis/gitops-qa/master/CODEOWNERS"
 
 
 class EnvironmentsManager:
@@ -24,7 +22,17 @@ class EnvironmentsManager:
     def get_httplib(self):
         return HttpLib()
 
-    def create_dict(self, url, dict):
+    def get_envs_owned(self, user, repo):
+        url = f"https://raw.githubusercontent.com/uc-cdis/{repo}/master/CODEOWNERS"
+        codeowners = self.httplib.fetch_raw_data(url)
+        envs = []
+        for line in codeowners.splitlines():
+            if user in line:
+                envs.append(line.split()[0])
+        return envs
+
+    def create_dict(self, repo, dict):
+        url = f"https://raw.githubusercontent.com/uc-cdis/{repo}/master/CODEOWNERS"
         CODEOWNERS = self.httplib.fetch_raw_data(url)
         lines = CODEOWNERS.splitlines()
 

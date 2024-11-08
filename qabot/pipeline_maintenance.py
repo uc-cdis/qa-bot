@@ -46,13 +46,19 @@ class PipelineMaintenance:
         self.in_memory_ci_stats = {}
         self.in_memory_ci_stats["repos"] = {}
         self.ci_env_pools = {
-            "services": ["jenkins-brain", "jenkins-blood"],
-            "releases": [
+            "services": [
+                "jenkins-brain",
+                "jenkins-blood",
                 "jenkins-dcp",
                 "jenkins-genomel",
-                "jenkins-new",
                 "jenkins-niaid",
-                "jenkins",
+            ],
+            "releases": [
+                "jenkins-new",
+                "jenkins-new-1",
+                "jenkins-new-2",
+                "jenkins-new-3",
+                "jenkins-new-4",
             ],
         }
 
