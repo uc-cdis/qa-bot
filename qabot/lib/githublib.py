@@ -58,7 +58,7 @@ class GithubLib:
 
     def replay_pr(self, pr_number):
         gh_client = self.get_github_client()
-        pr = gh_client.get_pull(pr_number)
+        pr = gh_client.get_pull(int(pr_number))
         head_sha = pr.head.sha
         workflow_runs = gh_client.get_workflow_runs()
         target_run = None
