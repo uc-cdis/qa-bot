@@ -1,14 +1,15 @@
-import os
-import slack
 import logging
+import os
 import traceback
 
+import slack
+
+from qabot.greeter import Greeter
 from qabot.jenkins_job_invoker import JenkinsJobInvoker
 from qabot.manifests_checker import ManifestsChecker
-from qabot.state_of_the_nation import StateOfTheNation
-from qabot.greeter import Greeter
-from qabot.release import ReleaseManager
 from qabot.pipeline_maintenance import PipelineMaintenance
+from qabot.release import ReleaseManager
+from qabot.state_of_the_nation import StateOfTheNation
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -81,7 +82,7 @@ commands_map = {
     "replay-pr": {
         "args": "repo name, pr number, comma-separated list of labels",
         "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
-        "call": JenkinsJobInvoker().replay_pr,
+        "call": PipelineMaintenance().replay_pr,
     },
     "self-service-release": {
         "args": "github username of environment's owner",
