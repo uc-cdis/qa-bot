@@ -1,9 +1,9 @@
-from qabot.lib.jenkinslib import JenkinsLib
-from qabot.lib.githublib import GithubLib
 import json
-import time
-import os
 import logging
+import os
+
+from qabot.lib.githublib import GithubLib
+from qabot.lib.jenkinslib import JenkinsLib
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -41,29 +41,10 @@ class JenkinsJobInvoker:
             bot_response = "Something wrong happened :facepalm:. Deets: {}".format(err)
         return bot_response
 
-    def replay_pr(self, repo_name, pr_number, labels=[]):
+    def replay_pr(self, repo_name, pr_number):
         """
         Replay a Pull Request like a boss
         """
-        githublib = GithubLib(repo=repo_name)
-        try:
-            if " " in labels:
-                raise Exception("Whitespace found in comma-separated list of labels")
-            if len(labels) > 0:
-                labels = labels.split(",")
-                log.info("applying labels...")
-                for i, label in enumerate(labels):
-                    # only override all labels on the first iteration
-                    override_all = i == 0
-                    githublib.set_label_to_pr(
-                        int(pr_number), label.replace("*", ""), override_all
-                    )
-                    log.debug("applied label: {}".format(label))
-            else:
-                log.warn("Replaying PR without labels...")
-        except Exception as err:
-            return "Something wrong happened :facepalm:. Deets: {}".format(err)
-
         jl = JenkinsLib("jenkins")
         log.info("find the number of the last build...")
         job_num = jl.get_number_of_last_build(repo_name, pr_number)
@@ -71,7 +52,7 @@ class JenkinsJobInvoker:
         err, url_from_replayed_pr = jl.send_blueocean_request(
             repo_name, pr_number, job_num
         )
-        if err == None:
+        if err is None:
             bot_response = "Your PR has been labeled and replayed successfully :tada: \n Czech it out :muscle: {}".format(
                 url_from_replayed_pr
             )

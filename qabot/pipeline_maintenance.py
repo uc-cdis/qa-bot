@@ -1,21 +1,20 @@
+import datetime
 import json
+import logging
 import os
 import re
-import logging
 import time
-import datetime
-from ascii_graph import Pyasciigraph
 
 import requests
+from ascii_graph import Pyasciigraph
 from requests.exceptions import RequestException
 
-from qabot.lib.slacklib import SlackLib
+from qabot.jenkins_job_invoker import JenkinsJobInvoker
 from qabot.lib.githublib import GithubLib
 from qabot.lib.influxlib import InfluxLib
 from qabot.lib.jenkinslib import JenkinsLib
 from qabot.lib.jiralib import JiraLib
-
-from qabot.jenkins_job_invoker import JenkinsJobInvoker
+from qabot.lib.slacklib import SlackLib
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -191,10 +190,12 @@ class PipelineMaintenance:
 
                 # Count failed PRs per repo_name
                 repo_key = test_suite_failures[point["repo_name"]]
-                repo_key.__setitem__(
-                    point["pr_num"], int(repo_key[point["pr_num"]]) + 1
-                ) if point["pr_num"] in repo_key else repo_key.__setitem__(
-                    point["pr_num"], 1
+                (
+                    repo_key.__setitem__(
+                        point["pr_num"], int(repo_key[point["pr_num"]]) + 1
+                    )
+                    if point["pr_num"] in repo_key
+                    else repo_key.__setitem__(point["pr_num"], 1)
                 )
 
             log.debug(f"###  ## FINAL test_suite_failures: {test_suite_failures}")
@@ -268,9 +269,11 @@ class PipelineMaintenance:
 
         pr = f"PR-{pr_number}"
         repo_stats_mapping = self.in_memory_ci_stats["repos"][repo_name][stats_key]
-        repo_stats_mapping.__setitem__(
-            pr, repo_stats_mapping[pr] + 1
-        ) if pr in repo_stats_mapping else repo_stats_mapping.__setitem__(pr, 1)
+        (
+            repo_stats_mapping.__setitem__(pr, repo_stats_mapping[pr] + 1)
+            if pr in repo_stats_mapping
+            else repo_stats_mapping.__setitem__(pr, 1)
+        )
 
     def _identify_pr_details_from_jenkins_notification(self, jenkins_msg):
         # identify repo_name and pr_number in the msg
@@ -496,6 +499,36 @@ class PipelineMaintenance:
 
         output += "```"
         bot_response += output
+        return bot_response
+
+    def replay_pr(self, repo_name, pr_number, labels=[]):
+        """
+        Replay a Pull Request like a boss
+        """
+        githublib = GithubLib(repo=repo_name)
+        try:
+            if " " in labels:
+                raise Exception("Whitespace found in comma-separated list of labels")
+            if len(labels) > 0:
+                labels = labels.split(",")
+                log.info("applying labels...")
+                for i, label in enumerate(labels):
+                    # only override all labels on the first iteration
+                    override_all = i == 0
+                    githublib.set_label_to_pr(
+                        int(pr_number), label.replace("*", ""), override_all
+                    )
+                    log.debug("applied label: {}".format(label))
+            else:
+                log.warn("Replaying PR without labels...")
+        except Exception as err:
+            return "Something wrong happened :facepalm:. Deets: {}".format(err)
+
+        if repo_name in ("cdis-manifest", "gitops-qa"):
+            jji = JenkinsJobInvoker()
+            bot_response = jji.replay_pr(repo_name, pr_number)
+        else:
+            bot_response = githublib.replay_pr(pr_number)
         return bot_response
 
 
