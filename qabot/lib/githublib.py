@@ -1,6 +1,8 @@
-from github import Github
 import logging
 import os
+
+from github import Github
+from github.GithubException import GithubException
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger(__name__)
@@ -53,3 +55,25 @@ class GithubLib:
             pr.set_labels(label)
         else:
             pr.add_to_labels(label)
+
+    def replay_pr(self, pr_number):
+        gh_client = self.get_github_client()
+        pr = gh_client.get_pull(int(pr_number))
+        head_sha = pr.head.sha
+        workflow_runs = gh_client.get_workflow_runs()
+        target_run = None
+        for run in workflow_runs:
+            if run.name == "Integration Tests" and run.head_sha == head_sha:
+                target_run = run
+                break
+        if target_run:
+            log.info("Latest 'Tests' workflow run ID:", target_run.id)
+            try:
+                target_run.rerun()
+                rerun_url = f"https://github.com/{self.org}/{self.repo}/actions/runs/{target_run.id}"
+                return f"Your PR has been labeled and replayed successfully :tada: \n Czech it out :muscle: {rerun_url}"
+            except GithubException as e:
+                log.error(e.data)
+                return "Failed to replay the PR :sadcat:, please try from Github directly :pray:"
+        else:
+            return "No `Integration Tests` workflow run found for this PR :thinking:"
