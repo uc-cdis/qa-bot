@@ -16,7 +16,7 @@ COPY . /opt/ctds/qabot
 WORKDIR /opt/ctds/qabot
 
 RUN poetry config virtualenvs.create false \
-    && poetry install -vv --no-root --no-dev --no-interaction \
+    && poetry install -vv --no-root --no-interaction \
     && poetry show -v
 
 ENTRYPOINT poetry run python qabot.py
