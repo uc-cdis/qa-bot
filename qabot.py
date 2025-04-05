@@ -15,7 +15,7 @@ from qabot.state_of_the_nation import StateOfTheNation
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
-slack_token = os.environ["SLACK_API_TOKEN"]
+slack_token = os.environ["SLACK_API_TOKEN"].strip("\n")
 app = App(token=slack_token)
 client = WebClient(token=slack_token)
 
