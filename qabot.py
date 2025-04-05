@@ -2,7 +2,8 @@ import logging
 import os
 import traceback
 
-import slack
+from slack_bolt.app import App
+from slack_sdk import WebClient
 
 from qabot.greeter import Greeter
 from qabot.jenkins_job_invoker import JenkinsJobInvoker
@@ -15,10 +16,8 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
 slack_token = os.environ["SLACK_API_TOKEN"]
-# override base_url to use whitelisted domain
-rtmclient = slack.RTMClient(
-    token=slack_token.strip(), base_url="https://cdis.slack.com/api/"
-)
+app = App(token=slack_token)
+client = WebClient(token=slack_token)
 
 
 def list_all_commands():
@@ -177,8 +176,7 @@ example:  {commands_map[command]['example']}
 
 
 def post_message(payload, bot_reply, channel_id):
-    webclient = payload["web_client"]
-    webclient.chat_postMessage(
+    client.chat_postMessage(
         channel=channel_id,
         text=bot_reply,
         username="qa-bot",
@@ -186,7 +184,7 @@ def post_message(payload, bot_reply, channel_id):
     )
 
 
-@slack.RTMClient.run_on(event="message")
+@app.event("message")
 def capture_messages(**payload):
     data = payload["data"]
     # this will log every single msg, it should be disabled by default
@@ -210,7 +208,7 @@ def capture_messages(**payload):
     if "bot_profile" in data.keys() and data["bot_profile"]["id"] == "B80E3HU5P":
         log.info("Jenkins just posted a Slack msg")
         bot_reply = PipelineMaintenance().react_to_jenkins_updates(data)
-        if bot_reply != None:
+        if bot_reply is not None:
             post_message(payload, bot_reply, "C01TS6PDMRT")
 
     if "<@UQKCGCU1H>" in the_msg:
@@ -235,9 +233,5 @@ e.g., @qa-bot command
         post_message(payload, bot_reply, channel_id)
 
 
-def main():
-    rtmclient.start()
-
-
 if __name__ == "__main__":
-    main()
+    app.start()
