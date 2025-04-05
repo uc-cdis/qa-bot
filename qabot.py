@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 
 slack_token = os.environ["SLACK_API_TOKEN"].strip("\n")
 app = App(token=slack_token)
-client = WebClient(token=slack_token)
 
 
 def list_all_commands():
@@ -176,7 +175,7 @@ example:  {commands_map[command]['example']}
 
 
 def post_message(payload, bot_reply, channel_id):
-    client.chat_postMessage(
+    app.client.chat_postMessage(
         channel=channel_id,
         text=bot_reply,
         username="qa-bot",
