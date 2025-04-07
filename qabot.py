@@ -2,8 +2,8 @@ import logging
 import os
 import traceback
 
+from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bolt.app import App
-from slack_sdk import WebClient
 
 from qabot.greeter import Greeter
 from qabot.jenkins_job_invoker import JenkinsJobInvoker
@@ -15,8 +15,10 @@ from qabot.state_of_the_nation import StateOfTheNation
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
 
-slack_token = os.environ["SLACK_API_TOKEN"].strip("\n")
-app = App(token=slack_token)
+SLACK_BOT_TOKEN = os.environ.get("SLACK_BOT_TOKEN").strip("\n")
+SLACK_APP_TOKEN = os.environ.get("SLACK_APP_TOKEN").strip("\n")
+
+app = App(token=SLACK_BOT_TOKEN)
 
 
 def list_all_commands():
@@ -137,7 +139,7 @@ commands_map = {
 
 
 def process_command(command, args):
-    print(f"### ## args = {args}")
+    log.info(f"command = {command}, args = {args}")
     # process args to handle whitespaces inside json blocks
     entered_json_block_at_index = None
     for i, a in enumerate(args):
@@ -160,7 +162,6 @@ def process_command(command, args):
 args:  {commands_map[command]['args']}
 example:  {commands_map[command]['example']}
       """
-            return help_txt
         else:
             try:
                 return commands_map[command]["call"](*args)
@@ -169,68 +170,71 @@ example:  {commands_map[command]['example']}
             except Exception as e:
                 log.error(e)
                 traceback.print_exc()
-                return "something went wrong. Contact the QA team"
+                return "Something went wrong. Contact the QA team"
     else:
         return "command not recognized. :thisisfine:"
 
 
-def post_message(payload, bot_reply, channel_id):
-    app.client.chat_postMessage(
-        channel=channel_id,
-        text=bot_reply,
-        username="qa-bot",
-        icon_url="https://avatars.slack-edge.com/2019-11-23/846894374304_3adeb13422453e142051_192.png",
+@app.event("app_mention")
+def handle_app_mention(payload, say, logger):
+    logger.info(payload)
+    user = payload.get("user", "")
+    if not user:
+        logger.info("There is no user associated with the last message")
+    text = (
+        payload.get("text", "").replace("\xa0", " ").replace("“", '"').replace("”", '"')
     )
-
-
-@app.event("message")
-def capture_messages(**payload):
-    data = payload["data"]
-    # this will log every single msg, it should be disabled by default
-    # log.debug("### DATA: {}".format(data))
-
-    channel_id = data["channel"]
-
-    # determine user for logging purposes
-    # ignore username when receiving msgs from other bots or other events
-    if "user" in data.keys():
-        user = data["user"]
-    else:
-        user = ""
-    # determines if the bot is being called
-    the_msg = ""
-    if "text" in data.keys():
-        the_msg = data["text"]
-    elif data["subtype"] == "message_changed":
-        the_msg = data["message"]["text"]
-
-    if "bot_profile" in data.keys() and data["bot_profile"]["id"] == "B80E3HU5P":
-        log.info("Jenkins just posted a Slack msg")
-        bot_reply = PipelineMaintenance().react_to_jenkins_updates(data)
-        if bot_reply is not None:
-            post_message(payload, bot_reply, "C01TS6PDMRT")
-
-    if "<@UQKCGCU1H>" in the_msg:
-        log.info("user {} just sent a msg: {}".format(user, the_msg))
-
-        raw_command = the_msg.replace("\xa0", " ")
-        raw_command = raw_command.replace("“", '"').replace("”", '"')
-        msg_parts_split = raw_command.split(" ")
-        msg_parts = list(filter(None, msg_parts_split))
+    if text:
+        msg_parts = list(filter(None, text.split(" ")))[
+            1:
+        ]  # ignore the first word which is `@QA Bot`
         # identify command
         if len(msg_parts) > 1:
             command = msg_parts[1]
             args = msg_parts[2:]
-            bot_reply = process_command(command, args)
-        else:
-            bot_reply = """
-Usage instructions: *@qa-bot <command>* \n
-e.g., @qa-bot command
-          _visit https://github.com/uc-cdis/qa-bot to learn more_
-          """
+            say(process_command(command, args))
+    else:
+        say(
+            """
+# Usage instructions: *@qa-bot <command>* \n
+# e.g., @qa-bot command
+#           _visit https://github.com/uc-cdis/qa-bot to learn more_
+#           """
+        )
 
-        post_message(payload, bot_reply, channel_id)
+
+@app.event("message")
+def handle_message_events(body, say, logger):
+    pass
+
+
+# @app.event("message")
+# def capture_messages(**payload):
+#     data = payload["data"]
+#     # this will log every single msg, it should be disabled by default
+#     # log.debug("### DATA: {}".format(data))
+
+#     channel_id = data["channel"]
+
+#     # determine user for logging purposes
+#     # ignore username when receiving msgs from other bots or other events
+#     if "user" in data.keys():
+#         user = data["user"]
+#     else:
+#         user = ""
+#     # determines if the bot is being called
+#     the_msg = ""
+#     if "text" in data.keys():
+#         the_msg = data["text"]
+#     elif data["subtype"] == "message_changed":
+#         the_msg = data["message"]["text"]
+
+#     if "bot_profile" in data.keys() and data["bot_profile"]["id"] == "B80E3HU5P":
+#         log.info("Jenkins just posted a Slack msg")
+#         bot_reply = PipelineMaintenance().react_to_jenkins_updates(data)
+#         if bot_reply is not None:
+#             post_message(payload, bot_reply, "C01TS6PDMRT")
 
 
 if __name__ == "__main__":
-    app.start()
+    SocketModeHandler(app, SLACK_APP_TOKEN).start()
