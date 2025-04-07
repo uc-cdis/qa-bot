@@ -185,9 +185,7 @@ def handle_app_mention(payload, say, logger):
         payload.get("text", "").replace("\xa0", " ").replace("“", '"').replace("”", '"')
     )
     if text:
-        msg_parts = list(filter(None, text.split(" ")))[
-            1:
-        ]  # ignore the first word which is `@QA Bot`
+        msg_parts = list(filter(None, text.split(" ")))
         # identify command
         if len(msg_parts) > 1:
             command = msg_parts[1]
