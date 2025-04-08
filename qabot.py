@@ -31,62 +31,62 @@ def list_all_commands():
 commands_map = {
     "help": {
         "args": "",
-        "example": "@qa-bot help",
+        "example": "@qabot help",
         "call": list_all_commands,
     },
     "compare-manifests": {
         "args": "pr number and signed-off manifest",
-        "example": "@qa-bot compare-manifests 928 internalstaging.datastage.io",
+        "example": "@qabot compare-manifests 928 internalstaging.datastage.io",
         "call": ManifestsChecker().compare_manifests,
     },
     "whereis": {
         "args": "release version",
-        "example": "@qa-bot whereis release 2020.02 \n or \n @qa-bot whereis tube 2020.08",
+        "example": "@qabot whereis release 2020.02 \n or \n @qabot whereis tube 2020.08",
         "call": ManifestsChecker().whereis_version,
     },
     "run-test": {
         "args": "jenkins instance, target environment and test suite to be executed",
-        "example": "@qa-bot run-test jenkins2 ci-env-1 test-portal-homepageTest",
+        "example": "@qabot run-test jenkins2 ci-env-1 test-portal-homepageTest",
         "call": JenkinsJobInvoker().run_test_on_environment,
     },
     "create-ticket": {
         "args": 'ticket_type {"title":"any title","description":"any description","assignee":"Name [Middle Name] LastName"}',
-        "example": '@qa-bot create-ticket bug {"title":"PR-1234 failed. help!","description":"This test test-portal-discoveryPageTest is failing","assignee":"Hara Prasad Juvala"}',
+        "example": '@qabot create-ticket bug {"title":"PR-1234 failed. help!","description":"This test test-portal-discoveryPageTest is failing","assignee":"Hara Prasad Juvala"}',
         "call": PipelineMaintenance().create_ticket,
     },
     "check-result": {
         "args": "job name, id id and jenkins instance",
-        "example": "@qa-bot check-result run-tests-on-environment 21 jenkins2",
+        "example": "@qabot check-result run-tests-on-environment 21 jenkins2",
         "call": JenkinsJobInvoker().get_status_of_job,
     },
     "run-jenkins-job": {
         "args": "job name, jenkins instance and parameters (json without spaces)",
-        "example": '@qa-bot run-jenkins-job self-service-qa-gen3-roll jenkins2 {"SERVICE_NAME":"all","TARGET_ENVIRONMENT":"ci-env-1"}',
+        "example": '@qabot run-jenkins-job self-service-qa-gen3-roll jenkins2 {"SERVICE_NAME":"all","TARGET_ENVIRONMENT":"ci-env-1"}',
         "call": JenkinsJobInvoker().invoke_jenkins_job,
     },
     "list-environments": {
         "args": "selected K8s cluster (e.g., qaplanetv1, qaplanetv2)",
-        "example": "@qa-bot list-environments qaplanetv1",
+        "example": "@qabot list-environments qaplanetv1",
         "call": JenkinsJobInvoker().fetch_list_of_environments,
     },
     "selenium-check-status": {
         "args": "selected K8s cluster (e.g., qaplanetv1, qaplanetv2)",
-        "example": "@qa-bot selenium-check-status qaplanetv1",
+        "example": "@qabot selenium-check-status qaplanetv1",
         "call": JenkinsJobInvoker().fetch_selenium_status,
     },
     "roll": {
         "args": "service to roll, jenkins instance and parameters (json without spaces)",
-        "example": "@qa-bot roll guppy in qaplanetv1 qa-dcp",
+        "example": "@qabot roll guppy in qaplanetv1 qa-dcp",
         "call": JenkinsJobInvoker().roll_service,
     },
     "replay-pr": {
         "args": "repo name, pr number, comma-separated list of labels",
-        "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
+        "example": "@qabot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
         "call": PipelineMaintenance().replay_pr,
     },
     "self-service-release": {
         "args": "github username of environment's owner",
-        "example": "@qa-bot self-service-release ac3eb",
+        "example": "@qabot self-service-release ac3eb",
         "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
     },
     "state-of-the-nation": {
@@ -111,7 +111,7 @@ commands_map = {
     },
     "check-pool-of-ci-environments": {
         "args": "",
-        "example": "@qa-bot check-pool-of-ci-environments",
+        "example": "@qabot check-pool-of-ci-environments",
         "call": PipelineMaintenance().check_pool_of_ci_envs,
     },
     "ci-benchmarking": {
@@ -126,15 +126,15 @@ commands_map = {
     },
     "who-do-I-ask-about": {
         "args": "repo_name",
-        "example": "@qa-bot who-do-I-ask-about arborist",
+        "example": "@qabot who-do-I-ask-about arborist",
         "call": PipelineMaintenance().get_repo_sme,
     },
     "get-ci-summary": {
         "args": "",
-        "example": "@qa-bot get-ci-summary",
+        "example": "@qabot get-ci-summary",
         "call": PipelineMaintenance().get_ci_summary,
     },
-    "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
+    "hello": {"args": "", "example": "@qabot hello", "call": Greeter().say_hello},
 }
 
 
@@ -194,8 +194,8 @@ def handle_app_mention(payload, say, logger):
     else:
         say(
             """
-# Usage instructions: *@qa-bot <command>* \n
-# e.g., @qa-bot command
+# Usage instructions: *@qabot <command>* \n
+# e.g., @qabot command
 #           _visit https://github.com/uc-cdis/qa-bot to learn more_
 #           """
         )

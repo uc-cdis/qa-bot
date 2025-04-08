@@ -399,7 +399,7 @@ class PipelineMaintenance:
 
                 bot_response += f"If you wish to consult a Subject Matter Expert (SME) to triage this CI failure, just run: \n"
                 bot_response += (
-                    f"``` @qa-bot who-do-I-ask-about <name-of-the-service> ``` \n"
+                    f"``` @qabot who-do-I-ask-about <name-of-the-service> ``` \n"
                 )
 
         except RequestException as err:
