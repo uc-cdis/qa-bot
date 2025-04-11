@@ -203,7 +203,7 @@ def handle_app_mention(payload, say, logger):
 
 @app.event("message")
 def handle_message_events(body, say, logger):
-    pass
+    logger.info(body)
 
 
 # @app.event("message")
