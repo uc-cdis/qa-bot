@@ -520,15 +520,11 @@ class PipelineMaintenance:
                     )
                     log.debug("applied label: {}".format(label))
             else:
-                log.warn("Replaying PR without labels...")
+                log.info("Replaying PR without labels...")
         except Exception as err:
             return "Something wrong happened :facepalm:. Deets: {}".format(err)
 
-        if repo_name in ("cdis-manifest", "gitops-qa"):
-            jji = JenkinsJobInvoker()
-            bot_response = jji.replay_pr(repo_name, pr_number)
-        else:
-            bot_response = githublib.replay_pr(pr_number)
+        bot_response = githublib.replay_pr(pr_number)
         return bot_response
 
 

@@ -28,7 +28,8 @@ jobs:
     - name: Run tests
       env:
         DEVELOPMENT: true
-        SLACK_API_TOKEN: meh
+        SLACK_BOT_TOKEN: meh
+        SLACK_APP_TOKEN: mmehh
         JENKINS_USER_API_TOKEN: blablabla
         JENKINS2_USER_API_TOKEN: yaddayaddayadda
         JENKINS_JOB_TOKEN: abc123XYZ
