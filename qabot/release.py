@@ -93,7 +93,7 @@ class ReleaseManager:
         else:
             log.info(f"Failed to trigger workflow: {bot_response.status_code}")
 
-        bot_response = "The release is being rolled out... :clock1: Check https://github.com/uc-cdis/cdis-manifest/pulls to see the PRs"
+        bot_response = "The release is being rolled out... :clock1: Check https://github.com/uc-cdis/gen3-gitops/pulls to see the PRs"
         return bot_response
 
 
