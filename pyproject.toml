@@ -16,6 +16,7 @@ cryptography = "^43.0.1"
 ascii_graph = "^1.5.1"
 slack-bolt = "^1.23.0"
 slack-sdk = "^3.35.0"
+gunicorn = "^23.0.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
