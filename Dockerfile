@@ -1,22 +1,19 @@
-FROM quay.io/cdis/python:python3.9-buster-2.0.0
+ARG AZLINUX_BASE_VERSION=master
 
-ENV appname=qabot
+FROM quay.io/cdis/python-nginx-al:${AZLINUX_BASE_VERSION} AS base
 
-RUN pip install --upgrade pip
-RUN pip install --upgrade poetry
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential gcc musl-dev libffi-dev openssl libssl-dev curl bash
+# Install vim and findutils (which provides `find`)
+RUN dnf install -y vim findutils jq && \
+    dnf install -y openssl && \
+    dnf clean all && \
+    rm -rf /var/cache/dnf
 
-RUN adduser --disabled-login --gecos '' qabotuser
+COPY --chown=gen3:gen3 . /src
 
-RUN mkdir -p /opt/ctds/qabot
+WORKDIR /src
 
-COPY . /opt/ctds/qabot
+USER gen3
 
-WORKDIR /opt/ctds/qabot
+RUN poetry install --no-interaction --only main
 
-RUN poetry config virtualenvs.create false \
-    && poetry install -vv --no-root --no-interaction \
-    && poetry show -v
-
-ENTRYPOINT poetry run python qabot.py
+CMD ["poetry", "run", "gunicorn", "-b", "0.0.0.0:8000", "-k", "uvicorn.workers.UvicornWorker", "--timeout", "1800", "qabot.main:app"]
