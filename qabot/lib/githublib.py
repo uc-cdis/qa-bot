@@ -14,7 +14,7 @@ class GithubLib:
     def __init__(
         self,
         org="uc-cdis",
-        repo="gen3-gitops",
+        repo="cdis-manifest",
         token=os.environ["GITHUB_TOKEN"].strip(),
     ):
         """
