@@ -1,11 +1,8 @@
 import logging
 import os
-import json
-from pprint import pprint
 
-from qabot.parse_codeowners import EnvironmentsManager
-from qabot.jenkins_job_invoker import JenkinsJobInvoker
 from qabot.lib.githublib import GithubLib
+from qabot.parse_codeowners import EnvironmentsManager
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -52,7 +49,7 @@ class ReleaseManager:
         em = EnvironmentsManager()
 
         qa_envs = em.get_envs_owned(user, "gitops-qa")
-        prod_envs = em.get_envs_owned(user, "cdis-manifest")
+        prod_envs = em.get_envs_owned(user, "gen3-code-vigil")
 
         log.info(
             "Creating release PRs for {} environments owned by user {}".format(
@@ -60,7 +57,7 @@ class ReleaseManager:
             )
         )
 
-        jji = JenkinsJobInvoker()
+        ghl = self.githublib
 
         # Invoke Jenkins job for QA environments owned by this user
         for e in qa_envs:
@@ -71,12 +68,13 @@ class ReleaseManager:
             "LIST_OF_ENVIRONMENTS": ",".join(qa_envs),
             "REPO_NAME": "gitops-qa",
         }
-        str_params = json.dumps(json_params, separators=(",", ":"))
-        bot_response = jji.invoke_jenkins_job(
-            "create-prs-for-all-monthly-release-envs", "jenkins", str_params
+        bot_response = ghl.trigger_gh_action_workflow(
+            workflow_repo="thor", workflow_filename="", ref="master", inputs=json_params
         )
-        if "something went wrong" in bot_response:
-            return bot_response
+        if bot_response.status_code == 204:
+            log.info("Workflow triggered successfully.")
+        else:
+            log.info(f"Failed to trigger workflow: {bot_response.status_code}")
 
         # Invoke Jenkins job for Prod environments owned by this user
         for e in prod_envs:
@@ -87,12 +85,13 @@ class ReleaseManager:
             "LIST_OF_ENVIRONMENTS": ",".join(prod_envs),
             "REPO_NAME": "cdis-manifest",
         }
-        str_params = json.dumps(json_params, separators=(",", ":"))
-        bot_response = jji.invoke_jenkins_job(
-            "create-prs-for-all-monthly-release-envs", "jenkins", str_params
+        bot_response = ghl.trigger_gh_action_workflow(
+            workflow_repo="thor", workflow_filename="", ref="master", inputs=json_params
         )
-        if "something went wrong" in bot_response:
-            return bot_response
+        if bot_response.status_code == 204:
+            log.info("Workflow triggered successfully.")
+        else:
+            log.info(f"Failed to trigger workflow: {bot_response.status_code}")
 
         bot_response = "The release is being rolled out... :clock1: Check https://github.com/uc-cdis/cdis-manifest/pulls to see the PRs"
         return bot_response
