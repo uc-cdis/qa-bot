@@ -90,4 +90,4 @@ class GithubLib:
         if inputs:
             payload["inputs"] = inputs
         response = requests.post(url, headers=headers, json=payload)
-        return response.status_code
+        return response
