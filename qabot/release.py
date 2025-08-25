@@ -48,8 +48,8 @@ class ReleaseManager:
         # find all environments owned by the user
         em = EnvironmentsManager()
 
-        qa_envs = em.get_envs_owned(user, "gitops-qa")
-        prod_envs = em.get_envs_owned(user, "gen3-code-vigil")
+        qa_envs = em.get_envs_owned(user, "gen3-gitops-dev")
+        prod_envs = em.get_envs_owned(user, "gen3-gitops")
 
         log.info(
             "Creating release PRs for {} environments owned by user {}".format(
