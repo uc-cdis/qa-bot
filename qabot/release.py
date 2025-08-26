@@ -61,12 +61,12 @@ class ReleaseManager:
                 continue
 
             # Print out the envs release PR creation message
-            [log.info("creating release PR for {}".format(e)) for e in env_list]
+            [log.info(f"creating release PR for {e}") for e in env_list]
 
             json_params = {
                 "RELEASE_VERSION": latest_release,
                 "LIST_OF_ENVIRONMENTS": ",".join(env_list),
-                "REPO_NAME": repo_name,
+                "TARGET_REPO_NAME": repo_name,
             }
             bot_response = ghl.trigger_gh_action_workflow(
                 workflow_repo="thor",
