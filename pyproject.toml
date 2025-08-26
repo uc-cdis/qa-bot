@@ -7,7 +7,7 @@ package-mode = false
 
 [tool.poetry.dependencies]
 python = "^3.9"
-requests = "^2.32.0"
+requests = "^2.32.4"
 PyGithub = "^1.44.1"
 httmock = "^1.4.0"
 influxdb = "^5.3.1"
