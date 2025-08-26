@@ -77,7 +77,10 @@ class ReleaseManager:
             if bot_response.status_code == 204:
                 log.info("Workflow triggered successfully.")
             else:
-                log.info(f"Failed to trigger workflow: {bot_response.status_code}")
+                log.error(bot_response.text)
+                raise Exception(
+                    f"Failed to trigger workflow: {bot_response.status_code}"
+                )
             url_list.append(f"https://github.com/uc-cdis/{repo_name}/pulls")
 
         log.info(
