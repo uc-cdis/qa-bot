@@ -1,11 +1,8 @@
 import logging
 import os
-import json
-from pprint import pprint
 
-from qabot.parse_codeowners import EnvironmentsManager
-from qabot.jenkins_job_invoker import JenkinsJobInvoker
 from qabot.lib.githublib import GithubLib
+from qabot.parse_codeowners import EnvironmentsManager
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -51,50 +48,46 @@ class ReleaseManager:
         # find all environments owned by the user
         em = EnvironmentsManager()
 
-        qa_envs = em.get_envs_owned(user, "gitops-qa")
-        prod_envs = em.get_envs_owned(user, "cdis-manifest")
+        prs_count = 0
+        ghl = self.githublib
+        url_list = []
+
+        for repo_name in ["gen3-gitops-dev", "gen3-gitops"]:
+            env_list = em.get_envs_owned(user, repo_name)
+            prs_count += len(env_list)
+
+            # Continue to the next env_list if no entries in current env list
+            if len(env_list) == 0:
+                continue
+
+            # Print out the envs release PR creation message
+            [log.info(f"creating release PR for {e}") for e in env_list]
+
+            json_params = {
+                "RELEASE_VERSION": latest_release,
+                "LIST_OF_ENVIRONMENTS": ",".join(env_list),
+                "TARGET_REPO_NAME": repo_name,
+            }
+            bot_response = ghl.trigger_gh_action_workflow(
+                workflow_repo="thor",
+                workflow_filename="deploy_monthly_release.yaml",
+                ref="master",
+                inputs=json_params,
+            )
+            if bot_response.status_code == 204:
+                log.info("Workflow triggered successfully.")
+            else:
+                log.error(bot_response.text)
+                raise Exception(
+                    f"Failed to trigger workflow: {bot_response.status_code}"
+                )
+            url_list.append(f"https://github.com/uc-cdis/{repo_name}/pulls")
 
         log.info(
-            "Creating release PRs for {} environments owned by user {}".format(
-                len(qa_envs) + len(prod_envs), user
-            )
+            f"Creating release PRs for {prs_count} environments owned by user {user}"
         )
 
-        jji = JenkinsJobInvoker()
-
-        # Invoke Jenkins job for QA environments owned by this user
-        for e in qa_envs:
-            log.info("creating release PR for {}".format(e))
-
-        json_params = {
-            "RELEASE_VERSION": latest_release,
-            "LIST_OF_ENVIRONMENTS": ",".join(qa_envs),
-            "REPO_NAME": "gitops-qa",
-        }
-        str_params = json.dumps(json_params, separators=(",", ":"))
-        bot_response = jji.invoke_jenkins_job(
-            "create-prs-for-all-monthly-release-envs", "jenkins", str_params
-        )
-        if "something went wrong" in bot_response:
-            return bot_response
-
-        # Invoke Jenkins job for Prod environments owned by this user
-        for e in prod_envs:
-            log.info("creating release PR for {}".format(e))
-
-        json_params = {
-            "RELEASE_VERSION": latest_release,
-            "LIST_OF_ENVIRONMENTS": ",".join(prod_envs),
-            "REPO_NAME": "cdis-manifest",
-        }
-        str_params = json.dumps(json_params, separators=(",", ":"))
-        bot_response = jji.invoke_jenkins_job(
-            "create-prs-for-all-monthly-release-envs", "jenkins", str_params
-        )
-        if "something went wrong" in bot_response:
-            return bot_response
-
-        bot_response = "The release is being rolled out... :clock1: Check https://github.com/uc-cdis/cdis-manifest/pulls to see the PRs"
+        bot_response = f"The release is being rolled out... :clock1: Check {', '.join(url_list)} to see the PRs"
         return bot_response
 
 
