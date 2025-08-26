@@ -1,6 +1,8 @@
+import json
 import logging
 import os
 
+import requests
 from github import Github
 from github.GithubException import GithubException
 
@@ -77,3 +79,15 @@ class GithubLib:
                 return "Failed to replay the PR :sadcat:, please try from Github directly :pray:"
         else:
             return "No `Integration Tests` workflow run found for this PR :thinking:"
+
+    def trigger_gh_action_workflow(self, workflow_repo, workflow_filename, ref, inputs):
+        url = f"https://api.github.com/repos/{self.org}/{workflow_repo}/actions/workflows/{workflow_filename}/dispatches"
+        headers = {
+            "Authorization": f"token {self.token}",
+            "Accept": "application/vnd.github+json",
+        }
+        payload = {"ref": ref}
+        if inputs:
+            payload["inputs"] = inputs
+        response = requests.post(url, headers=headers, json=payload)
+        return response

@@ -1,7 +1,8 @@
-from qabot.lib.httplib import HttpLib
 import logging
 import os
 from pprint import pprint
+
+from qabot.lib.httplib import HttpLib
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 log = logging.getLogger(__name__)
@@ -26,6 +27,8 @@ class EnvironmentsManager:
         url = f"https://raw.githubusercontent.com/uc-cdis/{repo}/master/CODEOWNERS"
         codeowners = self.httplib.fetch_raw_data(url)
         envs = []
+        if codeowners is None:
+            return []
         for line in codeowners.splitlines():
             if user in line:
                 envs.append(line.split()[0])
