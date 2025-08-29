@@ -120,6 +120,7 @@ class PipelineMaintenance:
         if bot_response.status_code == 204:
             return f"The environment {ci_env_name} has been removed from quarantine."
         else:
+            log.info(bot_response.text)
             return f"Failed to unqurantine environment {ci_env_name}, please try again or contact QA team"
 
     def quarantine_ci_env(self, ci_env_name):
@@ -139,6 +140,7 @@ class PipelineMaintenance:
         if bot_response.status_code == 204:
             return f"The environment {ci_env_name} has been placed under quarantine. :face_with_thermometer:"
         else:
+            log.info(bot_response.text)
             return f"Failed to qurantine environment {ci_env_name}, please try again or contact QA team"
 
     def failure_rate_for_test_suite(self, test_suite_name):
