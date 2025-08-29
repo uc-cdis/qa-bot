@@ -90,4 +90,13 @@ class GithubLib:
         if inputs:
             payload["inputs"] = inputs
         response = requests.post(url, headers=headers, json=payload)
-        return response
+        return response.status_code
+
+
+if __name__ == "__main__":
+    g = GithubLib(repo="gen3-code-vigil")
+    params = {"NAMESPACE": "dummy", "QUARANTINE": "yes"}
+    res = g.trigger_gh_action_workflow(
+        "gen3-code-vigil", "quarantine_ci_env.yaml", "master", params
+    )
+    print(res)

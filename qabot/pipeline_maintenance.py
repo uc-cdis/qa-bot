@@ -105,48 +105,41 @@ class PipelineMaintenance:
 
     def unquarantine_ci_env(self, ci_env_name):
         """
-        Add ci-environment back to the source-of-truth pool of CI environments files:
-         - services pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-services.txt
-         - releases pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-releases.txt
+        Runs github action workflow below, which sets the label quarantine to false on the namespace
+        Once the label is set the environment is terminated if the last helm install time was 1.5 hours ago
+        https://github.com/uc-cdis/gen3-code-vigil/blob/master/.github/workflows/quarantine_ci_env.yaml
         """
-        bot_response = ""
-        ci_env_pool = self._get_ci_env_pool(ci_env_name)
-
-        jji = JenkinsJobInvoker()
-        log.info(f"Putting environment {ci_env_name} back into {ci_env_pool} pool...")
-        json_params = {"ENVIRONMENT_NAME": ci_env_name, "CI_ENV_POOL": ci_env_pool}
-        str_params = json.dumps(json_params, separators=(",", ":"))
-        bot_response = jji.invoke_jenkins_job(
-            "unquarantine-ci-environment", "jenkins", str_params
+        ghl = GithubLib(repo="gen3-code-vigil")
+        workflow_inputs = {"NAMESPACE": ci_env_name, "QUARANTINE": "no"}
+        bot_response = ghl.trigger_gh_action_workflow(
+            workflow_repo="gen3-code-vigil",
+            workflow_filename="quarantine_ci_env.yaml",
+            ref="master",
+            inputs=workflow_inputs,
         )
-        if "something went wrong" in bot_response:
-            return bot_response
-
-        bot_response = f"The environment {ci_env_name} has been placed back into the CI-envs pool. :awesome-face:"
-        return bot_response
+        if bot_response.status_code == 204:
+            return f"The environment {ci_env_name} has been removed from quarantine."
+        else:
+            return f"Failed to unqurantine environment {ci_env_name}, please try again or contact QA team"
 
     def quarantine_ci_env(self, ci_env_name):
         """
-        Remove ci-environment from the source-of-truth pool of CI environments files:
-         - services pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-services.txt
-         - releases pool: https://cdistest-public-test-bucket.s3.amazonaws.com/jenkins-envs-releases.txt
-        both files are restored every night by a cronjob.
+        Runs github action workflow below, which sets the label quarantine to true on the namespace
+        Once the label is set the environment is not terminated for 8 hours from the last helm install time
+        https://github.com/uc-cdis/gen3-code-vigil/blob/master/.github/workflows/quarantine_ci_env.yaml
         """
-        bot_response = ""
-        ci_env_pool = self._get_ci_env_pool(ci_env_name)
-
-        jji = JenkinsJobInvoker()
-        log.info(f"Putting environment {ci_env_name} in quarantine...")
-        json_params = {"ENVIRONMENT_NAME": ci_env_name, "CI_ENV_POOL": ci_env_pool}
-        str_params = json.dumps(json_params, separators=(",", ":"))
-        bot_response = jji.invoke_jenkins_job(
-            "quarantine-ci-environment", "jenkins", str_params
+        ghl = GithubLib(repo="gen3-code-vigil")
+        workflow_inputs = {"NAMESPACE": ci_env_name, "QUARANTINED": "yes"}
+        bot_response = ghl.trigger_gh_action_workflow(
+            workflow_repo="gen3-code-vigil",
+            workflow_filename="quarantine_ci_env.yaml",
+            ref="master",
+            inputs=workflow_inputs,
         )
-        if "something went wrong" in bot_response:
-            return bot_response
-
-        bot_response = f"The environment {ci_env_name} has been placed under quarantine. :face_with_thermometer:"
-        return bot_response
+        if bot_response.status_code == 204:
+            return f"The environment {ci_env_name} has been placed under quarantine. :face_with_thermometer:"
+        else:
+            return f"Failed to qurantine environment {ci_env_name}, please try again or contact QA team"
 
     def failure_rate_for_test_suite(self, test_suite_name):
         """
