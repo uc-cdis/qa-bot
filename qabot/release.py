@@ -67,6 +67,7 @@ class ReleaseManager:
                 "RELEASE_VERSION": latest_release,
                 "LIST_OF_ENVIRONMENTS": ",".join(env_list),
                 "TARGET_REPO_NAME": repo_name,
+                "TRIGGERED_BY_USER": user,
             }
             bot_response = ghl.trigger_gh_action_workflow(
                 workflow_repo="thor",
