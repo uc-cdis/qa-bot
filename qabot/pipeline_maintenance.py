@@ -130,7 +130,7 @@ class PipelineMaintenance:
         https://github.com/uc-cdis/gen3-code-vigil/blob/master/.github/workflows/quarantine_ci_env.yaml
         """
         ghl = GithubLib(repo="gen3-code-vigil")
-        workflow_inputs = {"NAMESPACE": ci_env_name, "QUARANTINED": "yes"}
+        workflow_inputs = {"NAMESPACE": ci_env_name, "QUARANTINE": "yes"}
         bot_response = ghl.trigger_gh_action_workflow(
             workflow_repo="gen3-code-vigil",
             workflow_filename="quarantine_ci_env.yaml",
