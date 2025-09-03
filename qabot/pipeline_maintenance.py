@@ -9,7 +9,6 @@ import requests
 from ascii_graph import Pyasciigraph
 from requests.exceptions import RequestException
 
-from qabot.jenkins_job_invoker import JenkinsJobInvoker
 from qabot.lib.githublib import GithubLib
 from qabot.lib.influxlib import InfluxLib
 from qabot.lib.jenkinslib import JenkinsLib

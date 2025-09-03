@@ -87,8 +87,10 @@ class ReleaseManager:
         log.info(
             f"Creating release PRs for {prs_count} environments owned by user {user}"
         )
-
-        bot_response = f"The release is being rolled out... :clock1: Check {', '.join(url_list)} to see the PRs"
+        if prs_count == 0:
+            bot_response = "Please check the github handle of the user, could not find any environments owned"
+        else:
+            bot_response = f"The release is being rolled out... :clock1: Check {', '.join(url_list)} to see the PRs"
         return bot_response
 
 
