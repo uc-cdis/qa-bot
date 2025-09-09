@@ -14,6 +14,6 @@ WORKDIR /src
 
 USER gen3
 
-RUN poetry install --no-interaction --only main
+RUN poetry env use python3.12 && poetry install --no-interaction --only main
 
 CMD ["poetry", "run", "python", "qabot.py"]
