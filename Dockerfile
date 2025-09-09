@@ -1,4 +1,4 @@
-ARG AZLINUX_BASE_VERSION=master
+ARG AZLINUX_BASE_VERSION=feat_python3.12
 
 FROM quay.io/cdis/python-nginx-al:${AZLINUX_BASE_VERSION} AS base
 
