@@ -14,7 +14,7 @@ WORKDIR /src
 
 USER gen3
 
-RUN python3 --version
+RUN ls -l /usr/bin/python*
 
 RUN poetry env use python3.12 && poetry install --no-interaction --only main
 
