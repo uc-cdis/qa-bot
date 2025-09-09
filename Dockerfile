@@ -8,12 +8,19 @@ RUN dnf install -y vim findutils jq && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
+# Install Python 3.12 and pip
+RUN tdnf install -y \
+    python3-3.12.9 \
+    python3-devel-3.12.9 \
+ && ln -sf /usr/bin/python3.12 /usr/bin/python \
+ && ln -sf /usr/bin/pip3.12 /usr/bin/pip
+
 COPY --chown=gen3:gen3 . /src
 
 WORKDIR /src
 
 USER gen3
 
-RUN poetry env use python3.12 && poetry install --no-interaction --only main
+RUN poetry install --no-interaction --only main
 
 CMD ["poetry", "run", "python", "qabot.py"]
