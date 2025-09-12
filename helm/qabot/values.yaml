@@ -81,13 +81,6 @@ resources:
     cpu: 2
     memory: 512Mi
 
-# -- (string) Label to help organize pods and their use. Any value is valid, but use "_" or "-" to divide words.
-partOf: "CI"
-# -- (map) Will completely override the selectorLabels defined in the common chart's _label_setup.tpl
-selectorLabels:
-# -- (map) Will completely override the commonLabels defined in the common chart's _label_setup.tpl
-commonLabels:
-
 secretStoreServiceAccount:
   # -- (bool) Set true if deploying to AWS and want to use service account and IAM role.
   enabled: true
