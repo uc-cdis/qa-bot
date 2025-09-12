@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qabot-deployment
+  annotations:
+  {{- with .Values.podAnnotations }}
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "qabot.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    # Only select pods based on the 'app' label
+    matchLabels:
+      {{- include "qabot.selectorLabels" . | nindent 6 }}
+      public: "yes"
+  template:
+    metadata:
+      labels:
+        {{- include "qabot.selectorLabels" . | nindent 8 }}
+        {{- include "common.extraLabels" . | nindent 8 }}
+        public: "yes"
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/app-config.yaml") . | sha256sum }}
+        {{- $metricsEnabled := .Values.metricsEnabled }}
+      {{- if eq $metricsEnabled nil }}
+        {{- $metricsEnabled = .Values.global.metricsEnabled }}
+      {{- end }}
+      {{- if eq $metricsEnabled nil }}
+        {{- $metricsEnabled = true }}
+      {{- end }}
+
+      {{- if $metricsEnabled }}
+        {{- include "common.grafanaAnnotations" . | nindent 8 }}
+      {{- end }}
+    spec:
+      volumes:
+        {{- toYaml .Values.volumes | nindent 8 }}
+      containers:
+      - name: qabot
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 20
+          timeoutSeconds: 30
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 60
+          timeoutSeconds: 30
+        ports:
+          - containerPort: 8080
+        env:
+          {{- toYaml .Values.env | nindent 12 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+        volumeMounts:
+          {{- toYaml .Values.volumeMounts | nindent 12 }}
