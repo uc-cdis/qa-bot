@@ -9,9 +9,7 @@ metadata:
   labels:
     {{- include "qabot.labels" . | nindent 4 }}
 spec:
-  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
-  {{- end }}
   selector:
     # Only select pods based on the 'app' label
     matchLabels:
@@ -21,20 +19,11 @@ spec:
     metadata:
       labels:
         {{- include "qabot.selectorLabels" . | nindent 8 }}
-        {{- include "common.extraLabels" . | nindent 8 }}
         public: "yes"
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/app-config.yaml") . | sha256sum }}
-        {{- $metricsEnabled := .Values.metricsEnabled }}
-      {{- if eq $metricsEnabled nil }}
-        {{- $metricsEnabled = .Values.global.metricsEnabled }}
-      {{- end }}
-      {{- if eq $metricsEnabled nil }}
-        {{- $metricsEnabled = true }}
-      {{- end }}
-
-      {{- if $metricsEnabled }}
-        {{- include "common.grafanaAnnotations" . | nindent 8 }}
+        checksum/config: {{ include (print $.Template.BasePath "/secrets.yaml") . | sha256sum }}
+      {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
       volumes:

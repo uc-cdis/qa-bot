@@ -63,9 +63,9 @@ env:
 volumeMounts:
   - name: slacktoken
     mountPath: "/secret/githubtoken.json"
-  - name: kube-api-access
-    mountPath: /var/run/secrets/kubernetes.io/serviceaccount
-    readOnly: true
+#  - name: kube-api-access
+#    mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+#    readOnly: true
 
 # -- (list) Volumes to attach to the container.
 volumes:
@@ -90,3 +90,4 @@ secretStoreServiceAccount:
   roleArn: arn:aws:iam::707767160287:role/devplanetv2-external-secrets-sa
 externalSecrets:
   secretName: devplanetv2-qabot-g3auto #pragma: allowlist secret
+  
