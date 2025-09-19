@@ -118,7 +118,7 @@ class PipelineMaintenance:
             ]
             result = subprocess.run(command, capture_output=True, text=True, check=True)
             log.info(f"Output from command: {result.stdout}")
-            return f"The environment {ci_env_name} has been removed from quarantine."
+            return f"The environment {ci_env_name} has been removed from quarantine. :awesome-face:"
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
             return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
