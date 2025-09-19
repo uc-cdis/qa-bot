@@ -42,22 +42,22 @@ env:
     valueFrom:
       secretKeyRef:
         name: qabot-g3auto
-        key: "slack_bot_token.json"
+        key: "slack_bot_token"
   - name: SLACK_APP_TOKEN
     valueFrom:
       secretKeyRef:
         name: qabot-g3auto
-        key: "slack_app_token.json"
+        key: "slack_app_token"
   - name: GITHUB_TOKEN
     valueFrom:
       secretKeyRef:
         name: qabot-g3auto
-        key: "githubtoken.json"
+        key: "githubtoken"
   - name: JIRA_API_TOKEN
     valueFrom:
       secretKeyRef:
         name: qabot-g3auto
-        key: "jira_api_token.json"
+        key: "jira_api_token"
 
 # -- (list) Volumes to mount to the container.
 volumeMounts:
