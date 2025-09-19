@@ -62,7 +62,7 @@ env:
 # -- (list) Volumes to mount to the container.
 volumeMounts:
   - name: slacktoken
-    mountPath: "/secret/githubtoken.json"
+    mountPath: "/secret/githubtoken"
   - name: kube-api-access
     mountPath: /var/run/secrets/kubernetes.io/serviceaccount
     readOnly: true
