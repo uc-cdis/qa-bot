@@ -3,6 +3,7 @@ import json
 import logging
 import os
 import re
+import subprocess
 import time
 
 import requests
@@ -103,44 +104,41 @@ class PipelineMaintenance:
         return feature_name
 
     def unquarantine_ci_env(self, ci_env_name):
-        """
-        Runs github action workflow below, which sets the label quarantine to false on the namespace
-        Once the label is set the environment is terminated if the last helm install time was 1.5 hours ago
-        https://github.com/uc-cdis/gen3-code-vigil/blob/master/.github/workflows/quarantine_ci_env.yaml
-        """
-        ghl = GithubLib(repo="gen3-code-vigil")
-        workflow_inputs = {"NAMESPACE": ci_env_name, "QUARANTINE": "no"}
-        bot_response = ghl.trigger_gh_action_workflow(
-            workflow_repo="gen3-code-vigil",
-            workflow_filename="quarantine_ci_env.yaml",
-            ref="master",
-            inputs=workflow_inputs,
-        )
-        if bot_response.status_code == 204:
-            return f"The environment {ci_env_name} has been removed from quarantine."
-        else:
-            log.info(bot_response.text)
-            return f"Failed to unqurantine environment {ci_env_name}, please try again or contact QA team"
+        try:
+            command = ["kubectl", "label", "namespace", ci_env_name, "quarantine-"]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(f"Output from command: {result.stdout}")
+            command = [
+                "kubectl",
+                "label",
+                "namespace",
+                ci_env_name,
+                "teardown=true",
+                "--overwrite",
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(f"Output from command: {result.stdout}")
+            return f"The environment {ci_env_name} has been removed from quarantine. :awesome-face:"
+        except subprocess.CalledProcessError as e:
+            log.info(e.stderr)
+            return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
     def quarantine_ci_env(self, ci_env_name):
-        """
-        Runs github action workflow below, which sets the label quarantine to true on the namespace
-        Once the label is set the environment is not terminated for 8 hours from the last helm install time
-        https://github.com/uc-cdis/gen3-code-vigil/blob/master/.github/workflows/quarantine_ci_env.yaml
-        """
-        ghl = GithubLib(repo="gen3-code-vigil")
-        workflow_inputs = {"NAMESPACE": ci_env_name, "QUARANTINE": "yes"}
-        bot_response = ghl.trigger_gh_action_workflow(
-            workflow_repo="gen3-code-vigil",
-            workflow_filename="quarantine_ci_env.yaml",
-            ref="master",
-            inputs=workflow_inputs,
-        )
-        if bot_response.status_code == 204:
+        command = [
+            "kubectl",
+            "label",
+            "namespace",
+            ci_env_name,
+            "quarantine=true",
+            "--overwrite",
+        ]
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(f"Output from command: {result.stdout}")
             return f"The environment {ci_env_name} has been placed under quarantine. :face_with_thermometer:"
-        else:
-            log.info(bot_response.text)
-            return f"Failed to qurantine environment {ci_env_name}, please try again or contact QA team"
+        except subprocess.CalledProcessError as e:
+            log.info(e.stderr)
+            return f"Failed to quarantine environment {ci_env_name}, please try again or contact QA team"
 
     def failure_rate_for_test_suite(self, test_suite_name):
         """
