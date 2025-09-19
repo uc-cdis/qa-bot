@@ -121,7 +121,7 @@ class PipelineMaintenance:
             return f"The environment {ci_env_name} has been removed from quarantine."
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
-            return f"Failed to unqurantine environment {ci_env_name}, please try again or contact QA team"
+            return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
     def quarantine_ci_env(self, ci_env_name):
         command = [
@@ -138,7 +138,7 @@ class PipelineMaintenance:
             return f"The environment {ci_env_name} has been placed under quarantine. :face_with_thermometer:"
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
-            return f"Failed to qurantine environment {ci_env_name}, please try again or contact QA team"
+            return f"Failed to quarantine environment {ci_env_name}, please try again or contact QA team"
 
     def failure_rate_for_test_suite(self, test_suite_name):
         """
