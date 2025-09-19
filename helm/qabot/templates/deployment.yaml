@@ -32,22 +32,6 @@ spec:
       - name: qabot
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
-        readinessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 20
-          timeoutSeconds: 30
-        livenessProbe:
-          httpGet:
-            path: /
-            port: 8080
-          initialDelaySeconds: 5
-          periodSeconds: 60
-          timeoutSeconds: 30
-        ports:
-          - containerPort: 8080
         env:
           {{- toYaml .Values.env | nindent 12 }}
         resources:
