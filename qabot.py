@@ -80,7 +80,7 @@ commands_map = {
         "call": JenkinsJobInvoker().roll_service,
     },
     "replay-nightly-run": {
-        "args": "repo name, comma-separated list of labels",
+        "args": "comma-separated list of labels",
         "example": "@qa-bot replay-nightly-run test-portal-homepageTest,test-apis-dataUploadTest",
         "call": PipelineMaintenance().replay_nightly_run,
     },
