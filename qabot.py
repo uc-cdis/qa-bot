@@ -79,6 +79,11 @@ commands_map = {
         "example": "@qa-bot roll guppy in qaplanetv1 qa-dcp",
         "call": JenkinsJobInvoker().roll_service,
     },
+    "replay-nightly-run": {
+        "args": "repo name, comma-separated list of labels",
+        "example": "@qa-bot replay-nightly-run test-portal-homepageTest,test-apis-dataUploadTest",
+        "call": PipelineMaintenance().replay_nightly_run,
+    },
     "replay-pr": {
         "args": "repo name, pr number, comma-separated list of labels",
         "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
