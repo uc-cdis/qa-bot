@@ -5,8 +5,8 @@ import traceback
 from slack_bolt.adapter.socket_mode import SocketModeHandler
 from slack_bolt.app import App
 
+from qabot.env_maintenance import EnvMaintenance
 from qabot.greeter import Greeter
-from qabot.jenkins_job_invoker import JenkinsJobInvoker
 from qabot.manifests_checker import ManifestsChecker
 from qabot.pipeline_maintenance import PipelineMaintenance
 from qabot.release import ReleaseManager
@@ -44,40 +44,10 @@ commands_map = {
         "example": "@qa-bot whereis release 2020.02 \n or \n @qa-bot whereis tube 2020.08",
         "call": ManifestsChecker().whereis_version,
     },
-    "run-test": {
-        "args": "jenkins instance, target environment and test suite to be executed",
-        "example": "@qa-bot run-test jenkins2 ci-env-1 test-portal-homepageTest",
-        "call": JenkinsJobInvoker().run_test_on_environment,
-    },
-    "create-ticket": {
-        "args": 'ticket_type {"title":"any title","description":"any description","assignee":"Name [Middle Name] LastName"}',
-        "example": '@qa-bot create-ticket bug {"title":"PR-1234 failed. help!","description":"This test test-portal-discoveryPageTest is failing","assignee":"Hara Prasad Juvala"}',
-        "call": PipelineMaintenance().create_ticket,
-    },
-    "check-result": {
-        "args": "job name, id id and jenkins instance",
-        "example": "@qa-bot check-result run-tests-on-environment 21 jenkins2",
-        "call": JenkinsJobInvoker().get_status_of_job,
-    },
-    "run-jenkins-job": {
-        "args": "job name, jenkins instance and parameters (json without spaces)",
-        "example": '@qa-bot run-jenkins-job self-service-qa-gen3-roll jenkins2 {"SERVICE_NAME":"all","TARGET_ENVIRONMENT":"ci-env-1"}',
-        "call": JenkinsJobInvoker().invoke_jenkins_job,
-    },
-    "list-environments": {
-        "args": "selected K8s cluster (e.g., qaplanetv1, qaplanetv2)",
-        "example": "@qa-bot list-environments qaplanetv1",
-        "call": JenkinsJobInvoker().fetch_list_of_environments,
-    },
-    "selenium-check-status": {
-        "args": "selected K8s cluster (e.g., qaplanetv1, qaplanetv2)",
-        "example": "@qa-bot selenium-check-status qaplanetv1",
-        "call": JenkinsJobInvoker().fetch_selenium_status,
-    },
-    "roll-service": {
+    "roll": {
         "args": "service to roll, ci_environment_name",
         "example": "@qa-bot roll-service guppy jenkins-brain",
-        "call": JenkinsJobInvoker().roll_service,
+        "call": EnvMaintenance().roll_service,
     },
     "replay-nightly-run": {
         "args": "comma-separated list of labels",
@@ -99,11 +69,6 @@ commands_map = {
         "example": "bdcat all 50",
         "call": StateOfTheNation().run_state_of_the_nation_report,
     },
-    "get-failure-rate": {
-        "args": "test_suite_name",
-        "example": "test-portal-homepageTest",
-        "call": PipelineMaintenance().failure_rate_for_test_suite,
-    },
     "quarantine-ci-environment": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
@@ -114,30 +79,10 @@ commands_map = {
         "example": "jenkins-brain",
         "call": PipelineMaintenance().unquarantine_ci_env,
     },
-    "check-pool-of-ci-environments": {
-        "args": "",
-        "example": "@qa-bot check-pool-of-ci-environments",
-        "call": PipelineMaintenance().check_pool_of_ci_envs,
-    },
-    "ci-benchmarking": {
-        "args": "repo_name pr_number stage_name",
-        "example": " cdis-manifest 3265 K8sReset\n gitops-qa 1523 RunTests",
-        "call": PipelineMaintenance().ci_benchmarking,
-    },
-    "fetch-test-results": {
-        "args": "repo_name pr_number",
-        "example": " cdis-manifest 1234 \n fence 5678",
-        "call": PipelineMaintenance().fetch_ci_failures,
-    },
-    "who-do-I-ask-about": {
-        "args": "repo_name",
-        "example": "@qa-bot who-do-I-ask-about arborist",
-        "call": PipelineMaintenance().get_repo_sme,
-    },
-    "get-ci-summary": {
-        "args": "",
-        "example": "@qa-bot get-ci-summary",
-        "call": PipelineMaintenance().get_ci_summary,
+    "scaleup-namespace": {
+        "args": "ci_environment_name",
+        "example": "jenkins-brain",
+        "call": EnvMaintenance().scaleup_namespace,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
@@ -209,34 +154,6 @@ def handle_app_mention(payload, say, logger):
 @app.event("message")
 def handle_message_events(body, say, logger):
     logger.info(body)
-
-
-# @app.event("message")
-# def capture_messages(**payload):
-#     data = payload["data"]
-#     # this will log every single msg, it should be disabled by default
-#     # log.debug("### DATA: {}".format(data))
-
-#     channel_id = data["channel"]
-
-#     # determine user for logging purposes
-#     # ignore username when receiving msgs from other bots or other events
-#     if "user" in data.keys():
-#         user = data["user"]
-#     else:
-#         user = ""
-#     # determines if the bot is being called
-#     the_msg = ""
-#     if "text" in data.keys():
-#         the_msg = data["text"]
-#     elif data["subtype"] == "message_changed":
-#         the_msg = data["message"]["text"]
-
-#     if "bot_profile" in data.keys() and data["bot_profile"]["id"] == "B80E3HU5P":
-#         log.info("Jenkins just posted a Slack msg")
-#         bot_reply = PipelineMaintenance().react_to_jenkins_updates(data)
-#         if bot_reply is not None:
-#             post_message(payload, bot_reply, "C01TS6PDMRT")
 
 
 if __name__ == "__main__":
