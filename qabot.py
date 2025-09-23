@@ -74,9 +74,9 @@ commands_map = {
         "example": "@qa-bot selenium-check-status qaplanetv1",
         "call": JenkinsJobInvoker().fetch_selenium_status,
     },
-    "roll": {
+    "roll-service": {
         "args": "service to roll, ci_environment_name",
-        "example": "@qa-bot roll guppy jenkins-brain",
+        "example": "@qa-bot roll-service guppy jenkins-brain",
         "call": JenkinsJobInvoker().roll_service,
     },
     "replay-nightly-run": {
