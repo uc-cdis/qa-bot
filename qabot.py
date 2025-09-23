@@ -46,7 +46,7 @@ commands_map = {
     },
     "roll": {
         "args": "service to roll, ci_environment_name",
-        "example": "@qa-bot roll-service guppy jenkins-brain",
+        "example": "@qa-bot roll guppy jenkins-brain",
         "call": EnvMaintenance().roll_service,
     },
     "replay-nightly-run": {
