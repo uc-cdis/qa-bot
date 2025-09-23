@@ -75,12 +75,12 @@ commands_map = {
         "call": JenkinsJobInvoker().fetch_selenium_status,
     },
     "roll": {
-        "args": "service to roll, jenkins instance and parameters (json without spaces)",
-        "example": "@qa-bot roll guppy in qaplanetv1 qa-dcp",
+        "args": "service to roll, ci_environment_name",
+        "example": "@qa-bot roll guppy jenkins-brain",
         "call": JenkinsJobInvoker().roll_service,
     },
     "replay-nightly-run": {
-        "args": "comma-separated list of labels",
+        "args": "repo name, comma-separated list of labels",
         "example": "@qa-bot replay-nightly-run test-portal-homepageTest,test-apis-dataUploadTest",
         "call": PipelineMaintenance().replay_nightly_run,
     },

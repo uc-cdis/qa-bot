@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import subprocess
 
 from qabot.lib.githublib import GithubLib
 from qabot.lib.jenkinslib import JenkinsLib
@@ -66,11 +67,41 @@ class JenkinsJobInvoker:
         """
         return "not implemented yet"
 
-    def roll_service(self, service_name, cluster_name, environment):
+    def roll_service(self, service_name, ci_env_name):
         """
         Roll a service in one of our gen3 environments
         """
-        return "not implemented yet"
+        if service_name not in ["sower", "ssjdispatcher"]:
+            deployment_name = f"{service_name}-deployment"
+        else:
+            deployment_name = service_name
+        try:
+            command = [
+                "kubectl",
+                "rollout",
+                "restart",
+                f"deployment/{deployment_name}",
+                "-n",
+                ci_env_name,
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(f"Output from command when rolling deployment: {result.stdout}")
+            command = [
+                "kubectl",
+                "rollout",
+                "status",
+                f"deployment/{deployment_name}",
+                "-n",
+                ci_env_name,
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(
+                f"Output from command when checking deployment status: {result.stdout}"
+            )
+            return f"The service {service_name} has been rolled on {ci_env_name}. :awesome-face:"
+        except subprocess.CalledProcessError as e:
+            log.info(e.stderr)
+            return f"Failed to roll service {service_name} on {ci_env_name}, please try again or contact QA team"
 
     def fetch_list_of_environments(self, cluster_name):
         # TODO: Refactor and move this to a dictionary lookup in Jenkinslib
