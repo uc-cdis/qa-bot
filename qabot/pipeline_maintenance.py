@@ -449,5 +449,5 @@ class PipelineMaintenance:
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
-    result = pipem.get_ci_summary()
+    result = pipem.quarantine_ci_env("nightly-build")
     print(result)
