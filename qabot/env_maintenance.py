@@ -11,6 +11,7 @@ class EnvMaintenance:
         """
         Roll a service in one of our gen3 environments
         """
+        log.info(f"Running roll-service on {env_name}")
         try:
             # Sets commands and messages when all services need to be restarted
             if service_name.upper() == "ALL":
@@ -74,6 +75,7 @@ class EnvMaintenance:
         """
         Scaleup the given namespace in gen3 environments
         """
+        log.info(f"Running scaleup-namespace on {env_name}")
         script_path = "/src/qabot/scripts/scaleup-namespace.sh"
         try:
             os.chmod(script_path, 0o755)
@@ -106,6 +108,57 @@ class EnvMaintenance:
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
             return f"Failed to scaleup namespace {env_name}, please try again or contact QA team"
+
+    def run_gen3_job(self, job_name, env_name):
+        """
+        Run gen3 job in the given namespace in gen3 environments
+        """
+        log.info(f"Running run-gen3-job on {env_name}")
+        try:
+            command = [
+                "kubectl",
+                "delete",
+                "job",
+                f"{job_name}-qabot",
+                "-n",
+                env_name,
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(
+                f"Output from command when deleting existing gen3 job {job_name}: {result.stdout}"
+            )
+            command = [
+                "kubectl",
+                "create",
+                "job",
+                f"--from=cronjob/{job_name}",
+                f"{job_name}-qabot",
+                "-n",
+                env_name,
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(
+                f"Output from command when running gen3 job {job_name}: {result.stdout}"
+            )
+            command = [
+                "kubectl",
+                "wait",
+                "--for=condition=complete",
+                "--timeout=600s",
+                f"job/{job_name}-qabot",
+                "-n",
+                env_name,
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            assert (
+                "condition met" in result.stdout
+            ), f"Condition didn't meet for job completion: {result.stdout}"
+            return (
+                f"Job {job_name} executed and completed on {env_name}. :checkered_flag:"
+            )
+        except subprocess.CalledProcessError as e:
+            log.info(e.stderr)
+            return f"Failed to execute {job_name} in namespace {env_name}, please try again or contact QA team"
 
 
 if __name__ == "__main__":

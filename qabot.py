@@ -109,6 +109,11 @@ commands_map = {
         "example": "@qa-bot get-ci-summary",
         "call": PipelineMaintenance().get_ci_summary,
     },
+    "run-gen3-job": {
+        "args": "gen3_job_name, env_name",
+        "example": "@qa-bot run-gen3-job usersync",
+        "call": EnvMaintenance().run_gen3_job,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
