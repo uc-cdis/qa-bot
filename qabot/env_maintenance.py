@@ -79,7 +79,7 @@ class EnvMaintenance:
             os.chmod(script_path, 0o755)
             # Run command to scaleup the namespace
             command = [
-                "./scaleup-namespace.sh",
+                script_path,
                 env_name,
             ]
             result = subprocess.run(
