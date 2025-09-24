@@ -30,9 +30,6 @@ jobs:
         DEVELOPMENT: true
         SLACK_BOT_TOKEN: meh
         SLACK_APP_TOKEN: mmehh
-        JENKINS_USER_API_TOKEN: blablabla
-        JENKINS2_USER_API_TOKEN: yaddayaddayadda
-        JENKINS_JOB_TOKEN: abc123XYZ
         GITHUB_TOKEN: MEH-123
         JIRA_API_TOKEN: blah-456
       run: |

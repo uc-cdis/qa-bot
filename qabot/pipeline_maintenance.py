@@ -12,7 +12,6 @@ from requests.exceptions import RequestException
 
 from qabot.lib.githublib import GithubLib
 from qabot.lib.influxlib import InfluxLib
-from qabot.lib.jenkinslib import JenkinsLib
 from qabot.lib.jiralib import JiraLib
 from qabot.lib.slacklib import SlackLib
 
@@ -210,28 +209,6 @@ class PipelineMaintenance:
 
         return bot_response
 
-    def check_pool_of_ci_envs(self):
-        bot_response = "Pool of CI environments :jenkins-fire: \n"
-
-        for ci_pool in self.ci_swimming_lanes:
-            bot_response += f"{ci_pool} pool :point_down:\n"
-            bot_response += "```"
-            try:
-                response = requests.get(
-                    f"{self.cdis_public_bucket_base_url}jenkins-envs-{ci_pool}.txt"
-                )
-                response.raise_for_status()
-            except requests.exceptions.HTTPError as httperr:
-                log.error(
-                    "request to {0} failed due to the following error: {1}".format(
-                        self.cdis_public_bucket_base_url, str(httperr)
-                    )
-                )
-                return httperr
-            bot_response += response.text
-            bot_response += "```\n"
-        return bot_response
-
     def _populate_ci_stats(self, msg_event_ts, repo_name, pr_number, ci_results):
         msg_timestamp = datetime.datetime.fromtimestamp(msg_event_ts)
         print(f"### ## msg_timestamp: {msg_timestamp}")
@@ -325,80 +302,6 @@ class PipelineMaintenance:
                 ci_results = self.fetch_ci_failures(repo_name, pr_number)
                 log.info("populating ci stats....")
                 self._populate_ci_stats(msg_event_ts, repo_name, pr_number, ci_results)
-
-    def ci_benchmarking(self, repo_name, pr_num, stage_name):
-        bot_response = ""
-        jl = JenkinsLib("jenkins")
-        try:
-            stage_duration = jl.get_duration_of_ci_pipeline_stage(
-                repo_name, pr_num, stage_name
-            )
-            duration = (
-                str(datetime.timedelta(milliseconds=stage_duration))
-                .split(".")[0]
-                .split(":")
-            )
-            friendly_duration_format = " ".join(
-                [i + j for i, j in zip(duration, ["h", "m", "s"])]
-            )
-            bot_response += f"the {stage_name} stage from repo `{repo_name}` PR `#{pr_num}` took `{friendly_duration_format}` to run... :clock1:\n"
-        except RequestException as err:
-            err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
-            log.error(err_msg)
-            bot_response += err_msg
-
-        return bot_response
-
-    def fetch_ci_failures(self, repo_name, pr_num):
-        bot_response = ""
-        jl = JenkinsLib("jenkins")
-        try:
-            log.info("find the number of the last build...")
-            job_num = jl.get_number_of_last_build(repo_name, pr_num)
-
-            if job_num == None:
-                bot_response += "Could not fetch test results form this PR check. The Blueocean workspace is no longer available."
-                return bot_response
-
-            successful_tests, failed_tests = jl.fetch_tests_summary_from_pr_check(
-                repo_name, pr_num, job_num
-            )
-            # the latest PR build is still in flight
-            if successful_tests == None and failed_tests == None:
-                bot_response += "The latest PR build is still in flight... keep an eye on #gen3-qa-notifications :eye: "
-                return bot_response
-
-            bot_response += f"The last build from this PR check contains \n"
-
-            # let us just track the number of successfully executed tests
-            successful_tests_count = len(successful_tests)
-            # singular/plural logic due to OCD
-            test_tests = "test" if successful_tests_count == 1 else "tests"
-            bot_response += f" `{successful_tests_count} successful {test_tests}` \n"
-
-            if len(failed_tests) > 0:
-                bot_response += (
-                    f"and the following {len(failed_tests)} tests failed: \n"
-                )
-                # start formatted text here
-                bot_response += "```"
-
-                # let us explicitly return a list of the failing tests' names/description
-                for failed_test in failed_tests:
-                    bot_response += f"- {failed_test} \n"
-                # end of formatted text
-                bot_response += "```\n"
-
-                bot_response += f"If you wish to consult a Subject Matter Expert (SME) to triage this CI failure, just run: \n"
-                bot_response += (
-                    f"``` @qa-bot who-do-I-ask-about <name-of-the-service> ``` \n"
-                )
-
-        except RequestException as err:
-            err_msg = f"Could not fetch jenkins job metadata. Details: {err}"
-            log.error(err_msg)
-            bot_response += err_msg
-        return bot_response
 
     def create_ticket(self, type, args=""):
         # handle arguments
@@ -545,76 +448,6 @@ class PipelineMaintenance:
 
 
 if __name__ == "__main__":
-    # pipem = PipelineMaintenance()
-    # result = pipem.failure_rate_for_test_suite("test-portal-homepageTest")
-    # result = pipem.quarantine_ci_env("jenkins-new")
-    # result = pipem.check_pool_of_ci_envs()
-    # result = pipem.ci_benchmarking("cdis-manifest", "3265", "K8sReset")
-    # result = pipem.ci_benchmarking("gitops-qa", "1523", "RunTests")
-    # negative test
-    # result = pipem.ci_benchmarking("gen3-qa", "666", "Typo")
-    # result = pipem.fetch_ci_failures("gitops-qa", 1649)
-    # result = pipem.fetch_ci_failures("gen3-qa", 700)
-    # result = pipem.create_bug_ticket(
-    #    title="this PR-123 is failing",
-    #    description="help, this is failing",
-    #    assignee="Atharva Rane",
-    # )
-    # result = pipem.get_repo_sme("arborist")
-    pipem1 = PipelineMaintenance()
-    pipem1.react_to_jenkins_updates(
-        {
-            "subtype": "bot_message",
-            "text": "",
-            "suppress_notification": False,
-            "attachments": [
-                {
-                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
-                    "id": 1,
-                    "color": "439FE0",
-                    "fields": [
-                        {
-                            "title": "",
-                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
-                            "short": False,
-                        }
-                    ],
-                    "mrkdwn_in": ["pretext", "text", "fields"],
-                }
-            ],
-            "channel": "C01TS6PDMRT",
-            "event_ts": "1633005588.151600",
-            "ts": "1633106721.151600",
-        }
-    )
-    pipem2 = PipelineMaintenance()
-    pipem2.react_to_jenkins_updates(
-        {
-            "subtype": "bot_message",
-            "text": "",
-            "suppress_notification": False,
-            "attachments": [
-                {
-                    "fallback": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
-                    "id": 1,
-                    "color": "439FE0",
-                    "fields": [
-                        {
-                            "title": "",
-                            "value": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
-                            "short": False,
-                        }
-                    ],
-                    "mrkdwn_in": ["pretext", "text", "fields"],
-                }
-            ],
-            "channel": "C01TS6PDMRT",
-            "event_ts": "1633178730.151600",
-            "ts": "1633106721.151600",
-        }
-    )
-    # pipem.in_memory_ci_stats = {}
-    # trying with different instances to test singleton
-    pipem3 = PipelineMaintenance()
-    result = pipem3.get_ci_summary()
+    pipem = PipelineMaintenance()
+    result = pipem.quarantine_ci_env("nightly-build")
     print(result)

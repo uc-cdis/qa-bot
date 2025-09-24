@@ -69,7 +69,7 @@ class GithubLib:
                 target_run = run
                 break
         if target_run:
-            log.info("Latest 'Tests' workflow run ID:", target_run.id)
+            log.info(f"Latest 'Tests' workflow run ID: {target_run.id}")
             try:
                 target_run.rerun()
                 rerun_url = f"https://github.com/{self.org}/{self.repo}/actions/runs/{target_run.id}"

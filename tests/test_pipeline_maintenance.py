@@ -1,11 +1,12 @@
-from httmock import urlmatch, HTTMock
-import unittest
 import os
-from unittest.mock import Mock, patch
+import unittest
 from pprint import pprint
+from unittest.mock import Mock, patch
 
-from qabot.pipeline_maintenance import PipelineMaintenance
+from httmock import HTTMock, urlmatch
+
 from qabot.lib.influxlib import InfluxLib
+from qabot.pipeline_maintenance import PipelineMaintenance
 
 
 class PipelineMaintenanceTestCase(unittest.TestCase):
