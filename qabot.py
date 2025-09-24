@@ -44,6 +44,11 @@ commands_map = {
         "example": "@qa-bot whereis release 2020.02 \n or \n @qa-bot whereis tube 2020.08",
         "call": ManifestsChecker().whereis_version,
     },
+    "create-ticket": {
+        "args": 'ticket_type {"title":"any title","description":"any description","assignee":"Name [Middle Name] LastName"}',
+        "example": '@qa-bot create-ticket bug {"title":"PR-1234 failed. help!","description":"This test test-portal-discoveryPageTest is failing","assignee":"Hara Prasad Juvala"}',
+        "call": PipelineMaintenance().create_ticket,
+    },
     "roll": {
         "args": "service to roll, ci_environment_name",
         "example": "@qa-bot roll guppy jenkins-brain",
@@ -69,6 +74,11 @@ commands_map = {
         "example": "bdcat all 50",
         "call": StateOfTheNation().run_state_of_the_nation_report,
     },
+    "get-failure-rate": {
+        "args": "test_suite_name",
+        "example": "test-portal-homepageTest",
+        "call": PipelineMaintenance().failure_rate_for_test_suite,
+    },
     "quarantine-ci-environment": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
@@ -83,6 +93,31 @@ commands_map = {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
         "call": EnvMaintenance().scaleup_namespace,
+    },
+    "check-pool-of-ci-environments": {
+        "args": "",
+        "example": "@qa-bot check-pool-of-ci-environments",
+        "call": PipelineMaintenance().check_pool_of_ci_envs,
+    },
+    "ci-benchmarking": {
+        "args": "repo_name pr_number stage_name",
+        "example": " cdis-manifest 3265 K8sReset\n gitops-qa 1523 RunTests",
+        "call": PipelineMaintenance().ci_benchmarking,
+    },
+    "fetch-test-results": {
+        "args": "repo_name pr_number",
+        "example": " cdis-manifest 1234 \n fence 5678",
+        "call": PipelineMaintenance().fetch_ci_failures,
+    },
+    "who-do-I-ask-about": {
+        "args": "repo_name",
+        "example": "@qa-bot who-do-I-ask-about arborist",
+        "call": PipelineMaintenance().get_repo_sme,
+    },
+    "get-ci-summary": {
+        "args": "",
+        "example": "@qa-bot get-ci-summary",
+        "call": PipelineMaintenance().get_ci_summary,
     },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }

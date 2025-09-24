@@ -7,13 +7,13 @@ log = logging.getLogger(__name__)
 
 
 class EnvMaintenance:
-    def roll_service(self, service_name, env_name):
+    def roll_service(self, service_name: str, env_name: str):
         """
         Roll a service in one of our gen3 environments
         """
         try:
             # Sets commands and messages when all services need to be restarted
-            if service_name == "ALL":
+            if service_name.upper() == "ALL":
                 restart_command = [
                     "kubectl",
                     "rollout",
@@ -74,19 +74,21 @@ class EnvMaintenance:
         """
         Scaleup the given namespace in gen3 environments
         """
+        script_path = "/src/qabot/scripts/scaleup-namespace.sh"
         try:
-            # Source the sh file
-            command = [
-                "source",
-                "/src/qabot/env_helper_scripts/scaleup-namespace.sh",
-            ]
-            subprocess.run(command, capture_output=True, text=True, check=True)
+            os.chmod(script_path, 0o755)
             # Run command to scaleup the namespace
             command = [
-                "scaleup-namespace",
+                "./scaleup-namespace.sh",
                 env_name,
             ]
-            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            result = subprocess.run(
+                command,
+                capture_output=True,
+                text=True,
+                check=True,
+                input="yes\n",
+            )
             log.info(f"Output from command when scaling up namespace: {result.stdout}")
             return f"Namespace {env_name} is being scaled up. :rocket:"
         except subprocess.CalledProcessError as e:

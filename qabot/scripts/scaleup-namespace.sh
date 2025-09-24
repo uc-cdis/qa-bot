@@ -78,3 +78,6 @@ scaleup-namespace() {
     echo "CronJobs:"
     kubectl get cronjobs -n "$NAMESPACE" -o custom-columns=NAME:.metadata.name,SUSPENDED:.spec.suspend 2>/dev/null || echo "  No cronjobs found"
 }
+
+# Call the function with argument passed to the script
+scaleup-namespace "$1"

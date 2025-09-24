@@ -83,6 +83,18 @@ class PipelineMaintenanceTestCase(unittest.TestCase):
     def tearDown(self):
         self.patch1.stop()
 
+    def test_failure_rate_for_test_suite(self):
+        with HTTMock(self.get_test_script_source_mock):
+            result = self.pipeline_maintenance.failure_rate_for_test_suite(
+                "test-portal-mockHomepageTest"
+            )
+
+            self.assertEqual(
+                ":information_source: The test suite test-portal-mockHomepageTest failed:\n```- 1 time(s) on PR-123 from repo myRepo\n- 2 time(s) on PR-456 from repo myOtherRepo\n```",
+                result,
+                "Must show statistics on how often the test suite failed across diff repos/PRs",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
