@@ -209,28 +209,6 @@ class PipelineMaintenance:
 
         return bot_response
 
-    def check_pool_of_ci_envs(self):
-        bot_response = "Pool of CI environments :jenkins-fire: \n"
-
-        for ci_pool in self.ci_swimming_lanes:
-            bot_response += f"{ci_pool} pool :point_down:\n"
-            bot_response += "```"
-            try:
-                response = requests.get(
-                    f"{self.cdis_public_bucket_base_url}jenkins-envs-{ci_pool}.txt"
-                )
-                response.raise_for_status()
-            except requests.exceptions.HTTPError as httperr:
-                log.error(
-                    "request to {0} failed due to the following error: {1}".format(
-                        self.cdis_public_bucket_base_url, str(httperr)
-                    )
-                )
-                return httperr
-            bot_response += response.text
-            bot_response += "```\n"
-        return bot_response
-
     def _populate_ci_stats(self, msg_event_ts, repo_name, pr_number, ci_results):
         msg_timestamp = datetime.datetime.fromtimestamp(msg_event_ts)
         print(f"### ## msg_timestamp: {msg_timestamp}")

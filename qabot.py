@@ -94,11 +94,6 @@ commands_map = {
         "example": "jenkins-brain",
         "call": EnvMaintenance().scaleup_namespace,
     },
-    "check-pool-of-ci-environments": {
-        "args": "",
-        "example": "@qa-bot check-pool-of-ci-environments",
-        "call": PipelineMaintenance().check_pool_of_ci_envs,
-    },
     "who-do-I-ask-about": {
         "args": "repo_name",
         "example": "@qa-bot who-do-I-ask-about arborist",
