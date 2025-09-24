@@ -1,5 +1,7 @@
 import logging
 import os
+import random
+import string
 import subprocess
 
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
@@ -115,11 +117,17 @@ class EnvMaintenance:
         """
         log.info(f"Running run-gen3-job on {env_name}")
         try:
+            cronjob_name = job_name
+            if job_name == "etl":
+                cronjob_name = "etl-cronjob"
+            job_name += "-" + "".join(
+                random.choices(string.ascii_lowercase + string.digits, k=4)
+            )
             command = [
                 "kubectl",
                 "delete",
                 "job",
-                f"{job_name}-qabot",
+                job_name,
                 "-n",
                 env_name,
             ]
@@ -131,8 +139,8 @@ class EnvMaintenance:
                 "kubectl",
                 "create",
                 "job",
-                f"--from=cronjob/{job_name}",
-                f"{job_name}-qabot",
+                f"--from=cronjob/{cronjob_name}",
+                job_name,
                 "-n",
                 env_name,
             ]
@@ -145,7 +153,7 @@ class EnvMaintenance:
                 "wait",
                 "--for=condition=complete",
                 "--timeout=600s",
-                f"job/{job_name}-qabot",
+                f"job/{job_name}",
                 "-n",
                 env_name,
             ]

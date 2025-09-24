@@ -448,60 +448,6 @@ class PipelineMaintenance:
 
 
 if __name__ == "__main__":
-    pipem1 = PipelineMaintenance()
-    pipem1.react_to_jenkins_updates(
-        {
-            "subtype": "bot_message",
-            "text": "",
-            "suppress_notification": False,
-            "attachments": [
-                {
-                    "fallback": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
-                    "id": 1,
-                    "color": "439FE0",
-                    "fields": [
-                        {
-                            "title": "",
-                            "value": "Successful CI run for <https://github.com/uc-cdis/cdis-manifest/pull/3593> :tada:",
-                            "short": False,
-                        }
-                    ],
-                    "mrkdwn_in": ["pretext", "text", "fields"],
-                }
-            ],
-            "channel": "C01TS6PDMRT",
-            "event_ts": "1633005588.151600",
-            "ts": "1633106721.151600",
-        }
-    )
-    pipem2 = PipelineMaintenance()
-    pipem2.react_to_jenkins_updates(
-        {
-            "subtype": "bot_message",
-            "text": "",
-            "suppress_notification": False,
-            "attachments": [
-                {
-                    "fallback": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
-                    "id": 1,
-                    "color": "439FE0",
-                    "fields": [
-                        {
-                            "title": "",
-                            "value": "CI Failure on <https://github.com/uc-cdis/gitops-qa/pull/1668> :facepalm: running on jenkins-dcp :jenkins:.",
-                            "short": False,
-                        }
-                    ],
-                    "mrkdwn_in": ["pretext", "text", "fields"],
-                }
-            ],
-            "channel": "C01TS6PDMRT",
-            "event_ts": "1633178730.151600",
-            "ts": "1633106721.151600",
-        }
-    )
-    # pipem.in_memory_ci_stats = {}
-    # trying with different instances to test singleton
-    pipem3 = PipelineMaintenance()
-    result = pipem3.get_ci_summary()
+    pipem = PipelineMaintenance()
+    result = pipem.get_ci_summary()
     print(result)
