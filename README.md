@@ -47,6 +47,10 @@ Example: `@qa-bot unquarantine-ci-environment <env-name>`
 
 Example: `@qa-bot scaleup-namespace <env-name>`
 
+*run-gen3-job*
+
+Example: `@qa-bot run-gen3-job <job-name> <env-name>`
+
 *hello*
 
 Just replies back with a ”hello” msg (for testing purposes)
