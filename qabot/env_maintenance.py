@@ -125,18 +125,6 @@ class EnvMaintenance:
             )
             command = [
                 "kubectl",
-                "delete",
-                "job",
-                job_name,
-                "-n",
-                env_name,
-            ]
-            result = subprocess.run(command, capture_output=True, text=True, check=True)
-            log.info(
-                f"Output from command when deleting existing gen3 job {job_name}: {result.stdout}"
-            )
-            command = [
-                "kubectl",
                 "create",
                 "job",
                 f"--from=cronjob/{cronjob_name}",
