@@ -90,7 +90,19 @@ class EnvMaintenance:
                 input="yes\n",
             )
             log.info(f"Output from command when scaling up namespace: {result.stdout}")
-            return f"Namespace {env_name} is being scaled up. :rocket:"
+            command = [
+                "kubectl",
+                "rollout",
+                "status",
+                "deployment",
+                "-n",
+                env_name,
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(
+                f"Output from command when checking scaleup-namespace status: {result.stdout}"
+            )
+            return f"Namespace {env_name} has been scaled up. :rocket:"
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
             return f"Failed to scaleup namespace {env_name}, please try again or contact QA team"
