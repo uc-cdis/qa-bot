@@ -444,6 +444,30 @@ class PipelineMaintenance:
         bot_response = githublib.replay_pr(pr_number)
         return bot_response
 
+    def replay_nightly_run(self, labels=""):
+        """
+        Replay nightly-build like a boss
+        """
+        repo_name = "gen3-code-vigil"
+        githublib = GithubLib(repo=repo_name)
+
+        json_params = {
+            "TEST_LABELS": labels,
+        }
+        bot_response = githublib.trigger_gh_action_workflow(
+            workflow_repo=repo_name,
+            workflow_filename="nightly_run.yaml",
+            ref="master",
+            inputs=json_params,
+        )
+        if bot_response.status_code == 204:
+            log.info("Workflow triggered successfully.")
+            bot_response = "Replayed nightly-build run successfully. :awesome-face:"
+        else:
+            log.error(bot_response.text)
+            raise Exception(f"Failed to trigger workflow: {bot_response.status_code}")
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem1 = PipelineMaintenance()

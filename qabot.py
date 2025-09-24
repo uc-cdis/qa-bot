@@ -99,16 +99,6 @@ commands_map = {
         "example": "@qa-bot check-pool-of-ci-environments",
         "call": PipelineMaintenance().check_pool_of_ci_envs,
     },
-    "ci-benchmarking": {
-        "args": "repo_name pr_number stage_name",
-        "example": " cdis-manifest 3265 K8sReset\n gitops-qa 1523 RunTests",
-        "call": PipelineMaintenance().ci_benchmarking,
-    },
-    "fetch-test-results": {
-        "args": "repo_name pr_number",
-        "example": " cdis-manifest 1234 \n fence 5678",
-        "call": PipelineMaintenance().fetch_ci_failures,
-    },
     "who-do-I-ask-about": {
         "args": "repo_name",
         "example": "@qa-bot who-do-I-ask-about arborist",
