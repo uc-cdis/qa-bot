@@ -34,21 +34,6 @@ commands_map = {
         "example": "@qa-bot help",
         "call": list_all_commands,
     },
-    "compare-manifests": {
-        "args": "pr number and signed-off manifest",
-        "example": "@qa-bot compare-manifests 928 internalstaging.datastage.io",
-        "call": ManifestsChecker().compare_manifests,
-    },
-    "whereis": {
-        "args": "release version",
-        "example": "@qa-bot whereis release 2020.02 \n or \n @qa-bot whereis tube 2020.08",
-        "call": ManifestsChecker().whereis_version,
-    },
-    "create-ticket": {
-        "args": 'ticket_type {"title":"any title","description":"any description","assignee":"Name [Middle Name] LastName"}',
-        "example": '@qa-bot create-ticket bug {"title":"PR-1234 failed. help!","description":"This test test-portal-discoveryPageTest is failing","assignee":"Hara Prasad Juvala"}',
-        "call": PipelineMaintenance().create_ticket,
-    },
     "roll": {
         "args": "service to roll, ci_environment_name",
         "example": "@qa-bot roll guppy jenkins-brain",
@@ -69,16 +54,6 @@ commands_map = {
         "example": "@qa-bot self-service-release ac3eb",
         "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
     },
-    "state-of-the-nation": {
-        "args": "name_of_the_project state_of_the_prs(all, open or closed) [number_of_prs_to_scan]",
-        "example": "bdcat all 50",
-        "call": StateOfTheNation().run_state_of_the_nation_report,
-    },
-    "get-failure-rate": {
-        "args": "test_suite_name",
-        "example": "test-portal-homepageTest",
-        "call": PipelineMaintenance().failure_rate_for_test_suite,
-    },
     "quarantine-ci-environment": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
@@ -94,22 +69,11 @@ commands_map = {
         "example": "jenkins-brain",
         "call": EnvMaintenance().scaleup_namespace,
     },
-    "who-do-I-ask-about": {
-        "args": "repo_name",
-        "example": "@qa-bot who-do-I-ask-about arborist",
-        "call": PipelineMaintenance().get_repo_sme,
-    },
-    "get-ci-summary": {
-        "args": "",
-        "example": "@qa-bot get-ci-summary",
-        "call": PipelineMaintenance().get_ci_summary,
-    },
     "run-gen3-job": {
         "args": "gen3_job_name, env_name",
         "example": "@qa-bot run-gen3-job usersync jenkins-brain",
         "call": EnvMaintenance().run_gen3_job,
     },
-    "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
 
