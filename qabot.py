@@ -74,6 +74,7 @@ commands_map = {
         "example": "@qa-bot run-gen3-job usersync jenkins-brain",
         "call": EnvMaintenance().run_gen3_job,
     },
+    "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
 
