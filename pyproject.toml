@@ -6,7 +6,7 @@ authors = ["CTDS UChicago <cdis@uchicago.edu>"]
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = "^3.13"
 requests = "^2.32.4"
 PyGithub = "^1.44.1"
 httmock = "^1.4.0"
