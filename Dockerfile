@@ -1,6 +1,6 @@
-ARG AZLINUX_BASE_VERSION=feat_py3.13_hardened
+ARG AZLINUX_BASE_VERSION=feat_python3.13-alias
 
-FROM quay.io/cdis/python-nginx-al:${AZLINUX_BASE_VERSION} AS base
+FROM quay.io/cdis/python-build-base:${AZLINUX_BASE_VERSION} AS base
 
 # Install vim and findutils (which provides `find`)
 RUN dnf install -y vim findutils jq && \
