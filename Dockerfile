@@ -1,6 +1,6 @@
-ARG AZLINUX_BASE_VERSION=master
+ARG AZLINUX_BASE_VERSION=feat_python3.13-alias
 
-FROM quay.io/cdis/python-nginx-al:${AZLINUX_BASE_VERSION} AS base
+FROM quay.io/cdis/python-build-base:${AZLINUX_BASE_VERSION} AS base
 
 # Install vim and findutils (which provides `find`)
 RUN dnf install -y vim findutils jq && \
@@ -18,6 +18,8 @@ WORKDIR /src
 
 USER gen3
 
-RUN poetry install --no-interaction --only main
+#RUN poetry install --no-interaction --only main
 
-CMD ["poetry", "run", "python", "qabot.py"]
+RUN python3 --version
+
+#CMD ["poetry", "run", "python", "qabot.py"]
