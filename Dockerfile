@@ -20,6 +20,6 @@ USER gen3
 
 #RUN poetry install --no-interaction --only main
 
-RUN python --version
+RUN python3 --version
 
 #CMD ["poetry", "run", "python", "qabot.py"]
