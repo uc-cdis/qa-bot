@@ -18,7 +18,7 @@ WORKDIR /src
 
 USER gen3
 
-RUN poetry install --no-interaction --only main
+#RUN poetry install --no-interaction --only main
 
 CMD ["python", "--version"]
 
