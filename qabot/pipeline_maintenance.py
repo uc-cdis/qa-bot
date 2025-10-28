@@ -447,15 +447,15 @@ class PipelineMaintenance:
         return bot_response
 
     def test_external_pr(self, repo_name, pr_num):
-        repo_name = "gen3-code-vigil"
-        githublib = GithubLib(repo=repo_name)
+        workflow_repo_name = "gen3-code-vigil"
+        githublib = GithubLib(repo=workflow_repo_name)
 
         json_params = {
             "repo": repo_name,
             "pr_number": pr_num,
         }
         bot_response = githublib.trigger_gh_action_workflow(
-            workflow_repo=repo_name,
+            workflow_repo=workflow_repo_name,
             workflow_filename="test_external_pr.yaml",
             ref="master",
             inputs=json_params,
