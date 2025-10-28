@@ -446,6 +446,28 @@ class PipelineMaintenance:
             raise Exception(f"Failed to trigger workflow: {bot_response.status_code}")
         return bot_response
 
+    def test_external_pr(self, repo_name, pr_num):
+        workflow_repo_name = "gen3-code-vigil"
+        githublib = GithubLib(repo=workflow_repo_name)
+
+        json_params = {
+            "repo": repo_name,
+            "pr_number": pr_num,
+        }
+        bot_response = githublib.trigger_gh_action_workflow(
+            workflow_repo=workflow_repo_name,
+            workflow_filename="test_external_pr.yaml",
+            ref="master",
+            inputs=json_params,
+        )
+        if bot_response.status_code == 204:
+            log.info("Workflow triggered successfully.")
+            bot_response = f"Started external pr testing. Check the PR on the {repo_name} GH repository. :awesome-face:"
+        else:
+            log.error(bot_response.text)
+            raise Exception(f"Failed to trigger workflow: {bot_response.status_code}")
+        return bot_response
+
 
 if __name__ == "__main__":
     pipem = PipelineMaintenance()
