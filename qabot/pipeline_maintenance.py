@@ -451,8 +451,8 @@ class PipelineMaintenance:
         githublib = GithubLib(repo=repo_name)
 
         json_params = {
-            "REPO": repo_name,
-            "PR_NUM": pr_num,
+            "repo": repo_name,
+            "pr_number": pr_num,
         }
         bot_response = githublib.trigger_gh_action_workflow(
             workflow_repo=repo_name,
