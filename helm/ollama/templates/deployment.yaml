@@ -17,6 +17,9 @@ spec:
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: 11434
+          env:
+            - name: OLLAMA_MODEL
+              value: "{{ .Values.model.name }}"
           volumeMounts:
             - name: ollama-models
               mountPath: /root/.ollama
