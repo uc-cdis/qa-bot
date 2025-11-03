@@ -96,13 +96,12 @@ class GithubLib:
     def get_external_pr_number(self, repo_name, search_title):
         for i in range(6):
             time.sleep(10)
-            url = "https://api.github.com/search/issues"
-            query = f"repo:{self.org}/{repo_name}+type:pr+in:title+{search_title}"
             headers = {
                 "Authorization": f"token {self.token}",
                 "Accept": "application/vnd.github+json",
             }
-            response = requests.get(url, headers=headers, params={"q": query})
+            url = f"https://api.github.com/search/issues?q={search_title}+in:title+repo:{self.org}/{repo_name}+type:pr"
+            response = requests.get(url, headers=headers)
             response.raise_for_status()
             items = response.json().get("items", [])
             if not items:
