@@ -462,7 +462,15 @@ class PipelineMaintenance:
         )
         if bot_response.status_code == 204:
             log.info("Workflow triggered successfully.")
-            bot_response = f"Started external pr testing. Check the PR on the {repo_name} GH repository. :awesome-face:"
+            extenral_testing_pr_url = githublib.get_external_pr_number(
+                repo_name=repo_name, search_title=pr_num
+            )
+            if extenral_testing_pr_url is False:
+                bot_response = (
+                    "Could not find the external testing pr, please contact QA team."
+                )
+            else:
+                bot_response = f"Started external pr testing. URL: {extenral_testing_pr_url}. :awesome-face:"
         else:
             log.error(bot_response.text)
             raise Exception(f"Failed to trigger workflow: {bot_response.status_code}")
