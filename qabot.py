@@ -135,15 +135,17 @@ def handle_app_mention(payload, say, logger):
         if len(msg_parts) > 1:
             command = msg_parts[1]
             args = msg_parts[2:]
-            say(process_command(command, args))
+            say(
+                text=process_command(command, args),
+                thread_ts=payload.get("thread_ts") or payload.get("ts"),
+            )
     else:
-        say(
-            """
+        usage_msg = """
 # Usage instructions: *@qa-bot <command>* \n
 # e.g., @qa-bot command
 #           _visit https://github.com/uc-cdis/qa-bot to learn more_
 #           """
-        )
+        say(text=usage_msg, thread_ts=payload.get("thread_ts") or payload.get("ts"))
 
 
 @app.event("message")
