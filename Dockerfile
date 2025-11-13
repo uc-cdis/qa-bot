@@ -20,8 +20,8 @@ WORKDIR /src
 
 USER gen3
 
-#RUN poetry install --no-interaction --only main
+RUN poetry install --no-interaction --only main
 
 RUN python3 --version
 
-#CMD ["poetry", "run", "python", "qabot.py"]
+CMD ["poetry", "run", "python", "qabot.py"]
