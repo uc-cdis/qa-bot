@@ -74,6 +74,11 @@ commands_map = {
         "example": "@qa-bot run-gen3-job usersync jenkins-brain",
         "call": EnvMaintenance().run_gen3_job,
     },
+    "test-external-pr": {
+        "args": "repo_name, pr_num",
+        "example": "@qa-bot test-external-pr fence 123",
+        "call": PipelineMaintenance().test_external_pr,
+    },
     "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
 }
 
@@ -130,14 +135,19 @@ def handle_app_mention(payload, say, logger):
         if len(msg_parts) > 1:
             command = msg_parts[1]
             args = msg_parts[2:]
-            say(process_command(command, args))
+            say(
+                text=f"<@{payload['user']}> {process_command(command, args)}",
+                thread_ts=payload.get("thread_ts") or payload.get("ts"),
+            )
     else:
-        say(
-            """
+        usage_msg = """
 # Usage instructions: *@qa-bot <command>* \n
 # e.g., @qa-bot command
 #           _visit https://github.com/uc-cdis/qa-bot to learn more_
 #           """
+        say(
+            text=f"<@{payload['user']}> {usage_msg}",
+            thread_ts=payload.get("thread_ts") or payload.get("ts"),
         )
 
 

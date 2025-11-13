@@ -51,6 +51,10 @@ Example: `@qa-bot scaleup-namespace <env-name>`
 
 Example: `@qa-bot run-gen3-job <job-name> <env-name>`
 
+*test-external-pr*
+
+Example: `@qa-bot test-external-pr <repo-name> <pr-num>`
+
 *hello*
 
 Just replies back with a ”hello” msg (for testing purposes)
