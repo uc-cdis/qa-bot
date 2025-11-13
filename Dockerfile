@@ -1,4 +1,4 @@
-ARG AZLINUX_BASE_VERSION=3.13-buildbase
+ARG AZLINUX_BASE_VERSION=3.13-pythonnginx
 
 FROM quay.io/cdis/amazonlinux-base:${AZLINUX_BASE_VERSION} AS base
 
