@@ -1,8 +1,10 @@
-ARG AZLINUX_BASE_VERSION=feat_python3.13-alias
+ARG AZLINUX_BASE_VERSION=3.13-buildbase
 
-FROM quay.io/cdis/python-build-base:${AZLINUX_BASE_VERSION} AS base
+FROM quay.io/cdis/amazonlinux-base:${AZLINUX_BASE_VERSION} AS base
 
 # Install vim and findutils (which provides `find`)
+USER root
+
 RUN dnf install -y vim findutils jq && \
     dnf install -y openssl && \
     dnf clean all && \
