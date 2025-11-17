@@ -49,16 +49,16 @@ scaleup-namespace() {
 
     echo ""
 
-    # Suspend all cronjobs
-    echo "Restarting ALL  cronjobs..."
+    # Restart all cronjobs
+    echo "Restarting ALL cronjobs..."
     local CRONJOBS=$(kubectl get cronjobs -n "$NAMESPACE" -o jsonpath='{.items[*].metadata.name}')
 
     if [ -n "$CRONJOBS" ]; then
         for cronjob in $CRONJOBS; do
-            echo "  Suspending cronjob '$cronjob'"
+            echo "  Restarting cronjob '$cronjob'"
             kubectl patch cronjob "$cronjob" -n "$NAMESPACE" -p '{"spec":{"suspend":false}}'
         done
-        echo "✓ All cronjobs suspended"
+        echo "✓ All cronjobs restarted"
     else
         echo "  No cronjobs found in namespace '$NAMESPACE'"
     fi
