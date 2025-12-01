@@ -9,15 +9,12 @@ service:
 
 resources:
   requests:
-    cpu: "2"
-    memory: "4Gi"
-  limits:
     cpu: "4"
-    memory: "8Gi"
+    memory: "16Gi"
 
 persistence:
   enabled: true
   size: 10Gi
 
 model:
-  name: "llama3-2b"
+  name: "gpt-oss:20b"
