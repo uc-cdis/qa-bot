@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+import time
 
 import requests
 from github import Github
@@ -91,3 +92,20 @@ class GithubLib:
             payload["inputs"] = inputs
         response = requests.post(url, headers=headers, json=payload)
         return response
+
+    def get_external_pr_number(self, repo_name, search_title):
+        for i in range(6):
+            time.sleep(10)
+            headers = {
+                "Authorization": f"token {self.token}",
+                "Accept": "application/vnd.github+json",
+            }
+            url = f"https://api.github.com/search/issues?q={search_title}+in:title+repo:{self.org}/{repo_name}+type:pr"
+            response = requests.get(url, headers=headers)
+            response.raise_for_status()
+            items = response.json().get("items", [])
+            if not items:
+                continue
+            pr = items[0]
+            return pr["html_url"]
+        return False
