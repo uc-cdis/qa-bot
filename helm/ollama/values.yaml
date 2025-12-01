@@ -1,0 +1,20 @@
+image:
+  repository: ollama/ollama
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 11434
+
+resources:
+  requests:
+    cpu: "4"
+    memory: "16Gi"
+
+persistence:
+  enabled: true
+  size: 10Gi
+
+model:
+  name: "gpt-oss:20b"
