@@ -23,6 +23,7 @@ spec:
           volumeMounts:
             - name: ollama-models
               mountPath: /root/.ollama
+          command: ["/bin/ollama", "run", "$OLLAMA_MODEL"]
       volumes:
         - name: ollama-models
           persistentVolumeClaim:

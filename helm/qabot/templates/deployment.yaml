@@ -26,7 +26,6 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
     spec:
-      hostNetwork: true
       serviceAccountName: kubectl-access
       volumes:
         {{- toYaml .Values.volumes | nindent 8 }}
