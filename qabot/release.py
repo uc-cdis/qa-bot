@@ -73,7 +73,7 @@ class ReleaseManager:
             bot_response = ghl.trigger_gh_action_workflow(
                 workflow_repo="thor",
                 workflow_filename="deploy_monthly_release.yaml",
-                ref="master",
+                ref="chore/add_threadts_monthly_release",
                 inputs=json_params,
             )
             if bot_response.status_code == 204:
