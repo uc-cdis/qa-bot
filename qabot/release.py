@@ -42,7 +42,7 @@ class ReleaseManager:
 
         return latest_release
 
-    def roll_out_latest_gen3_release_to_environments(self, user):
+    def roll_out_latest_gen3_release_to_environments(self, user, context=None):
         latest_release = self.find_latest_release()
 
         # find all environments owned by the user
@@ -68,6 +68,7 @@ class ReleaseManager:
                 "LIST_OF_ENVIRONMENTS": ",".join(env_list),
                 "TARGET_REPO_NAME": repo_name,
                 "TRIGGERED_BY_USER": user,
+                "SLACK_THREAD_TS": context["thread_ts"],
             }
             bot_response = ghl.trigger_gh_action_workflow(
                 workflow_repo="thor",
