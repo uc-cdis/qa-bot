@@ -33,57 +33,72 @@ commands_map = {
         "args": "",
         "example": "@qa-bot help",
         "call": list_all_commands,
+        "pass_thread_ts": False,
     },
     "roll": {
         "args": "service to roll, ci_environment_name",
         "example": "@qa-bot roll guppy jenkins-brain",
         "call": EnvMaintenance().roll_service,
+        "pass_thread_ts": False,
     },
     "replay-nightly-run": {
         "args": "comma-separated list of labels",
         "example": "@qa-bot replay-nightly-run test-portal-homepageTest,test-apis-dataUploadTest",
         "call": PipelineMaintenance().replay_nightly_run,
+        "pass_thread_ts": False,
     },
     "replay-pr": {
         "args": "repo name, pr number, comma-separated list of labels",
         "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
         "call": PipelineMaintenance().replay_pr,
+        "pass_thread_ts": False,
     },
     "self-service-release": {
         "args": "github username of environment's owner",
         "example": "@qa-bot self-service-release ac3eb",
         "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
+        "pass_thread_ts": True,
     },
     "quarantine-ci-environment": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
         "call": PipelineMaintenance().quarantine_ci_env,
+        "pass_thread_ts": False,
     },
     "unquarantine-ci-environment": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
         "call": PipelineMaintenance().unquarantine_ci_env,
+        "pass_thread_ts": False,
     },
     "scaleup-namespace": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",
         "call": EnvMaintenance().scaleup_namespace,
+        "pass_thread_ts": False,
     },
     "run-gen3-job": {
         "args": "gen3_job_name, env_name",
         "example": "@qa-bot run-gen3-job usersync jenkins-brain",
         "call": EnvMaintenance().run_gen3_job,
+        "pass_thread_ts": False,
     },
     "test-external-pr": {
         "args": "repo_name, pr_num",
         "example": "@qa-bot test-external-pr fence 123",
         "call": PipelineMaintenance().test_external_pr,
+        "pass_thread_ts": False,
     },
-    "hello": {"args": "", "example": "@qa-bot hello", "call": Greeter().say_hello},
+    "hello": {
+        "args": "",
+        "example": "@qa-bot hello",
+        "call": Greeter().say_hello,
+        "pass_thread_ts": False,
+    },
 }
 
 
-def process_command(command, args):
+def process_command(command, args, thread_ts=None):
     log.info(f"command = {command}, args = {args}")
     # process args to handle whitespaces inside json blocks
     entered_json_block_at_index = None
@@ -109,7 +124,10 @@ example:  {commands_map[command]['example']}
       """
         else:
             try:
-                return commands_map[command]["call"](*args)
+                if commands_map[command]["pass_thread_ts"]:
+                    return commands_map[command]["call"](*args, thread_ts)
+                else:
+                    return commands_map[command]["call"](*args)
             except TypeError as te:
                 return str(te)
             except Exception as e:
@@ -135,9 +153,10 @@ def handle_app_mention(payload, say, logger):
         if len(msg_parts) > 1:
             command = msg_parts[1]
             args = msg_parts[2:]
+            thread_ts = (payload.get("thread_ts") or payload.get("ts"),)
             say(
-                text=f"<@{payload['user']}> {process_command(command, args)}",
-                thread_ts=payload.get("thread_ts") or payload.get("ts"),
+                text=f"<@{payload['user']}> {process_command(command, args, thread_ts)}",
+                thread_ts=thread_ts,
             )
     else:
         usage_msg = """
