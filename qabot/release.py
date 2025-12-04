@@ -68,8 +68,9 @@ class ReleaseManager:
                 "LIST_OF_ENVIRONMENTS": ",".join(env_list),
                 "TARGET_REPO_NAME": repo_name,
                 "TRIGGERED_BY_USER": user,
-                "SLACK_THREAD_TS": thread_ts,
+                "SLACK_THREAD_TS": str(thread_ts),
             }
+            log.info(f"Json Params: {json_params}")
             bot_response = ghl.trigger_gh_action_workflow(
                 workflow_repo="thor",
                 workflow_filename="deploy_monthly_release.yaml",
