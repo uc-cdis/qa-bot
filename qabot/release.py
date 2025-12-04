@@ -70,11 +70,10 @@ class ReleaseManager:
                 "TRIGGERED_BY_USER": user,
                 "SLACK_THREAD_TS": str(thread_ts),
             }
-            log.info(f"Json Params: {json_params}")
             bot_response = ghl.trigger_gh_action_workflow(
                 workflow_repo="thor",
                 workflow_filename="deploy_monthly_release.yaml",
-                ref="chore/add_threadts_monthly_release",
+                ref="master",
                 inputs=json_params,
             )
             if bot_response.status_code == 204:
