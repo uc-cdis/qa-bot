@@ -97,7 +97,7 @@ commands_map = {
 }
 
 
-def process_command(command, args, context=None):
+def process_command(command, args, thread_ts=None):
     log.info(f"command = {command}, args = {args}")
     # process args to handle whitespaces inside json blocks
     entered_json_block_at_index = None
@@ -124,7 +124,7 @@ example:  {commands_map[command]['example']}
         else:
             try:
                 if commands_map[command]["pass_context"]:
-                    return commands_map[command]["call"](*args, context=context)
+                    return commands_map[command]["call"](*args, thread_ts)
                 else:
                     return commands_map[command]["call"](*args)
             except TypeError as te:
@@ -152,15 +152,10 @@ def handle_app_mention(payload, say, logger):
         if len(msg_parts) > 1:
             command = msg_parts[1]
             args = msg_parts[2:]
-            context = {
-                "thread_ts": payload.get("thread_ts") or payload.get("ts"),
-                "user": user,
-                "channel": payload.get("channel"),
-                "payload": payload,
-            }
+            thread_ts = (payload.get("thread_ts") or payload.get("ts"),)
             say(
-                text=f"<@{payload['user']}> {process_command(command, args, context)}",
-                thread_ts=payload.get("thread_ts") or payload.get("ts"),
+                text=f"<@{payload['user']}> {process_command(command, args, thread_ts)}",
+                thread_ts=thread_ts,
             )
     else:
         usage_msg = """
