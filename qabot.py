@@ -47,6 +47,12 @@ commands_map = {
         "call": PipelineMaintenance().replay_nightly_run,
         "pass_thread_ts": False,
     },
+    "replay-nightly-run-gen3ff": {
+        "args": "comma-separated list of labels",
+        "example": "@qa-bot replay-nightly-run-gen3ff test-portal-homepageTest,test-apis-dataUploadTest",
+        "call": PipelineMaintenance().replay_nightly_run_gen3ff,
+        "pass_thread_ts": False,
+    },
     "replay-pr": {
         "args": "repo name, pr number, comma-separated list of labels",
         "example": "@qa-bot replay-pr gen3-qa 549 test-portal-homepageTest,test-apis-dataUploadTest",
