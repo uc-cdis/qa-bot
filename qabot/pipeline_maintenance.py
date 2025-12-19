@@ -446,6 +446,32 @@ class PipelineMaintenance:
             raise Exception(f"Failed to trigger workflow: {bot_response.status_code}")
         return bot_response
 
+    def replay_nightly_run_gen3ff(self, labels=""):
+        """
+        Replay nightly-build-gen3ff like a boss
+        """
+        repo_name = "gen3-code-vigil"
+        githublib = GithubLib(repo=repo_name)
+
+        json_params = {
+            "TEST_LABELS": labels,
+        }
+        bot_response = githublib.trigger_gh_action_workflow(
+            workflow_repo=repo_name,
+            workflow_filename="nightly_run_gen3ff.yaml",
+            ref="master",
+            inputs=json_params,
+        )
+        if bot_response.status_code == 204:
+            log.info("Workflow triggered successfully.")
+            bot_response = (
+                "Replayed nightly-build-gen3ff run successfully. :awesome-face:"
+            )
+        else:
+            log.error(bot_response.text)
+            raise Exception(f"Failed to trigger workflow: {bot_response.status_code}")
+        return bot_response
+
     def test_external_pr(self, repo_name, pr_num):
         workflow_repo_name = "gen3-code-vigil"
         githublib = GithubLib(repo=workflow_repo_name)
