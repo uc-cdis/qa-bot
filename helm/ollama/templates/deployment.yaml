@@ -12,14 +12,21 @@ spec:
       labels:
         app: ollama
     spec:
+      initContainers:
+        - name: pull-model
+          image: ollama/ollama:latest
+          imagePullPolicy: IfNotPresent
+          command: ["sh", "-c"]
+          args:
+            - ollama pull {{ required "ollama.model.name is required" .Values.ollama.model.name }}
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
       containers:
         - name: ollama
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: 11434
-          env:
-            - name: OLLAMA_MODEL
-              value: "{{ .Values.model.name }}"
           volumeMounts:
             - name: ollama-models
               mountPath: /root/.ollama

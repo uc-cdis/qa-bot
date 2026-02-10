@@ -16,5 +16,6 @@ persistence:
   enabled: true
   size: 10Gi
 
-model:
-  name: "gpt-oss:20b"
+ollama:
+  model:
+    name: gemma3:4b-it-qat
