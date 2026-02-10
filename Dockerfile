@@ -4,6 +4,7 @@ FROM quay.io/cdis/amazonlinux-base:${AZLINUX_BASE_VERSION} AS base
 
 # Install vim and findutils (which provides `find`)
 USER root
+RUN chown -R gen3:gen3 /venv
 
 RUN dnf install -y vim findutils jq && \
     dnf install -y openssl && \
@@ -19,7 +20,6 @@ COPY --chown=gen3:gen3 . /src
 WORKDIR /src
 
 USER gen3
-RUN chown -R gen3:gen3 /venv
 
 RUN poetry install --no-interaction --only main
 
