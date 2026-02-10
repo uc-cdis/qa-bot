@@ -4,6 +4,7 @@ FROM quay.io/cdis/amazonlinux-base:${AZLINUX_BASE_VERSION} AS base
 
 # Install vim and findutils (which provides `find`)
 USER root
+RUN chown -R gen3:gen3 /venv
 
 RUN dnf install -y vim findutils jq && \
     dnf install -y openssl && \
