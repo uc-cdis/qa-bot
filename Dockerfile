@@ -19,6 +19,7 @@ COPY --chown=gen3:gen3 . /src
 WORKDIR /src
 
 USER gen3
+RUN chown -R gen3:gen3 /venv
 
 RUN poetry install --no-interaction --only main
 
