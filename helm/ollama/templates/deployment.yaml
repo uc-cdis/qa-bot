@@ -20,7 +20,7 @@ spec:
           args:
             - ollama pull {{ required "ollama.model.name is required" .Values.ollama.model.name }}
           volumeMounts:
-            - name: ollama-data
+            - name: ollama-models
               mountPath: /root/.ollama
       containers:
         - name: ollama
