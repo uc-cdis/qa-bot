@@ -10,11 +10,11 @@ service:
 resources:
   requests:
     cpu: "4"
-    memory: "16Gi"
+    memory: 20Gi
 
 persistence:
   enabled: true
-  size: 10Gi
+  size: 20Gi
 
 model:
   name: "gpt-oss:20b"
