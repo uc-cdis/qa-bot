@@ -1,4 +1,4 @@
-from agents.allure_report_debug_agent import agent_executor
+from agents.allure_report_debug_agent import agent
 
 
 def main():
@@ -7,7 +7,7 @@ def main():
         if user_input.lower() in ["exit", "quit"]:
             break
 
-        response = agent_executor.invoke({"input": user_input})
+        response = agent.invoke({"input": user_input})
         print("Agent:", response["output"])
 
 
