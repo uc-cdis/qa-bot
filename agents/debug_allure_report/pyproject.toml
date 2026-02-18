@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "langchain-local-ollama"
+version = "0.1.0"
+description = "Langchain project using local LLMs vias ollama"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+boto3 = "^1.34"
+python-dotenv = "^1.0.0"
+python = "^3.12"
+langchain = "^1.2.10"
+langchain-ollama = "^1.0.1"
+
+[build-system]
+requies = ["poetry-core>=1.4.0"]
+build-backend = "poetry.core.masonry.api"
