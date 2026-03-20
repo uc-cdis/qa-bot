@@ -1,6 +1,6 @@
 {{/*
 Return the fully qualified app name
 */}}
-{{- define "ollama.fullname" -}}
+{{- define "anythingllm.fullname" -}}
 {{- printf "%s" .Release.Name -}}
 {{- end }}

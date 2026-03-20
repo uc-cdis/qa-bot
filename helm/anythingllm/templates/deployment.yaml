@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: anythingllm
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: anythingllm
+  template:
+    metadata:
+      labels:
+        app: anythingllm
+    spec:
+      containers:
+        - name: anythingllm
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: {{ .Values.service.port }}
+          env:
+            - name: STORAGE_DIR
+              value: {{ .Values.env.STORAGE_DIR | quote }}
+          volumeMounts:
+            - name: storage
+              mountPath: {{ .Values.storage.mountPath }}
+            - name: env-file
+              mountPath: /app/server/.env
+              subPath: .env
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: anythingllm-pvc
+        - name: env-file
+          configMap:
+            name: anythingllm-env

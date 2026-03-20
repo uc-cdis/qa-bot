@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: anythingllm-env
+data:
+  .env: |
+    STORAGE_DIR={{ .Values.env.STORAGE_DIR }}

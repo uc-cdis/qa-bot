@@ -1,0 +1,4 @@
+FROM mintplexlabs/anythingllm:latest
+
+# Set storage dir
+ENV STORAGE_DIR=/app/server/storage
