@@ -16,7 +16,7 @@ jobs:
     name: Build Helm Cleanup Image
     uses: uc-cdis/.github/.github/workflows/image_build_push.yaml@master
     with:
-      DOCKERFILE_LOCATION: "./helm/anythingllm/Dockerfile"
+      DOCKERFILE_LOCATION: "./helm/anythingllm/DockerFile"
       OVERRIDE_REPO_NAME: "anythingllm"
       OVERRIDE_TAG_NAME: "$(echo ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.tag || format('{0}', github.head_ref || github.ref_name) }} | tr / _)"
       USE_QUAY_ONLY: true
