@@ -1,0 +1,24 @@
+image:
+  repository: quay.io/cdis/anythingllm
+  tag: master
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 3001
+
+storage:
+  size: 5Gi
+  mountPath: /app/server/storage
+
+env:
+  STORAGE_DIR: /app/server/storage
+
+# -- (map) Configuration for ingress.
+ingress:
+  scheme: internal
+  environment: "devplanetv2-internal"
+  certArn: "arn:aws:acm:us-east-1:707767160287:certificate/f427a646-94fd-4b91-8bcd-80f5920c1e46"
+  group: "devplanetv2-internal"
+  sslPolicy: "ELBSecurityPolicy-TLS13-1-2-Res-FIPS-2023-04"
+  host: anythingllm.ci.planx-pla.net
