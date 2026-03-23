@@ -30,3 +30,6 @@ spec:
         - name: storage
           persistentVolumeClaim:
             claimName: anythingllm-pvc
+        - name: env-file
+          configMap:
+            name: anythingllm-env
