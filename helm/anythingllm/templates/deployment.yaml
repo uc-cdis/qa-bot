@@ -29,6 +29,9 @@ spec:
             - name: env-file
               mountPath: /app/server/.env
               subPath: .env
+            - name: env-file
+              mountPath: /app/.env
+              subPath: .env
       volumes:
         - name: storage
           persistentVolumeClaim:
