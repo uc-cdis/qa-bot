@@ -21,16 +21,12 @@ spec:
           env:
             - name: STORAGE_DIR
               value: {{ .Values.env.STORAGE_DIR | quote }}
+            - name: DATABASE_URL
+              value: "file:/app/server/storage/anythingllm.db"
           volumeMounts:
             - name: storage
               mountPath: {{ .Values.storage.mountPath }}
-            - name: env-file
-              mountPath: /app/server/.env
-              subPath: .env
       volumes:
         - name: storage
           persistentVolumeClaim:
             claimName: anythingllm-pvc
-        - name: env-file
-          configMap:
-            name: anythingllm-env
