@@ -12,6 +12,8 @@ spec:
       labels:
         app: anythingllm
     spec:
+      securityContext:
+        fsGroup: 1000
       containers:
         - name: anythingllm
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
@@ -22,6 +24,8 @@ spec:
             - name: STORAGE_DIR
               value: {{ .Values.env.STORAGE_DIR | quote }}
             - name: DATABASE_URL
+              value: "file:/app/server/storage/anythingllm.db"
+            - name: PRISMA_DATABASE_URL
               value: "file:/app/server/storage/anythingllm.db"
           volumeMounts:
             - name: storage
