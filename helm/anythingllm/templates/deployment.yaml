@@ -30,16 +30,7 @@ spec:
           volumeMounts:
             - name: storage
               mountPath: {{ .Values.storage.mountPath }}
-            - name: env-file
-              mountPath: /app/server/.env
-              subPath: .env
-            - name: env-file
-              mountPath: /app/.env
-              subPath: .env
       volumes:
         - name: storage
           persistentVolumeClaim:
             claimName: anythingllm-pvc
-        - name: env-file
-          configMap:
-            name: anythingllm-env
