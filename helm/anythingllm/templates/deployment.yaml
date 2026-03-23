@@ -26,6 +26,9 @@ spec:
           volumeMounts:
             - name: storage
               mountPath: {{ .Values.storage.mountPath }}
+            - name: env-file
+              mountPath: /app/server/.env
+              subPath: .env
       volumes:
         - name: storage
           persistentVolumeClaim:
