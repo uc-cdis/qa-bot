@@ -4,8 +4,9 @@ image:
   pullPolicy: IfNotPresent
 
 service:
-  type: ClusterIP
-  port: 3001
+  type: NodePort
+  port: 80
+  targetPort: 3001
 
 storage:
   size: 5Gi

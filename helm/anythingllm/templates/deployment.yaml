@@ -12,25 +12,25 @@ spec:
       labels:
         app: anythingllm
     spec:
+      securityContext:
+        fsGroup: 1000
       containers:
         - name: anythingllm
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
-            - containerPort: {{ .Values.service.port }}
+            - containerPort: {{ .Values.service.targetPort }}
           env:
             - name: STORAGE_DIR
               value: {{ .Values.env.STORAGE_DIR | quote }}
+            - name: DATABASE_URL
+              value: "file:/app/server/storage/anythingllm.db"
+            - name: PRISMA_DATABASE_URL
+              value: "file:/app/server/storage/anythingllm.db"
           volumeMounts:
             - name: storage
               mountPath: {{ .Values.storage.mountPath }}
-            - name: env-file
-              mountPath: /app/server/.env
-              subPath: .env
       volumes:
         - name: storage
           persistentVolumeClaim:
             claimName: anythingllm-pvc
-        - name: env-file
-          configMap:
-            name: anythingllm-env
