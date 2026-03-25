@@ -4,7 +4,9 @@ metadata:
   name: anythingllm-pvc
 spec:
   accessModes:
-    - ReadWriteOnce
+    - ReadWriteMany
   resources:
     requests:
       storage: {{ .Values.storage.size }}
+  storageClassName: ""
+  volumeName: anythingllm-storage-pv
