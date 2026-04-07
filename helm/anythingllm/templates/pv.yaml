@@ -4,19 +4,8 @@ metadata:
   name: anythingllm-storage-pv
 spec:
   capacity:
-    storage: {{ .Values.storage.size }}
+    storage: 5Gi
   accessModes:
     - ReadWriteMany
-  storageClassName: ""
-  claimRef: # To ensure no other PVCs can claim this PV
-    namespace: {{ .Release.Namespace }}
-    name: anythingllm-pvc
-  mountOptions:
-    - allow-delete
-    - allow-overwrite
-    - region us-east-1
-  csi:
-    driver: s3.csi.aws.com # required
-    volumeHandle: s3-csi-driver-volume # Must be unique
-    volumeAttributes:
-      bucketName: ci-anythingllm
+  hostPath:
+    path: /tmp/anythingllm-data
