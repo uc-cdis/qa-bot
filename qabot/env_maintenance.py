@@ -16,9 +16,6 @@ class EnvMaintenance:
         log.info(f"Running roll-service on {env_name}")
         try:
             # Sets commands and messages when all services need to be restarted
-            assert f"Namespace {env_name} has been scaled up" in self.scaleup_namespace(
-                env_name
-            ), f"{env_name} failed to scale up during roll all"
             if service_name.upper() == "ALL":
                 scale_up_command = [
                     "kubectl",
