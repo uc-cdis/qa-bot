@@ -17,6 +17,21 @@ class EnvMaintenance:
         try:
             # Sets commands and messages when all services need to be restarted
             if service_name.upper() == "ALL":
+                scale_up_command = [
+                    "kubectl",
+                    "scale",
+                    "deployment",
+                    "--all",
+                    "--replicas=1",
+                    "-n",
+                    env_name,
+                ]
+                scale_up_result = subprocess.run(
+                    scale_up_command, capture_output=True, text=True, check=True
+                )
+                log.info(
+                    f"Output from command when scaling up deployment: {scale_up_result.stdout}"
+                )
                 restart_command = [
                     "kubectl",
                     "rollout",
