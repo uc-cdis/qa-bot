@@ -16,6 +16,7 @@ spec:
         fsGroup: 1000
       containers:
         - name: anythingllm
+          command: ["sleep", "3600"]
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
@@ -27,6 +28,14 @@ spec:
               value: "file:/app/server/storage/anythingllm.db"
             - name: PRISMA_DATABASE_URL
               value: "file:/app/server/storage/anythingllm.db"
+            - name: OLLAMA_BASE_PATH
+              value: http://ollama:11434
+            - name: OLLAMA_MODEL_PREF
+              value: gemma3:4b
+            - name: WHISPER_PROVIDER
+              value: local
+            - name: LLM_PROVIDER
+              value: ollama
           volumeMounts:
             - name: storage
               mountPath: {{ .Values.storage.mountPath }}
