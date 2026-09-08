@@ -122,7 +122,7 @@ class PipelineMaintenance:
             log.info(e.stderr)
             return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
-    def _get_kubectl_ai_pod_name():
+    def _get_kubectl_ai_pod_name(self):
         # Get the pod name for fence app
         cmd = [
             "kubectl",
