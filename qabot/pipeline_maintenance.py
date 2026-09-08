@@ -149,6 +149,7 @@ class PipelineMaintenance:
             "kubectl",
             "-n",
             "qabot",
+            "exec",
             "-it",
             pod_name,
             "--",
