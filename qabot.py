@@ -65,6 +65,12 @@ commands_map = {
         "call": ReleaseManager().roll_out_latest_gen3_release_to_environments,
         "pass_thread_ts": True,
     },
+    "investigate-ci-environment": {
+        "args": "ci_environment_name",
+        "example": "jenkins-brain",
+        "call": PipelineMaintenance().quarantine_ci_env,
+        "pass_thread_ts": True,
+    },
     "quarantine-ci-environment": {
         "args": "ci_environment_name",
         "example": "jenkins-brain",

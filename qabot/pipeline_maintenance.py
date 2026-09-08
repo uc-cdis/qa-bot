@@ -122,6 +122,49 @@ class PipelineMaintenance:
             log.info(e.stderr)
             return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
+    def _get_kubectl_ai_pod_name():
+        # Get the pod name for fence app
+        cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "get",
+            "pods",
+            "-l",
+            "app=kubectl-ai",
+        ]
+        log.info(f"Running command - {' '.join(cmd)}")
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        assert result.returncode == 0
+        kubectl_ai_pod_name = result.stdout.splitlines()[-1].split()[0]
+        log.info(f"Found running kubectl-ai pod - {kubectl_ai_pod_name}")
+        return kubectl_ai_pod_name
+
+    def investigate_ci_env(self, ci_env_name):
+        kubectl_prompt = f"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/summary.txt."
+        pod_name = self._get_kubectl_ai_pod_name()
+        command = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "-it",
+            pod_name,
+            "--",
+            "kubectl-ai",
+            "--llm-provider=openai",
+            "--model='Qwen/Qwen3.8-27B-FP8'",
+            kubectl_prompt,
+        ]
+        try:
+            result = subprocess.run(command, capture_output=True, text=True, check=True)
+            log.info(f"Output from command: {result.stdout}")
+            return f"The environment {ci_env_name} has been investigated. :mag:"
+        except subprocess.CalledProcessError as e:
+            log.info(e.stderr)
+            return f"Failed to investigate environment {ci_env_name}, please try again or contact QA team"
+
     def quarantine_ci_env(self, ci_env_name):
         command = [
             "kubectl",
