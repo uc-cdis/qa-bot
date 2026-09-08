@@ -142,7 +142,7 @@ class PipelineMaintenance:
         log.info(f"Found running kubectl-ai pod - {kubectl_ai_pod_name}")
         return kubectl_ai_pod_name
 
-    def investigate_ci_env(self, ci_env_name):
+    def investigate_ci_env(self, ci_env_name, thread_ts):
         kubectl_prompt = f"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/summary.txt."
         pod_name = self._get_kubectl_ai_pod_name()
         command = [
