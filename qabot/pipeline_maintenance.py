@@ -200,7 +200,7 @@ class PipelineMaintenance:
             "cp",
             "-",
             f"s3://ci-allure-reports/qabot/{file_name}",
-            '--content-type "text/html"',
+            '--content-type "text/plain"',
             '--content-disposition "inline"',
         ]
         try:
