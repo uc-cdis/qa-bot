@@ -200,9 +200,12 @@ class PipelineMaintenance:
             "cp",
             "-",
             f"s3://ci-allure-reports/qabot/{file_name}",
-            '--content-type "text/plain"',
-            '--content-disposition "inline"',
+            "--content-type",
+            "text/plain",
+            "--content-disposition",
+            "inline",
         ]
+
         try:
             analysis_result = subprocess.run(
                 analysis_cmd, capture_output=True, text=True, check=True
