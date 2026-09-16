@@ -7,13 +7,19 @@ USER root
 RUN chown -R gen3:gen3 /venv
 
 RUN dnf install -y vim findutils jq && \
-    dnf install -y openssl && \
+    dnf install -y openssl unzip && \
     dnf clean all && \
     rm -rf /var/cache/dnf
 
 # Install Kubectl
 RUN curl -LO https://dl.k8s.io/release/v1.33.0/bin/linux/amd64/kubectl && \
     install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+
+# aws cli v2
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" \
+    && unzip awscliv2.zip \
+    && ./aws/install \
+    && /bin/rm -rf awscliv2.zip ./aws
 
 COPY --chown=gen3:gen3 . /src
 
