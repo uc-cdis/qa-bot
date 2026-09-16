@@ -122,7 +122,7 @@ class PipelineMaintenance:
             log.info(e.stderr)
             return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
-    def _get_kubectl_ai_pod_name(self):
+    def _get_failure_analysis_pod_name(self):
         # Get the pod name for fence app
         cmd = [
             "kubectl",
@@ -131,7 +131,7 @@ class PipelineMaintenance:
             "get",
             "pods",
             "-l",
-            "app=kubectl-ai",
+            "app=failure-analysis",
         ]
         log.info(f"Running command - {' '.join(cmd)}")
         result = subprocess.run(
@@ -139,12 +139,12 @@ class PipelineMaintenance:
         )
         assert result.returncode == 0
         kubectl_ai_pod_name = result.stdout.splitlines()[-1].split()[0]
-        log.info(f"Found running kubectl-ai pod - {kubectl_ai_pod_name}")
+        log.info(f"Found running failure-analysis pod - {kubectl_ai_pod_name}")
         return kubectl_ai_pod_name
 
     def investigate_ci_env(self, ci_env_name, thread_ts):
-        kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/summary.txt."'
-        pod_name = self._get_kubectl_ai_pod_name()
+        kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/summary-{ci_env_name}.txt."'
+        pod_name = self._get_failure_analysis_pod_name()
         command = [
             "kubectl",
             "-n",
@@ -160,9 +160,26 @@ class PipelineMaintenance:
             "--quiet",
             kubectl_prompt,
         ]
+        report_cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "exec",
+            pod_name,
+            "--",
+            "cat",
+            f"/tmp/summary-{ci_env_name}.txt",
+        ]
         try:
-            result = subprocess.run(command, capture_output=True, text=True, check=True)
-            log.info(f"Output from command: {result.stdout}")
+            subprocess.run(command, capture_output=True, text=True, check=True)
+            report_result = subprocess.run(
+                report_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=600,
+            )
+            log.info(f"Output from command: {report_result.stdout}")
             return f"The environment {ci_env_name} has been investigated. :mag:"
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
