@@ -142,7 +142,7 @@ class PipelineMaintenance:
         log.info(f"Found running failure-analysis pod - {kubectl_ai_pod_name}")
         return kubectl_ai_pod_name
 
-    def investigate_ci_env(self, ci_env_name, thread_ts):
+    def investigate_env(self, ci_env_name, thread_ts):
         file_name = f"summary-{ci_env_name}.txt"
         kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/{file_name}."'
         pod_name = self._get_failure_analysis_pod_name()
