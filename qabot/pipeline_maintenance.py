@@ -123,7 +123,7 @@ class PipelineMaintenance:
             return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
     def _get_failure_analysis_pod_name(self):
-        # Get the pod name for fence app
+        # Get the pod name for failure-analysis app
         cmd = [
             "kubectl",
             "-n",
@@ -145,6 +145,29 @@ class PipelineMaintenance:
     def investigate_ci_env(self, ci_env_name, thread_ts):
         kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/summary-{ci_env_name}.txt."'
         pod_name = self._get_failure_analysis_pod_name()
+        # Delete existing report (although its overwritten, making sure a new file is generated)
+        delete_cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "exec",
+            pod_name,
+            "--",
+            "rm",
+            "-rf",
+            f"/tmp/summary-{ci_env_name}.txt",
+        ]
+        delete_report_result = subprocess.run(
+            delete_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=600,
+        )
+        if not delete_report_result.returncode == 0:
+            print(
+                f"deleting report command failed. Error: {delete_report_result.stderr.strip()}"
+            )
         command = [
             "kubectl",
             "-n",
