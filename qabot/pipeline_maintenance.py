@@ -169,7 +169,7 @@ class PipelineMaintenance:
             print(
                 f"deleting report command failed. Error: {delete_report_result.stderr.strip()}"
             )
-        command = [
+        analysis_cmd = [
             "kubectl",
             "-n",
             "qabot",
@@ -201,7 +201,14 @@ class PipelineMaintenance:
             f"s3://ci-allure-reports/qabot/{file_name}",
         ]
         try:
-            subprocess.run(command, capture_output=True, text=True, check=True)
+            analysis_result = subprocess.run(
+                analysis_cmd, capture_output=True, text=True, check=True
+            )
+            if not analysis_result.returncode == 0:
+                print(
+                    f"running analysis command failed. Error: {analysis_result.stderr.strip()}"
+                )
+                return f"Something went wrong running analysis command, please try again or contact QA team"
             report_result = subprocess.run(
                 report_cmd,
                 stdout=subprocess.PIPE,
@@ -209,7 +216,7 @@ class PipelineMaintenance:
                 text=True,
                 timeout=600,
             )
-            log.info(f"Output from command: {report_result.stdout}")
+            log.info(f"Output from summary file: {report_result.stdout}")
             # Upload file to aws
             aws_result = subprocess.run(
                 aws_cmd,
@@ -218,7 +225,7 @@ class PipelineMaintenance:
                 text=True,
                 timeout=600,
             )
-            log.info(f"Output from command: {aws_result.stdout}")
+            log.info(f"Output from aws upload: {aws_result.stdout}")
             failure_analysis_link = f"https://allure.ci.planx-pla.net/qabot/{file_name}"
             return f"The environment {ci_env_name} has been investigated. :mag:\n*Failure Analysis*: <{failure_analysis_link}|click here>"
         except subprocess.CalledProcessError as e:
