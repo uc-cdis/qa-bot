@@ -143,7 +143,8 @@ class PipelineMaintenance:
         return kubectl_ai_pod_name
 
     def investigate_ci_env(self, ci_env_name, thread_ts):
-        kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/summary-{ci_env_name}.txt."'
+        file_name = f"summary-{ci_env_name}.txt"
+        kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/{file_name}."'
         pod_name = self._get_failure_analysis_pod_name()
         # Delete existing report (although its overwritten, making sure a new file is generated)
         delete_cmd = [
@@ -155,7 +156,7 @@ class PipelineMaintenance:
             "--",
             "rm",
             "-rf",
-            f"/tmp/summary-{ci_env_name}.txt",
+            f"/tmp/{file_name}",
         ]
         delete_report_result = subprocess.run(
             delete_cmd,
@@ -191,7 +192,13 @@ class PipelineMaintenance:
             pod_name,
             "--",
             "cat",
-            f"/tmp/summary-{ci_env_name}.txt",
+            f"/tmp/{file_name}",
+        ]
+        aws_cmd = [
+            "aws",
+            "cp",
+            f"/tmp/{file_name}",
+            f"s3://ci-allure-reports/qabot/{file_name}",
         ]
         try:
             subprocess.run(command, capture_output=True, text=True, check=True)
@@ -203,7 +210,17 @@ class PipelineMaintenance:
                 timeout=600,
             )
             log.info(f"Output from command: {report_result.stdout}")
-            return f"The environment {ci_env_name} has been investigated. :mag:"
+            # Upload file to aws
+            aws_result = subprocess.run(
+                aws_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=600,
+            )
+            log.info(f"Output from command: {aws_result.stdout}")
+            failure_analysis_link = f"https://allure.ci.planx-pla.net/qabot/{file_name}"
+            return f"The environment {ci_env_name} has been investigated. :mag:\n*Failure Analysis*: <{failure_analysis_link}|click here>"
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
             return f"Failed to investigate environment {ci_env_name}, please try again or contact QA team"
