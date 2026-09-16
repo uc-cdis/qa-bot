@@ -200,6 +200,8 @@ class PipelineMaintenance:
             "cp",
             "-",
             f"s3://ci-allure-reports/qabot/{file_name}",
+            '--content-type "text/html"',
+            '--content-disposition "inline"',
         ]
         try:
             analysis_result = subprocess.run(
@@ -227,7 +229,10 @@ class PipelineMaintenance:
                 text=True,
                 timeout=600,
             )
-            log.info(f"Output from aws upload: {aws_result.stdout}")
+            if not aws_result.returncode == 0:
+                log.info(
+                    f"aws upload command failed. Error:: {aws_result.stderr.strip()}"
+                )
             failure_analysis_link = f"https://allure.ci.planx-pla.net/qabot/{file_name}"
             return f"The environment {ci_env_name} has been investigated. :mag:\n*Failure Analysis*: <{failure_analysis_link}|click here>"
         except subprocess.CalledProcessError as e:
