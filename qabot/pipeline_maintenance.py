@@ -196,8 +196,9 @@ class PipelineMaintenance:
         ]
         aws_cmd = [
             "aws",
+            "s3",
             "cp",
-            f"/tmp/{file_name}",
+            "-",
             f"s3://ci-allure-reports/qabot/{file_name}",
         ]
         try:
@@ -220,6 +221,7 @@ class PipelineMaintenance:
             # Upload file to aws
             aws_result = subprocess.run(
                 aws_cmd,
+                input=report_result.stdout,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
