@@ -51,7 +51,11 @@ class EnvMaintenance:
                 msg = f"All services have been rolled on {env_name}. :awesome-face:"
             # Sets commands and messages when one service needs to be restarted
             else:
-                if service_name not in ["sower", "ssjdispatcher"]:
+                if service_name not in [
+                    "sower",
+                    "ssjdispatcher",
+                    "jupyter-enterprise-gateway",
+                ]:
                     deployment_name = f"{service_name}-deployment"
                 else:
                     deployment_name = service_name
