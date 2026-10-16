@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import random
@@ -174,6 +175,63 @@ class EnvMaintenance:
         except subprocess.CalledProcessError as e:
             log.info(e.stderr)
             return f"Failed to execute {job_name} in namespace {env_name}, please try again or contact QA team"
+
+    def argocd_sync(self, env_name, slack_user):
+        """
+        Trigger an ArgoCD sync (with prune) for the application of the given env,
+        recording the slack user who requested it as the initiator.
+        The application is named either gen3-dev-{env_name} or {env_name}, so try both.
+        """
+        if not slack_user:
+            return "Could not identify the Slack user who triggered argocd-sync, so it was not run."
+        log.info(f"Running argocd-sync on {env_name} for {slack_user}")
+        patch = json.dumps(
+            {
+                "operation": {
+                    "initiatedBy": {"username": slack_user},
+                    "sync": {"prune": True},
+                }
+            }
+        )
+        synced = []
+        errors = []
+        for app_name in (f"gen3-dev-{env_name}", env_name):
+            command = [
+                "kubectl",
+                "patch",
+                "application",
+                app_name,
+                "-n",
+                env_name,
+                "--type",
+                "merge",
+                "-p",
+                patch,
+            ]
+            try:
+                result = subprocess.run(
+                    command, capture_output=True, text=True, check=True
+                )
+                log.info(f"Output from argocd sync of {app_name}: {result.stdout}")
+                synced.append(app_name)
+            except subprocess.CalledProcessError as e:
+                log.info(e.stderr)
+                # an application that doesn't exist under this name is expected
+                if "NotFound" not in e.stderr and "not found" not in e.stderr:
+                    errors.append(app_name)
+        if errors or not synced:
+            failed = (
+                ", ".join(errors) if errors else f"{env_name} (no application found)"
+            )
+            msg = f"Failed to trigger ArgoCD sync for {failed}, please try again or contact QA team"
+            if synced:
+                msg = (
+                    f"ArgoCD sync triggered for {', '.join(synced)}, but "
+                    + msg[0].lower()
+                    + msg[1:]
+                )
+            return msg
+        return f"ArgoCD sync triggered for application(s) {', '.join(synced)} in {env_name}. :arrows_counterclockwise:"
 
 
 if __name__ == "__main__":
