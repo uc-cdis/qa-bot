@@ -179,9 +179,7 @@ class EnvMaintenance:
             log.info(e.stderr)
             return f"Failed to execute {job_name} in namespace {env_name}, please try again or contact QA team"
 
-    def argocd_sync_status(
-        self, app_name, env_name, since, start_wait=30, finish_wait=300
-    ):
+    def argocd_sync_status(self, app_name, since, start_wait=30, finish_wait=300):
         """
         Read the last operation state of an ArgoCD application and wait for the
         sync triggered at `since` to reach a final phase. Only the phase and
@@ -202,7 +200,7 @@ class EnvMaintenance:
             "application",
             app_name,
             "-n",
-            env_name,
+            "argocd",
             "-o",
             f"jsonpath={jsonpath}",
         ]
@@ -261,7 +259,7 @@ class EnvMaintenance:
                 "application",
                 app_name,
                 "-n",
-                env_name,
+                "argocd",
                 "--type",
                 "merge",
                 "-p",
@@ -280,9 +278,7 @@ class EnvMaintenance:
                     results.append((app_name, ":x:", "failed to trigger sync", ""))
         for app_name in patched:
             try:
-                recent, phase, details = self.argocd_sync_status(
-                    app_name, env_name, since
-                )
+                recent, phase, details = self.argocd_sync_status(app_name, since)
             except (subprocess.CalledProcessError, ValueError) as se:
                 log.info(f"Could not read sync status of {app_name}: {se}")
                 results.append(
