@@ -35,6 +35,13 @@ commands_map = {
         "call": list_all_commands,
         "pass_thread_ts": False,
     },
+    "argocd-sync": {
+        "args": "environment_name",
+        "example": "@qa-bot argocd-sync qa-brh-helm",
+        "call": EnvMaintenance().argocd_sync,
+        "pass_thread_ts": False,
+        "pass_user": True,
+    },
     "roll": {
         "args": "service to roll, ci_environment_name",
         "example": "@qa-bot roll guppy jenkins-brain",
@@ -110,7 +117,19 @@ commands_map = {
 }
 
 
-def process_command(command, args, thread_ts=None):
+def get_slack_username(user_id):
+    """
+    Resolve a slack user id to a username, falling back to the id itself
+    """
+    try:
+        profile = app.client.users_info(user=user_id)["user"]
+        return profile.get("name") or user_id
+    except Exception as e:
+        log.warning(f"Could not resolve slack user {user_id}: {e}")
+        return user_id
+
+
+def process_command(command, args, thread_ts=None, user=None):
     log.info(f"command = {command}, args = {args}")
     # process args to handle whitespaces inside json blocks
     entered_json_block_at_index = None
@@ -136,7 +155,9 @@ example:  {commands_map[command]['example']}
       """
         else:
             try:
-                if commands_map[command]["pass_thread_ts"]:
+                if commands_map[command].get("pass_user"):
+                    return commands_map[command]["call"](*args, user)
+                elif commands_map[command]["pass_thread_ts"]:
                     return commands_map[command]["call"](*args, thread_ts)
                 else:
                     return commands_map[command]["call"](*args)
@@ -167,7 +188,7 @@ def handle_app_mention(payload, say, logger):
             args = msg_parts[2:]
             thread_ts = (payload.get("thread_ts") or payload.get("ts"),)
             say(
-                text=f"<@{payload['user']}> {process_command(command, args, thread_ts)}",
+                text=f"<@{payload['user']}> {process_command(command, args, thread_ts, get_slack_username(user) if user else None)}",
                 thread_ts=thread_ts,
             )
     else:
