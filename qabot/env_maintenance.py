@@ -236,10 +236,6 @@ class EnvMaintenance:
         """
         if not slack_user:
             return "Could not identify the Slack user who triggered argocd-sync, so it was not run."
-        # env_name comes from a slack message and ends up as a kubectl argument;
-        # only QA environments (qa-*) may be synced
-        if not re.fullmatch(r"qa-[a-z0-9][a-z0-9.-]*", env_name):
-            return f"`{env_name}` is not allowed, argocd-sync only supports environments starting with `qa-`."
         log.info(f"Running argocd-sync on {env_name} for {slack_user}")
         patch = json.dumps(
             {
