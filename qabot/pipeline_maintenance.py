@@ -122,6 +122,126 @@ class PipelineMaintenance:
             log.info(e.stderr)
             return f"Failed to unquarantine environment {ci_env_name}, please try again or contact QA team"
 
+    def _get_failure_analysis_pod_name(self):
+        # Get the pod name for failure-analysis app
+        cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "get",
+            "pods",
+            "-l",
+            "app=failure-analysis",
+        ]
+        log.info(f"Running command - {' '.join(cmd)}")
+        result = subprocess.run(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True
+        )
+        assert result.returncode == 0
+        kubectl_ai_pod_name = result.stdout.splitlines()[-1].split()[0]
+        log.info(f"Found running failure-analysis pod - {kubectl_ai_pod_name}")
+        return kubectl_ai_pod_name
+
+    def investigate_env(self, ci_env_name, thread_ts):
+        file_name = f"summary-{ci_env_name}.txt"
+        kubectl_prompt = f'"List unhealthy pods in the {ci_env_name} namespace (CrashLoopBackOff, Error, Pending). For each pod, inspect only relevant events and the last 50 log lines. Summarize the root cause briefly. Write a concise report to /tmp/{file_name}."'
+        pod_name = self._get_failure_analysis_pod_name()
+        # Delete existing report (although its overwritten, making sure a new file is generated)
+        delete_cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "exec",
+            pod_name,
+            "--",
+            "rm",
+            "-rf",
+            f"/tmp/{file_name}",
+        ]
+        delete_report_result = subprocess.run(
+            delete_cmd,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+            timeout=600,
+        )
+        if not delete_report_result.returncode == 0:
+            print(
+                f"deleting report command failed. Error: {delete_report_result.stderr.strip()}"
+            )
+        analysis_cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "exec",
+            "-it",
+            pod_name,
+            "--",
+            "kubectl-ai",
+            "--llm-provider=openai",
+            "--model=Qwen/Qwen3.8-27B-FP8",
+            "--skip-permissions",
+            "--quiet",
+            kubectl_prompt,
+        ]
+        report_cmd = [
+            "kubectl",
+            "-n",
+            "qabot",
+            "exec",
+            pod_name,
+            "--",
+            "cat",
+            f"/tmp/{file_name}",
+        ]
+        aws_cmd = [
+            "aws",
+            "s3",
+            "cp",
+            "-",
+            f"s3://ci-allure-reports/qabot/{file_name}",
+            "--content-type",
+            "text/plain",
+            "--content-disposition",
+            "inline",
+        ]
+
+        try:
+            analysis_result = subprocess.run(
+                analysis_cmd, capture_output=True, text=True, check=True
+            )
+            if not analysis_result.returncode == 0:
+                print(
+                    f"running analysis command failed. Error: {analysis_result.stderr.strip()}"
+                )
+                return f"Something went wrong running analysis command, please try again or contact QA team"
+            report_result = subprocess.run(
+                report_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=600,
+            )
+            log.info(f"Output from summary file: {report_result.stdout}")
+            # Upload file to aws
+            aws_result = subprocess.run(
+                aws_cmd,
+                input=report_result.stdout,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                timeout=600,
+            )
+            if not aws_result.returncode == 0:
+                log.info(
+                    f"aws upload command failed. Error:: {aws_result.stderr.strip()}"
+                )
+            failure_analysis_link = f"https://allure.ci.planx-pla.net/qabot/{file_name}"
+            return f"The environment {ci_env_name} has been investigated. :mag:\n*Failure Analysis*: <{failure_analysis_link}|click here>"
+        except subprocess.CalledProcessError as e:
+            log.info(e.stderr)
+            return f"Failed to investigate environment {ci_env_name}, please try again or contact QA team"
+
     def quarantine_ci_env(self, ci_env_name):
         command = [
             "kubectl",
