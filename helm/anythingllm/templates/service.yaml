@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: anythingllm-service
 spec:
+  type: {{ .Values.service.type }}
   selector:
     app: anythingllm
   ports:
